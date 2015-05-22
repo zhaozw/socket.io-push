@@ -1,0 +1,38 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:paddingTop="@dimen/activity_vertical_margin"
+                android:paddingBottom="@dimen/activity_vertical_margin"
+                tools:context="com.yy.misaka.demo.DemoActivity">
+
+    <EditText
+            android:text="18680268780"
+            android:id="@+id/et_phone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+
+    <EditText
+            android:hint="验证码"
+            android:id="@+id/et_code"
+            android:layout_below="@id/et_phone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+    <Button android:id="@+id/btn_get_code" android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="获取验证码" android:layout_below="@id/et_code"/>
+
+    <EditText
+            android:hint="密码"
+            android:id="@+id/et_password"
+            android:layout_below="@id/btn_get_code"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+    <Button android:id="@+id/btn_set_password" android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="设置密码" android:layout_below="@id/et_password"/>
+
+</RelativeLayout>

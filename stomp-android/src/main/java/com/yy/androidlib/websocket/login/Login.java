@@ -1,0 +1,89 @@
+package com.yy.androidlib.websocket.login;
+
+import android.content.Context;
+import android.text.TextUtils;
+import com.yy.androidlib.websocket.Callback;
+import com.yy.androidlib.websocket.Destination;
+import com.yy.androidlib.websocket.ReplyHandler;
+import com.yy.androidlib.websocket.StompClient;
+
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
+public class Login {
+
+    private StompClient stompClient;
+    private String appId = "login";
+    private LoginRequest request;
+    private Context context;
+
+    public String getCurrentUid() {
+        if (request != null) {
+            return request.getUid();
+        } else {
+            return "0";
+        }
+    }
+
+    public Login(Context context, StompClient stompClient, final String loginAppId) {
+        this.context = context;
+        this.stompClient = stompClient;
+        this.appId = loginAppId;
+        stompClient.addConnectionCallback(new Callback() {
+            @Override
+            public void onConnected() {
+                if (request != null) {
+                    login(request, null);
+                }
+            }
+        });
+    }
+
+    public void login(LoginRequest user, final ReplyHandler<LoginRequest> handler) {
+        user.setAppId(appId);
+        if (!user.getPhone().startsWith("86")) {
+            user.setPhone("86" + user.getPhone());
+            user.setPassword(LoginUtils.EncryptSha256(LoginUtils.EncryptSha256(user.getPassword())));
+        }
+        stompClient.request("login", "/login", user, new ReplyHandler<LoginRequest>(LoginRequest.class) {
+
+            @Override
+            public void onSuccess(LoginRequest result) {
+                request = result;
+                if (handler != null) {
+                    handler.onSuccess(result);
+                }
+            }
+
+            @Override
+            public void onError(int code, String message) {
+                if (handler != null) {
+                    handler.onError(code, message);
+                }
+            }
+        });
+    }
+
+    public void getRegisterSmsCode(String phone, String countryCode, ReplyHandler<RegisterRequest> handler) {
+        RegisterRequest request = new RegisterRequest();
+        request.setMobile(LoginUtils.chinaMobile(phone));
+        request.setCountryCode(countryCode);
+        request.setAppId(appId);
+        stompClient.request("login", "/getRegisterSms", request, handler);
+    }
+
+    public void register(String phone, String password, String code, ReplyHandler<RegisterRequest> handler) {
+        RegisterRequest request = new RegisterRequest();
+        request.setMobile(LoginUtils.chinaMobile(phone));
+        request.setCountryCode("86");
+        request.setAppId(appId);
+        String pwdSha = LoginUtils.EncryptSha256(LoginUtils.EncryptSha256(password));
+        request.setPassword(pwdSha);
+        request.setAuthcode(code);
+        request.setImei(LoginUtils.getImei(context));
+        request.setImsi(LoginUtils.getImsi(context));
+        request.setDevType(0);// android
+        request.setDevId(LoginUtils.getImei(context));
+        stompClient.request("login", "/register", request, handler);
+    }
+}

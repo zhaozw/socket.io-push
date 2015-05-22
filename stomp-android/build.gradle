@@ -1,0 +1,145 @@
+apply plugin: 'android-library'
+
+dependencies {
+    compile 'com.google.code.gson:gson:2.3.1'
+    compile 'com.yy.androidlib:util:1.0.8'
+    compile ('com.yy.androidlib:hiido-profiling:1.0.14'){
+        force = true
+        exclude group:'com.koushikdutta.async'
+        transitive = false
+    }
+//    compile 'com.koushikdutta.async:androidasync:2.0.9'
+//    androidTestCompile 'org.robolectric:robolectric:2.4'
+//    androidTestCompile 'junit:junit:4.10'
+
+}
+
+android {
+    compileSdkVersion 19
+    buildToolsVersion '19.1.0'
+
+    defaultConfig {
+        minSdkVersion 15
+        targetSdkVersion 19
+        versionCode 1
+        versionName "1.0"
+    }
+    lintOptions {
+        abortOnError false
+    }
+}
+
+apply plugin: 'maven'
+
+group = 'com.yy'
+version = '1.0.20'
+
+task androidSourcesJar(type: Jar) {
+    classifier = 'sources'
+    from android.sourceSets.main.java.sourceFiles
+}
+
+artifacts {
+    archives androidSourcesJar
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+
+            repository(url: "http://jrepo.yypm.com/nexus/content/repositories/releases") {
+                authentication(userName: "admin", password: "admin123")
+            }
+
+            pom.project {
+                name 'misaka-android'
+                packaging 'aar'
+                description 'misaka-android'
+                url 'https://github.com/xuduo/stomp-app'
+
+                scm {
+                    url 'https://github.com/xuduo/stomp-app'
+                    connection 'https://github.com/xuduo/stomp-app'
+                    developerConnection 'https://github.com/xuduo/stomp-app'
+                }
+
+                licenses {
+                    license {
+                        name 'The Apache Software License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        distribution 'repo'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id 'xuduo'
+                        name 'xuduo'
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+//------
+
+//apply plugin: 'maven'
+//apply plugin: 'signing'
+//
+//group = 'com.yy'
+//version = '1.0.0'
+//
+//signing {
+//    sign configurations.archives
+//}
+//
+//task androidSourcesJar(type: Jar) {
+//    classifier = 'sources'
+//    from android.sourceSets.main.java.sourceFiles
+//}
+//
+//artifacts {
+//    archives androidSourcesJar
+//}
+//
+//uploadArchives {
+//    repositories {
+//        mavenDeployer {
+//            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+//
+//            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+//                authentication(userName: sonatypeUsername, password: sonatypePassword)
+//            }
+//
+//            pom.project {
+//                name 'stomp-android'
+//                packaging 'aar'
+//                description 'stomp-android'
+//                url 'https://github.com/xuduo/stomp-app'
+//
+//                scm {
+//                    url 'https://github.com/xuduo/stomp-app'
+//                    connection 'https://github.com/xuduo/stomp-app'
+//                    developerConnection 'https://github.com/xuduo/stomp-app'
+//                }
+//
+//                licenses {
+//                    license {
+//                        name 'The Apache Software License, Version 2.0'
+//                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+//                        distribution 'repo'
+//                    }
+//                }
+//
+//                developers {
+//                    developer {
+//                        id 'xuduo'
+//                        name 'xuduo'
+//                    }
+//                }
+//            }
+//        }
+//    }
+//}
