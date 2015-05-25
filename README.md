@@ -5,7 +5,7 @@
 
 > | **项**   | **详细**               |
 > | ---      | ---                    |
-> | 联系人   | 许铎，江成彦         |
+> | 联系人   | 许铎，江成彦,李登科,林华锋         |
 > | 状态     | 开发中 |
 
 类似于YY体系的service平台,专门为简化移动开发打造的平台.
@@ -32,15 +32,19 @@
 
 ## 基本功能
 
-### 1. 请求代理
+### 1. 请求代理 (例:发送消息给另一个用户uid:12345)
 
 客户端代码(android)
 ```
+ Message message = new Message();
+ message.setContent("hello!");
+ message.setToUid(12345);
+ 
  AppModel.INSTANCE.getStomp().request("demo-server", "/sendMessage", message, new ReplyHandler<Message>(Message.class) {
 
                     @Override
                     public void onSuccess(Message result) {
-                        Log.i(TAG, "onSuccess " + result);
+                        Log.i(TAG, "onSuccess " + message.getContent());
                     }
 
                     @Override
@@ -56,7 +60,7 @@
 @RequestMapping(value = "/sendMessage", method = RequestMethod.POST)
     public
     @ResponseBody
-    Message sendMessage(@RequestParam String data, @RequestParam String appId) throws IOException {
+    Message sendMessage(@RequestBody User user, @RequestHeader(required = false, defaultValue = "0") Long uid) throws IOException {
         logger.info("data {}, appId {}", data, appId);
         Message message = mapper.readValue(data, Message.class);
         messageService.sendMessage(message);
@@ -64,7 +68,26 @@
     }
 ```
 
-### 2. 广播
+### 2. uid单播
+
+客户端代码(android)
+
+```
+ stomp.subscribeUserPush("demo-server", "/message", new StompClient.SubscribeHandler<Message>(Message.class) {
+            @Override
+            public void onSuccess(Message result) {
+                NotificationCenter.INSTANCE.getObserver(ImCallback.Message.class).onMessageReceived(result);
+            }
+        });
+```
+
+应用服务器代码
+
+```
+broadcastService.pushToUser(message.getToUid(), "demo-server", "/message", message);
+```
+
+### 3. 广播 (例:订阅用户在线列表更新)
 
 客户端代码(android)
 
@@ -89,23 +112,4 @@ stomp.subscribeBroadcast("demo-server", "/userList",
 
 ```
 broadcastService.broadcast("demo-server", "/userList", allUsers());
-```
-
-### 3. uid单播
-
-客户端代码(android)
-
-```
- stomp.subscribeUserPush("demo-server", "/message", new StompClient.SubscribeHandler<Message>(Message.class) {
-            @Override
-            public void onSuccess(Message result) {
-                NotificationCenter.INSTANCE.getObserver(ImCallback.Message.class).onMessageReceived(result);
-            }
-        });
-```
-
-应用服务器代码
-
-```
-broadcastService.pushToUser(message.getToUid(), "demo-server", "/message", message);
 ```
