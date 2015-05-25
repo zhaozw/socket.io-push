@@ -4,13 +4,29 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
-import com.google.gson.*;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 import com.yy.androidlib.hiido.profiling.HiidoProfiling;
 import com.yy.androidlib.hiido.profiling.ProfileData;
 import com.yy.androidlib.util.apache.RandomStringUtils;
 
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class StompClient implements StompConnectManager.StompListener {
 
@@ -82,18 +98,17 @@ public class StompClient implements StompConnectManager.StompListener {
         //从map中删除id
         if (path.equals("/user/queue/reply")) {
             Request request = replyCallbacks.remove(requestId);
-            if (profiling != null) {
-                int status;
-                if (respCode == 1) {
-                    status = 0;
-                } else { // fail
-                    status = 500;
-                }
-                report(request, status);
-            }
-
             if (request != null && request.getReplyHandler() != null) {
                 request.getReplyHandler().handle(gson, message.getBody(), respCode, msg, config.getServerDataParseErrorTips());
+            }
+            if(profiling != null ){
+                int status ;
+                if(respCode == 1){
+                    status = ProfileData.Status.SUCCESS.value;
+                }else{ // fail
+                    status = ProfileData.Status.ERROR.value;
+                }
+                report(request, status);
             }
         } else {
             for (Map.Entry<String, ReplyHandler> entry : subscribeCallbacks.entrySet()) {
@@ -210,16 +225,16 @@ public class StompClient implements StompConnectManager.StompListener {
     public void setProfiling(HiidoProfiling profiling) {
         this.profiling = profiling;
     }
+    public void enableProfiling(HiidoProfiling profiling){
+        setProfiling(profiling);
+    }
 
     private void report(Request request, int status) {
         if (this.profiling == null || request == null) {
             return;
         }
-        long unixTime = System.currentTimeMillis();
-        long use_time = unixTime - request.getTimestamp();
         String appId = request.getAppId();
         String interfaceName = request.getDestination();
-        ProfileData data = new ProfileData(profiling.getAppName(), interfaceName);
         int _appId;
         if (appId != null || "".equals(appId)) {
             _appId = 0;
@@ -230,14 +245,13 @@ public class StompClient implements StompConnectManager.StompListener {
                 _appId = 0;
             }
         }
-        data.setAppId(_appId);  //appId
-        data.setStatus(status); // 返回状态
-        data.setChannelType(4); // misaka
-        data.setDate(unixTime / 1000); // unix日期
-        data.setInterfaceName(interfaceName); //方法名称
-        data.setUse_time(use_time); //接口耗时
-        profiling.report(data);
+        profiling.setAppId(_appId);
+        long startTime = request.getTimestamp();
+        profiling.report(startTime,interfaceName,status, ProfileData.ChannelType.MISAKA.value);
 
     }
+
+
+
 
 }
