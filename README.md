@@ -26,9 +26,7 @@
   - 每个应用独立的帐号系统,登录注册过程对应用服务器透明
   - 对应用服务器透明,用户登录以后,LBS转发的请求会带上uid参数
 
-<br/>
-<img class="img-responsive" src="posts/misaka/structure.png" alt= "struct" />
-<br/>
+
 
 ## 基本功能
 
