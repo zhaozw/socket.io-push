@@ -28,7 +28,7 @@ android {
 apply plugin: 'maven'
 
 group = 'com.yy'
-version = '1.0.20'
+version = '1.0.21'
 
 task androidSourcesJar(type: Jar) {
     classifier = 'sources'

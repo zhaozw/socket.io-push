@@ -67,7 +67,6 @@ dependencies {
     compile 'com.ning:async-http-client:1.9.8'
     compile 'org.slf4j:slf4j-api:1.7.7'
     compile 'commons-lang:commons-lang:2.6'
-    compile project(':stomp-server')
     testCompile 'junit:junit:4.10'
     testCompile 'org.springframework:spring-test:4.0.7.RELEASE'
     testCompile 'org.apache.tomcat.embed:tomcat-embed-core:8.0.8'

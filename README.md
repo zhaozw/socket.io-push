@@ -30,6 +30,19 @@
 
 ## 基本功能
 
+
+
+### maven 依赖
+
+```
+<dependency>
+            <groupId>com.yy</groupId>
+            <artifactId>misaka-android</artifactId>
+            <version>1.0.21</version>
+            <type>aar</type>
+</dependency>
+```
+
 ### 1. 请求代理 (例:发送消息给另一个用户uid:12345)
 
 客户端代码(android)
@@ -111,3 +124,21 @@ stomp.subscribeBroadcast("demo-server", "/userList",
 ```
 broadcastService.broadcast("demo-server", "/userList", allUsers());
 ```
+
+
+## 项目运行和编译
+
+项目使用gradle进行构建(除了IOS)部分
+1. demo-android   安卓demo
+2. demo-ios ios   demo
+3. misaka-android   android sdk
+4. misaka-ios_oc  ios oc sdk
+5. lbs-server   lbs服务器
+6. demo-server   服务器demo
+
+### 1.运行lbs服务器和demo服务器
+./gradlew :demo-server bootRun
+./gradlew :lbs-server bootRun
+lbs服务器也可以使用我们的测试服务器
+内网 dev.yypm.com:8080
+外网 mlbs.yypm.com:8080
