@@ -57,34 +57,34 @@ public class LoginActivity extends Activity {
 //                    }
 //                });
 
-                AppModel.INSTANCE.getStomp().request("1001", "/getGuruList", new PageRequest(), new ReplyHandler<TeacherData>(TeacherData.class) {
-                    @Override
-                    public void onSuccess(TeacherData result) {
-                        Log.i("stomp", " result " + result.actualEndIndex);
-                    }
-
-                    @Override
-                    public void onError(int code, String message) {
-                        Log.i("stomp", " error " + message);
-                    }
-                });
-
-//                AppModel.INSTANCE.getLogin().login(user, new ReplyHandler<LoginRequest>(LoginRequest.class) {
+//                AppModel.INSTANCE.getStomp().request("1001", "/getGuruList", new PageRequest(), new ReplyHandler<TeacherData>(TeacherData.class) {
 //                    @Override
-//                    public void onSuccess(LoginRequest result) {
-//                        Log.i(TAG, "onSuccess " + result);
-//                        Toast.makeText(LoginActivity.this, "login success uid :" +AppModel.INSTANCE.getLogin().getCurrentUid(), Toast.LENGTH_LONG).show();
-//                        saveAccount(username, password);
-//                        Intent intent = new Intent(LoginActivity.this, ImUserListActivity.class);
-//                        startActivity(intent);
-//                        AppModel.INSTANCE.getProfile().queryMyInfo();
+//                    public void onSuccess(TeacherData result) {
+//                        Log.i("stomp", " result " + result.actualEndIndex);
 //                    }
 //
 //                    @Override
 //                    public void onError(int code, String message) {
-//                        Toast.makeText(LoginActivity.this, "request error!code:" + code + " ,message:" + message, Toast.LENGTH_LONG).show();
+//                        Log.i("stomp", " error " + message);
 //                    }
 //                });
+
+                AppModel.INSTANCE.getLogin().login(user, new ReplyHandler<LoginRequest>(LoginRequest.class) {
+                    @Override
+                    public void onSuccess(LoginRequest result) {
+                        Log.i(TAG, "onSuccess " + result);
+                        Toast.makeText(LoginActivity.this, "login success uid :" +AppModel.INSTANCE.getLogin().getCurrentUid(), Toast.LENGTH_LONG).show();
+                        saveAccount(username, password);
+                        Intent intent = new Intent(LoginActivity.this, ImUserListActivity.class);
+                        startActivity(intent);
+                        AppModel.INSTANCE.getProfile().queryMyInfo();
+                    }
+
+                    @Override
+                    public void onError(int code, String message) {
+                        Toast.makeText(LoginActivity.this, "request error!code:" + code + " ,message:" + message, Toast.LENGTH_LONG).show();
+                    }
+                });
             }
         });
 

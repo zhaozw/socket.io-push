@@ -25,19 +25,15 @@ public class MessageController extends BaseController {
     @RequestMapping(value = "/enterRoom")
     public
     @ResponseBody
-    List<User> enterRoom(@RequestParam(required = false) String data, @RequestParam String appId, @RequestHeader("X-Uid") String uid) {
-        logger.info("data {}, appId {}", data, appId);
+    List<User> enterRoom(@RequestHeader("X-Uid") String uid) {
         messageService.enterRoom(uid);
-//        throw new ResultException(-5, "111");
         return messageService.allUsers();
     }
 
     @RequestMapping(value = "/sendMessage", method = RequestMethod.POST)
     public
     @ResponseBody
-    Message sendMessage(@RequestParam String data, @RequestParam String appId, @RequestHeader("X-Uid") String uid) throws IOException {
-        logger.info("data {}, appId {}", data, appId);
-        Message message = mapper.readValue(data, Message.class);
+    Message sendMessage(@RequestBody Message message, @RequestHeader("X-Uid") String uid) throws IOException {
         message.setFromUid(uid);
         messageService.sendMessage(message);
         return message;

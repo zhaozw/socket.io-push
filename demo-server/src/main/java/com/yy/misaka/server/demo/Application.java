@@ -2,6 +2,8 @@ package com.yy.misaka.server.demo;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
+import com.ning.http.client.AsyncHttpClient;
+import com.yy.misaka.support.BroadcastService;
 import org.apache.catalina.connector.Connector;
 import org.apache.coyote.http11.Http11NioProtocol;
 import org.apache.tomcat.util.net.NioEndpoint;
@@ -62,6 +64,17 @@ public class Application extends WebMvcConfigurerAdapter {
         lef.setJpaProperties(getJpaProperties());
         return lef;
     }
+
+    @Bean
+    public BroadcastService broadcastService() {
+        return new BroadcastService();
+    }
+
+    @Bean
+    public AsyncHttpClient asyncHttpClient() {
+        return new AsyncHttpClient();
+    }
+
 
     @Bean
     public JpaVendorAdapter jpaVendorAdapter() {

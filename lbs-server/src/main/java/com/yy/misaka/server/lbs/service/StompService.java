@@ -125,7 +125,7 @@ public class StompService {
                                     messagingTemplate.replyToUser(message, null, code, decoded);
                                 } else {
                                     if (dataAsBody) {
-                                        messagingTemplate.replyToUserSuccess(message, response.getResponseBody().getBytes());
+                                        messagingTemplate.replyToUserSuccess(message, response.getResponseBody());
                                     } else {
                                         try {
                                             JsonNode nyy = mapper.readTree(response.getResponseBody());

@@ -28,9 +28,7 @@ public class ProfileController {
     @RequestMapping(value = "/modifyMyInfo", method = RequestMethod.POST)
     public
     @ResponseBody
-    User modify(@RequestParam String data, @RequestParam String appId, @RequestHeader("X-Uid") String uid) throws IOException {
-        logger.info("data {}, appId {}", data, appId);
-        User user = mapper.readValue(data, User.class);
+    User modify(@RequestBody User user,  @RequestHeader("X-Uid") String uid) throws IOException {
         user.setUid(uid);
         return profileService.modify(user);
     }
@@ -38,8 +36,7 @@ public class ProfileController {
     @RequestMapping(value = "/myInfo", method = RequestMethod.POST)
     public
     @ResponseBody
-    User myInfo(@RequestParam String data, @RequestParam String appId, @RequestHeader("X-Uid") String uid) throws IOException {
-        logger.info("data {}, appId {}", data, appId);
+    User myInfo(@RequestHeader("X-Uid") String uid) throws IOException {
         return profileService.getByUid(uid);
     }
 

@@ -137,8 +137,18 @@ broadcastService.broadcast("demo-server", "/userList", allUsers());
 6. demo-server   服务器demo
 
 ### 1.运行lbs服务器和demo服务器
-./gradlew :demo-server bootRun
-./gradlew :lbs-server bootRun
-lbs服务器也可以使用我们的测试服务器
+./gradlew demo-server:bootRun
+./gradlew lbs-server:bootRun
+lbs-sever也可以使用我们的测试服务器
 内网 dev.yypm.com:8080
 外网 mlbs.yypm.com:8080
+
+### 2.运行demo
+
+AppModel.java配置
+
+```
+    private String lbsHost = "http://" + "dev.yypm.com:8080"; //lbs服务器地址
+    private String demoHost = "http://" + "dev.yypm.com:8091"; //demo服务器地址
+    
+```

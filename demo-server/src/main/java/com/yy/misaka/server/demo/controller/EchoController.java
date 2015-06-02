@@ -18,7 +18,7 @@ public class EchoController {
     @RequestMapping(value = "/echo",method = RequestMethod.POST)
     public
     @ResponseBody
-    String test(@RequestParam String data, @RequestParam String appId) {
+    String test(@RequestBody String data, @RequestParam String appId) {
         logger.info("data {}, appId {}", data, appId);
         return data;
     }

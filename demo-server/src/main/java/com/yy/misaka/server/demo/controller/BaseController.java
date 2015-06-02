@@ -10,6 +10,8 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,18 +20,27 @@ public class BaseController {
 
     protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @ExceptionHandler(ResultException.class)
-    public ResponseEntity<String> exception(ResultException e) {
-        logger.error("test exception ", e);
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> exception(Exception e) {
+        logger.error("Controller exception ", e);
         MultiValueMap<String, String> headers = new LinkedMultiValueMap<String, String>();
-        List<String> code = new ArrayList<String>();
-        code.add(e.getResult().getCode() + "");
-        headers.put("response-code", code);
         List<String> message = new ArrayList<String>();
-        message.add(e.getResult().getMessage());
+        List<String> code = new ArrayList<String>();
+        if (e instanceof ResultException) {
+            ResultException resultException = (ResultException) e;
+            code.add(resultException.getResult().getCode() + "");
+            try {
+                message.add(URLEncoder.encode(resultException.getResult().getMessage(), "UTF-8"));
+            } catch (UnsupportedEncodingException e1) {
+                message.add("");
+            }
+        } else {
+            code.add("-1");
+            message.add(e.getMessage());
+        }
+        headers.put("response-code", code);
         headers.put("response-message", message);
         return new ResponseEntity<String>("", headers, HttpStatus.OK);
     }
-
 
 }

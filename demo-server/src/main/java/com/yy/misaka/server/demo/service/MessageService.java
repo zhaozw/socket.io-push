@@ -3,6 +3,7 @@ package com.yy.misaka.server.demo.service;
 import com.yy.misaka.server.demo.domain.Message;
 import com.yy.misaka.server.demo.domain.User;
 import com.yy.misaka.server.demo.repository.UserRepository;
+import com.yy.misaka.support.BroadcastService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

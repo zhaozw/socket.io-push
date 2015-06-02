@@ -9,7 +9,6 @@ import com.yy.androidlib.util.notification.NotificationCenter;
 import com.yy.androidlib.websocket.Callback;
 import com.yy.androidlib.websocket.Config;
 import com.yy.androidlib.websocket.StompClient;
-import com.yy.androidlib.websocket.YYHostResolver;
 import com.yy.androidlib.websocket.login.Login;
 import com.yy.misaka.demo.appmodel.callback.ImCallback;
 import com.yy.misaka.demo.appmodel.callback.ProfileCallback;
@@ -22,11 +21,12 @@ import java.io.File;
 public enum AppModel {
     INSTANCE;
 
-//    private String host = "http://" + "dev.yypm.com";
-    //    private String host = "http://" + "patch.3g.yy.com";
-//    private String host = "http://" + "test.misaka.yy.com";
-//    private String host = "http://" + "172.19.206.211";
-    private String host = "http://" + "mlbs.yy.com";
+//    private String lbsHost = "http://" + "dev.yypm.com";
+    //    private String lbsHost = "http://" + "patch.3g.yy.com";
+//    private String lbsHost = "http://" + "test.misaka.yy.com";
+//    private String lbsHost = "http://" + "172.19.206.211";
+    private String lbsHost = "http://" + "172.19.207.244:8080"; //lbs服务器地址
+    private String demoHost = "http://" + "172.19.207.244:8091"; //demo服务器地址
     private StompClient stomp;
     private Login login;
     private ImModel im;
@@ -34,19 +34,18 @@ public enum AppModel {
 
     public void init(Application application) {
         initLogging();
-        stomp = new StompClient(application, host + ":8080", new Config().mode(Config.Mode.REMOTE).hostResolver(new YYHostResolver(application)).dataAsBody(false));
-        stomp.addRoute("demo-server", host + ":8080");
-        stomp.addRoute("1001","http://finance.yyembed.yy.com/1.0");
+        stomp = new StompClient(application, lbsHost, new Config().dataAsBody(true));
+        stomp.addRoute("demo-server", demoHost);
         stomp.addRoute("login", "http://uaas.yy.com");
         stomp.addConnectionCallback(new Callback() {
             @Override
             public void onConnected() {
-                im.onConnected();
+                //    im.onConnected();
             }
         });
         login = new Login(application, stomp, "fm141027");
         im = new ImModel(application, stomp, login);
-        pm = new ProfileModel(application, stomp, host + ":8091");
+        pm = new ProfileModel(application, stomp, demoHost);
         initCallbacks();
 
 //        AsyncHttpClient.getDefaultInstance().executeString(new AsyncHttpGet(host + ":8090/"), new AsyncHttpClient.StringCallback() {
