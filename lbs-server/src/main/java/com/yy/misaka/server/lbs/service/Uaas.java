@@ -423,6 +423,7 @@ public class Uaas {
             logger.error("parse json error {}", result, e);
             ExceptionCodeEnum.throwReqFail();
         }
+        logger.debug("authCodeResult {} {} ", authCodeResult.data.result_code, authCodeResult.data.getResult_desc());
         ExceptionCodeEnum.findOrThrow(authCodeResult.data.result_code, authCodeResult);
         return authCodeResult.data.result_code;
     }

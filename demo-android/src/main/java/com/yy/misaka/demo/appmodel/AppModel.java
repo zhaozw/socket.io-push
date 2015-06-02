@@ -21,12 +21,10 @@ import java.io.File;
 public enum AppModel {
     INSTANCE;
 
-//    private String lbsHost = "http://" + "dev.yypm.com";
-    //    private String lbsHost = "http://" + "patch.3g.yy.com";
-//    private String lbsHost = "http://" + "test.misaka.yy.com";
-//    private String lbsHost = "http://" + "172.19.206.211";
-    private String lbsHost = "http://" + "172.19.207.244:8080"; //lbs服务器地址
-    private String demoHost = "http://" + "172.19.207.244:8091"; //demo服务器地址
+    private String lbsHost = "http://" + "dev.yypm.com:8080"; //lbs服务器地址
+//    private String lbsHost = "http://" + "172.19.207.244:8080"; //lbs服务器地址
+    private String demoHost = "http://" + "dev.yypm.com:8091"; //demo服务器地址
+//    private String demoHost = "http://" + "172.19.207.244:8091"; //demo服务器地址
     private StompClient stomp;
     private Login login;
     private ImModel im;
