@@ -14,7 +14,7 @@ import java.util.List;
 public class HttpTests {
 
     private ReplyHandler replyHandler;
-    private List<StompClient> stomps = new ArrayList<StompClient>();
+    private List<MisakaClient> stomps = new ArrayList<MisakaClient>();
 
     @Before
     public void setUp() throws Exception {
@@ -25,7 +25,7 @@ public class HttpTests {
     @Test
     public void testWebSocket() throws Exception {
         for (int i = 0; i < 10; i++) {
-            final StompClient stomp = new StompClient(this, "http://172.19.206.96:8090/stomp/608/sovu732o/websocket", new Config().mode(Config.Mode.REMOTE));
+            final MisakaClient stomp = new MisakaClient(this, "http://172.19.206.96:8090/stomp/608/sovu732o/websocket", new Config().mode(Config.Mode.REMOTE));
             stomp.connect();
             stomps.add(stomp);
             Robolectric.runUiThreadTasks();

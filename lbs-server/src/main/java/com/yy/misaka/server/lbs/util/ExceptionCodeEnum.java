@@ -55,7 +55,7 @@ public class ExceptionCodeEnum {
         public final int code;
         public final String desc;
 
-        private NotKnowExCode(String retCode, int code, String desc) {
+        NotKnowExCode(String retCode, int code, String desc) {
             this.retCode = retCode;
             this.code = code;
             this.desc = desc;
@@ -68,7 +68,7 @@ public class ExceptionCodeEnum {
         public final int code;
         public final String desc;
 
-        private GetSmsExCode(String retCode, int code, String desc) {
+        GetSmsExCode(String retCode, int code, String desc) {
             this.retCode = retCode;
             this.code = code;
             this.desc = desc;
@@ -100,7 +100,7 @@ public class ExceptionCodeEnum {
         public final int code;
         public final String desc;
 
-        private GeneralExCode(String retCode, int code, String desc) {
+        GeneralExCode(String retCode, int code, String desc) {
             this.retCode = retCode;
             this.code = code;
             this.desc = desc;

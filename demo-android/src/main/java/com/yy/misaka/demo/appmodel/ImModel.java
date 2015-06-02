@@ -4,9 +4,8 @@ import android.content.Context;
 import com.google.gson.reflect.TypeToken;
 import com.yy.androidlib.util.logging.Logger;
 import com.yy.androidlib.util.notification.NotificationCenter;
-import com.yy.androidlib.websocket.Destination;
 import com.yy.androidlib.websocket.ReplyHandler;
-import com.yy.androidlib.websocket.StompClient;
+import com.yy.androidlib.websocket.MisakaClient;
 import com.yy.androidlib.websocket.login.Login;
 import com.yy.misaka.demo.Message;
 import com.yy.misaka.demo.User;
@@ -15,7 +14,6 @@ import com.yy.misaka.demo.appmodel.callback.ImCallback.Room;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -26,7 +24,7 @@ import java.util.Map;
  */
 public class ImModel {
     private static final String TAG = "IM";
-    private final StompClient stomp;
+    private final MisakaClient stomp;
     private final Context context;
     private final Login login;
     private List<User> users = new ArrayList<User>();
@@ -37,13 +35,13 @@ public class ImModel {
         @Override
         public void onSuccess(List<User> result) {
             Logger.info(this, "onUserList, size: %d", result == null ? 0 : result.size());
-            Iterator<User> it = result.iterator();
-            while (it.hasNext()) {
-                User user = it.next();
-                if (user.getUid().equals(AppModel.INSTANCE.getLogin().getCurrentUid())) {
-                    it.remove();
-                }
-            }
+//            Iterator<User> it = result.iterator();
+//            while (it.hasNext()) {
+//                User user = it.next();
+//                if (user.getUid().equals(AppModel.INSTANCE.getLogin().getCurrentUid())) {
+//                    it.remove();
+//                }
+//            }
             if (result != null) {
                 users = result;
                 NotificationCenter.INSTANCE.getObserver(Room.class).onUserList();
@@ -56,7 +54,7 @@ public class ImModel {
         }
     };
 
-    public ImModel(Context context, StompClient stomp, Login login) {
+    public ImModel(Context context, MisakaClient stomp, Login login) {
         this.context = context;
         this.stomp = stomp;
         this.login = login;
@@ -64,7 +62,7 @@ public class ImModel {
 
     public void onConnected() {
         stomp.subscribeBroadcast("demo-server/userList", roomUserCallback);
-        stomp.subscribeUserPush("demo-server/message", new StompClient.SubscribeHandler<Message>(Message.class) {
+        stomp.subscribeUserPush("demo-server/message", new MisakaClient.SubscribeHandler<Message>(Message.class) {
             @Override
             public void onSuccess(Message result) {
                 saveBuddyMessage(result.getFromUid(), result);

@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class StompClient implements StompConnectManager.StompListener {
+public class MisakaClient implements StompConnectManager.StompListener {
 
     private Config config;
     private Handler mainHandler;
@@ -160,7 +160,7 @@ public class StompClient implements StompConnectManager.StompListener {
         }
     };
 
-    public StompClient(Context context, String host, Config config) {
+    public MisakaClient(Context context, String host, Config config) {
         this.config = config;
         mainHandler = new Handler(Looper.getMainLooper());
         stomp = new StompConnectManager(context, config, mainHandler, host, this);

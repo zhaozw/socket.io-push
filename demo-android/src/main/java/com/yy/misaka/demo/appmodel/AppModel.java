@@ -8,7 +8,7 @@ import com.yy.androidlib.util.logging.YYAppender.LogOptions;
 import com.yy.androidlib.util.notification.NotificationCenter;
 import com.yy.androidlib.websocket.Callback;
 import com.yy.androidlib.websocket.Config;
-import com.yy.androidlib.websocket.StompClient;
+import com.yy.androidlib.websocket.MisakaClient;
 import com.yy.androidlib.websocket.login.Login;
 import com.yy.misaka.demo.appmodel.callback.ImCallback;
 import com.yy.misaka.demo.appmodel.callback.ProfileCallback;
@@ -25,25 +25,26 @@ public enum AppModel {
 //        private String lbsHost = "http://" + "172.19.207.244:8080"; //lbs服务器地址
     private String demoHost = "http://" + "dev.yypm.com:8091"; //demo服务器地址
 //        private String demoHost = "http://" + "172.19.207.244:8091"; //demo服务器地址
-    private StompClient stomp;
+    private MisakaClient misaka;
     private Login login;
     private ImModel im;
     private ProfileModel pm;
 
     public void init(Application application) {
         initLogging();
-        stomp = new StompClient(application, lbsHost, new Config().dataAsBody(true));
-        stomp.addRoute("demo-server", demoHost);
-        stomp.addRoute("login", "http://uaas.yy.com");
-        stomp.addConnectionCallback(new Callback() {
+
+        misaka = new MisakaClient(application, lbsHost, new Config().dataAsBody(true));
+        misaka.addRoute("demo-server", demoHost);
+        misaka.addRoute("login", "http://uaas.yy.com");
+        misaka.addConnectionCallback(new Callback() {
             @Override
             public void onConnected() {
                 im.onConnected();
             }
         });
-        login = new Login(application, stomp, "fm141027");
-        im = new ImModel(application, stomp, login);
-        pm = new ProfileModel(application, stomp, demoHost);
+        login = new Login(application, misaka, "fm141027");
+        im = new ImModel(application, misaka, login);
+        pm = new ProfileModel(application, misaka, demoHost);
         initCallbacks();
     }
 
@@ -67,8 +68,8 @@ public enum AppModel {
         NotificationCenter.INSTANCE.addCallbacks(ProfileCallback.class);
     }
 
-    public StompClient getStomp() {
-        return stomp;
+    public MisakaClient getMisaka() {
+        return misaka;
     }
 
     public Login getLogin() {

@@ -1,18 +1,13 @@
 package com.yy.androidlib.websocket.login;
 
 import android.content.Context;
-import android.text.TextUtils;
 import com.yy.androidlib.websocket.Callback;
-import com.yy.androidlib.websocket.Destination;
 import com.yy.androidlib.websocket.ReplyHandler;
-import com.yy.androidlib.websocket.StompClient;
-
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import com.yy.androidlib.websocket.MisakaClient;
 
 public class Login {
 
-    private StompClient stompClient;
+    private MisakaClient misakaClient;
     private String appId = "login";
     private LoginRequest request;
     private Context context;
@@ -25,11 +20,11 @@ public class Login {
         }
     }
 
-    public Login(Context context, StompClient stompClient, final String loginAppId) {
+    public Login(Context context, MisakaClient misakaClient, final String loginAppId) {
         this.context = context;
-        this.stompClient = stompClient;
+        this.misakaClient = misakaClient;
         this.appId = loginAppId;
-        stompClient.addConnectionCallback(new Callback() {
+        misakaClient.addConnectionCallback(new Callback() {
             @Override
             public void onConnected() {
                 if (request != null) {
@@ -45,7 +40,7 @@ public class Login {
             user.setPhone("86" + user.getPhone());
             user.setPassword(LoginUtils.EncryptSha256(LoginUtils.EncryptSha256(user.getPassword())));
         }
-        stompClient.request("login", "/login", user, new ReplyHandler<LoginRequest>(LoginRequest.class) {
+        misakaClient.request("login", "/login", user, new ReplyHandler<LoginRequest>(LoginRequest.class) {
 
             @Override
             public void onSuccess(LoginRequest result) {
@@ -69,7 +64,7 @@ public class Login {
         request.setMobile(LoginUtils.chinaMobile(phone));
         request.setCountryCode(countryCode);
         request.setAppId(appId);
-        stompClient.request("login", "/getRegisterSms", request, handler);
+        misakaClient.request("login", "/getRegisterSms", request, handler);
     }
 
     public void register(String phone, String password, String code, ReplyHandler<RegisterRequest> handler) {
@@ -84,6 +79,6 @@ public class Login {
         request.setImsi(LoginUtils.getImsi(context));
         request.setDevType(0);// android
         request.setDevId(LoginUtils.getImei(context));
-        stompClient.request("login", "/register", request, handler);
+        misakaClient.request("login", "/register", request, handler);
     }
 }

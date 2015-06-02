@@ -4,9 +4,8 @@ import android.content.Context;
 import com.yy.androidlib.util.http.AsyncHttp;
 import com.yy.androidlib.util.http.FormEntry;
 import com.yy.androidlib.util.notification.NotificationCenter;
-import com.yy.androidlib.websocket.Destination;
 import com.yy.androidlib.websocket.ReplyHandler;
-import com.yy.androidlib.websocket.StompClient;
+import com.yy.androidlib.websocket.MisakaClient;
 import com.yy.misaka.demo.User;
 import com.yy.misaka.demo.appmodel.callback.ProfileCallback;
 
@@ -20,7 +19,7 @@ import java.util.List;
 public class ProfileModel {
     private static final String TAG = "PROFILE";
 
-    private final StompClient stomp;
+    private final MisakaClient stomp;
 
     /**
      * Application
@@ -30,7 +29,7 @@ public class ProfileModel {
     private String host;
     private User myInfo;
 
-    public ProfileModel(Context context, StompClient stomp, String host) {
+    public ProfileModel(Context context, MisakaClient stomp, String host) {
         this.host = host;
         this.context = context;
         this.stomp = stomp;

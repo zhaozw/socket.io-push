@@ -42,6 +42,20 @@
             <type>aar</type>
 </dependency>
 ```
+### 初始化
+
+```
+        misaka = new MisakaClient(application, lbsHost, new Config().dataAsBody(true));
+        misaka.addRoute("demo-server", demoHost);      // appId,业务服务器地址
+        misaka.addRoute("login", "http://uaas.yy.com"); // 使用登录服务
+        misaka.addConnectionCallback(new Callback() {
+            @Override
+            public void onConnected() {
+                im.onConnected();
+            }
+        });
+```
+
 
 ### 1. 请求代理 (例:发送消息给另一个用户uid:12345)
 
@@ -51,7 +65,7 @@
  message.setContent("hello!");
  message.setToUid(12345);
  
- AppModel.INSTANCE.getStomp().request("demo-server", "/sendMessage", message, new ReplyHandler<Message>(Message.class) {
+ misaka.request("demo-server", "/sendMessage", message, new ReplyHandler<Message>(Message.class) {
 
                     @Override
                     public void onSuccess(Message result) {
@@ -84,7 +98,7 @@
 客户端代码(android)
 
 ```
- stomp.subscribeUserPush("demo-server", "/message", new StompClient.SubscribeHandler<Message>(Message.class) {
+  misaka..subscribeUserPush("demo-server", "/message", new StompClient.SubscribeHandler<Message>(Message.class) {
             @Override
             public void onSuccess(Message result) {
                 NotificationCenter.INSTANCE.getObserver(ImCallback.Message.class).onMessageReceived(result);
@@ -103,7 +117,7 @@ broadcastService.pushToUser(message.getToUid(), "demo-server", "/message", messa
 客户端代码(android)
 
 ```
-stomp.subscribeBroadcast("demo-server", "/userList",
+ misaka..subscribeBroadcast("demo-server", "/userList",
 
     new SubscribeHandler<List<User>>(new TypeToken<List<User>>() {}.getType()) {
 
@@ -125,7 +139,6 @@ stomp.subscribeBroadcast("demo-server", "/userList",
 broadcastService.broadcast("demo-server", "/userList", allUsers());
 ```
 
-
 ## 项目运行和编译
 
 项目使用gradle进行构建(除了IOS)部分
@@ -136,14 +149,25 @@ broadcastService.broadcast("demo-server", "/userList", allUsers());
 5. lbs-server   lbs服务器
 6. demo-server   服务器demo
 
-### 1.运行lbs服务器和demo服务器
+### 1.运行lbs-server和demo服务器
+demo-server Application.java 配置链接的lbs服务器地址
+```
+@Bean
+    public BroadcastService broadcastService() {
+        BroadcastService broadcastService = new BroadcastService();
+        broadcastService.setHost("http://dev.yypm.com:8080");
+        return broadcastService;
+    }
+```
+
 ./gradlew demo-server:bootRun
 ./gradlew lbs-server:bootRun
 lbs-sever也可以使用我们的测试服务器
 内网 dev.yypm.com:8080
-外网 mlbs.yypm.com:8080
+demo-server可以使用我们的测试服务器
+内网 mlbs.yypm.com:8091
 
-### 2.运行demo
+### 2.运行demo-android
 
 AppModel.java配置
 
@@ -152,3 +176,6 @@ AppModel.java配置
     private String demoHost = "http://" + "dev.yypm.com:8091"; //demo服务器地址
     
 ```
+./gradlew demo-android:build 
+命令打包apk或者ide导入gradle项目直接运行
+
