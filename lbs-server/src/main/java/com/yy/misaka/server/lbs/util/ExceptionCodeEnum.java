@@ -6,10 +6,12 @@ import java.util.Map;
 import com.yy.misaka.server.support.ServiceException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ExceptionCodeEnum {
 
-    protected static Log logger = LogFactory.getLog(ExceptionCodeEnum.class);
+    protected static Logger logger = LoggerFactory.getLogger(ExceptionCodeEnum.class);
 
     @SuppressWarnings("rawtypes")
     private static Map<String, Enum> enumMap = new HashMap<>();

@@ -360,6 +360,7 @@ public class Uaas {
     private AuthResult getAuthResult(String phone, String password, String appId) {
         String authReqUrl = getAuthReqUrl(phone, password, appId);
         String result = HttpUtil.httpGet(authReqUrl);
+        logger.debug("auth result {}", result);
         AuthResult authResult = null;
         try {
             authResult = mapper.readValue(result, AuthResult.class);
