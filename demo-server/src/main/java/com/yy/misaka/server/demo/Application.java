@@ -67,7 +67,9 @@ public class Application extends WebMvcConfigurerAdapter {
 
     @Bean
     public BroadcastService broadcastService() {
-        return new BroadcastService();
+        BroadcastService broadcastService = new BroadcastService();
+        broadcastService.setHost("http://dev.yypm.com:8080");
+        return broadcastService;
     }
 
     @Bean

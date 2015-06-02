@@ -25,14 +25,14 @@ public class LbsApiController extends BaseMessageController {
     }
 
     @RequestMapping(value = "/api/broadcast")
-    public ResponseEntity<String> broadcast(String pushId, byte[] data) {
-        messagingTemplate.broadcast("/topic/" + pushId, data);
+    public ResponseEntity<String> broadcast(String destination, String pushId, String data) {
+        messagingTemplate.broadcast("/topic/" + pushId + destination, data);
         return new ResponseEntity<String>(HttpStatus.OK);
     }
 
     @RequestMapping(value = "/api/pushToUser")
-    public ResponseEntity<String> pushToUser(String pushId, String uid, byte[] data) {
-        messagingTemplate.sendToUser(uid, "/queue/" + pushId, data);
+    public ResponseEntity<String> pushToUser(String destination, String pushId, String uid, String data) {
+        messagingTemplate.sendToUser(uid, "/queue/" + pushId + destination, data);
         return new ResponseEntity<String>(HttpStatus.OK);
     }
 

@@ -22,9 +22,9 @@ public enum AppModel {
     INSTANCE;
 
     private String lbsHost = "http://" + "dev.yypm.com:8080"; //lbs服务器地址
-//    private String lbsHost = "http://" + "172.19.207.244:8080"; //lbs服务器地址
+//        private String lbsHost = "http://" + "172.19.207.244:8080"; //lbs服务器地址
     private String demoHost = "http://" + "dev.yypm.com:8091"; //demo服务器地址
-//    private String demoHost = "http://" + "172.19.207.244:8091"; //demo服务器地址
+//        private String demoHost = "http://" + "172.19.207.244:8091"; //demo服务器地址
     private StompClient stomp;
     private Login login;
     private ImModel im;
@@ -38,25 +38,13 @@ public enum AppModel {
         stomp.addConnectionCallback(new Callback() {
             @Override
             public void onConnected() {
-                //    im.onConnected();
+                im.onConnected();
             }
         });
         login = new Login(application, stomp, "fm141027");
         im = new ImModel(application, stomp, login);
         pm = new ProfileModel(application, stomp, demoHost);
         initCallbacks();
-
-//        AsyncHttpClient.getDefaultInstance().executeString(new AsyncHttpGet(host + ":8090/"), new AsyncHttpClient.StringCallback() {
-//                    // Callback is invoked with any exceptions/errors, and the result, if available.
-//                    @Override
-//                    public void onCompleted(Exception e, AsyncHttpResponse response, String result) {
-//                        if (e != null) {
-//                            e.printStackTrace();
-//                            return;
-//                        }
-//                        System.out.println("I got a string: " + result);
-//                    }
-//                });
     }
 
     private void initLogging() {
