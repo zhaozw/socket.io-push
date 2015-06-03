@@ -5,18 +5,31 @@
 
 > | **项**   | **详细**               |
 > | ---      | ---                    |
-> | 联系人   | 许铎，江成彦,李登科,林华锋         |
+> | 联系人   | 许铎，江成彦,李登科,林华锋,连兴伦       |
 > | 状态     | 开发中 |
 
-类似于YY体系的service平台,专门为简化移动开发打造的平台.
+针对使用http短链接协议开发的app,加入LBS长连接代理层
 
-主要包括
+###作用
+
+1. 业务服务器和app, 使用短链接接口, 即可长连接功能
+
+2. 性能提升,自动测速连接最快的LBS服务器
+
+3. SDK集成,协议序列化和反序列化
+
+4. 可选接入注册,登录,验证服务,每个app帐号独立,无需重复开发
+
+5. 可选海度性能上报, 每个请求uri分类统计, 耗时和成功率统计
+
+
+###主要包括
 
 1. 移动sdk
 
 2. 应用服务器sdk
 
-3. LBS长连接服务器
+3. LBS长连接代理服务器
 
   - 转发客户端的http请求到应用服务器
   - 提供http推送接口给应用服务器调用
@@ -45,7 +58,7 @@
 ### 初始化
 
 ```
-        misaka = new MisakaClient(application, lbsHost, new Config().dataAsBody(true));
+        misaka = new MisakaClient(context, lbsHost, new Config().dataAsBody(true)); // dataAsBody true表示整个对象序列化为json,post到业务服务器,否则使用nyy协议
         misaka.addRoute("demo-server", demoHost);      // appId,业务服务器地址
         misaka.addRoute("login", "http://uaas.yy.com"); // 使用登录服务
         misaka.addConnectionCallback(new Callback() {
@@ -137,6 +150,75 @@ broadcastService.pushToUser(message.getToUid(), "demo-server", "/message", messa
 
 ```
 broadcastService.broadcast("demo-server", "/userList", allUsers());
+```
+
+### 4. 使用性能统计
+
+```
+     HiidoProfiling profiling = new HiidoProfiling("app_id");
+     misaka.setProfiling(profiling);
+```
+
+### 5. 使用登录功能
+
+```
+//初始化
+Login login = new Login(context, misaka, "app_id");
+
+//登录
+LoginRequest user = new LoginRequest();
+final String username = usernameEdit.getText().toString();
+final String password = passwordEdit.getText().toString();
+user.setPhone(username);
+user.setPassword(password);
+
+login.login(user, new ReplyHandler<LoginRequest>(LoginRequest.class) {
+     @Override
+     public void onSuccess(LoginRequest result) {
+         Log.i(TAG, "onSuccess " + result);      
+     }
+                 
+     @Override
+     public void onError(int code, String message) {
+         Toast.makeText(LoginActivity.this, "request error!code:" + code + " ,message:" + message, Toast.LENGTH_LONG).show();
+      }
+});
+
+//获取注册验证码
+login.getRegisterSmsCode(phone, "86", new ReplyHandler<RegisterRequest>(RegisterRequest.class) {
+   @Override
+   public void onSuccess(RegisterRequest result) {
+       Toast.makeText(RegisterActivity.this, "get register code success ", Toast.LENGTH_LONG).show();
+   }
+
+    @Override
+    public void onError(int code, String message) {
+        Toast.makeText(RegisterActivity.this, "get register code error " + message, Toast.LENGTH_LONG).show();
+    }
+});
+
+//设置密码
+login.register(phone, password, code, new ReplyHandler<RegisterRequest>(RegisterRequest.class) {
+    @Override
+    public void onSuccess(RegisterRequest result) {
+        Toast.makeText(RegisterActivity.this, "setPassword success ", Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onError(int code, String message) {
+        Toast.makeText(RegisterActivity.this, "setPassword error " + message, Toast.LENGTH_LONG).show();
+    }
+});
+
+```
+
+### 5. 使用LBS测速功能
+
+config中设置hostResolver
+```
+
+config.hostResolver(new YYHostResolver(context));
+
 ```
 
 ## 项目运行和编译
