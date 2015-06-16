@@ -98,9 +98,8 @@
 @RequestMapping(value = "/sendMessage", method = RequestMethod.POST)
     public
     @ResponseBody
-    Message sendMessage(@RequestBody User user, @RequestHeader(required = false, defaultValue = "0") Long uid) throws IOException {
-        logger.info("data {}, appId {}", data, appId);
-        Message message = mapper.readValue(data, Message.class);
+    Message sendMessage(@RequestBody Message message, @RequestHeader(required = false, defaultValue = "0") Long uid) throws IOException {
+        message.setFromUid(uid);
         messageService.sendMessage(message);
         return message;
     }
