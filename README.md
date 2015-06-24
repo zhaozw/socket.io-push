@@ -78,7 +78,7 @@
  message.setContent("hello!");
  message.setToUid(12345);
  
- misaka.request("demo-server", "/sendMessage", message, new ReplyHandler<Message>(Message.class) {
+ misaka.request(APP_ID, "/sendMessage", message, new ReplyHandler<Message>(Message.class) {
 
                     @Override
                     public void onSuccess(Message result) {
@@ -98,9 +98,8 @@
 @RequestMapping(value = "/sendMessage", method = RequestMethod.POST)
     public
     @ResponseBody
-    Message sendMessage(@RequestBody User user, @RequestHeader(required = false, defaultValue = "0") Long uid) throws IOException {
-        logger.info("data {}, appId {}", data, appId);
-        Message message = mapper.readValue(data, Message.class);
+    Message sendMessage(@RequestBody Message message, @RequestHeader(required = false, defaultValue = "0") Long uid) throws IOException {
+        message.setFromUid(uid);
         messageService.sendMessage(message);
         return message;
     }
@@ -111,7 +110,7 @@
 客户端代码(android)
 
 ```
-  misaka..subscribeUserPush("demo-server", "/message", new StompClient.SubscribeHandler<Message>(Message.class) {
+  misaka..subscribeUserPush(APP_ID, "/message", new StompClient.SubscribeHandler<Message>(Message.class) {
             @Override
             public void onSuccess(Message result) {
                 NotificationCenter.INSTANCE.getObserver(ImCallback.Message.class).onMessageReceived(result);
@@ -122,7 +121,7 @@
 应用服务器代码
 
 ```
-broadcastService.pushToUser(message.getToUid(), "demo-server", "/message", message);
+broadcastService.pushToUser(message.getToUid(), APP_ID, "/message", message);
 ```
 
 ### 3. 广播 (例:订阅用户在线列表更新)
@@ -130,7 +129,7 @@ broadcastService.pushToUser(message.getToUid(), "demo-server", "/message", messa
 客户端代码(android)
 
 ```
- misaka..subscribeBroadcast("demo-server", "/userList",
+ misaka..subscribeBroadcast(APP_ID, "/userList",
 
     new SubscribeHandler<List<User>>(new TypeToken<List<User>>() {}.getType()) {
 
@@ -149,13 +148,13 @@ broadcastService.pushToUser(message.getToUid(), "demo-server", "/message", messa
 应用服务器代码
 
 ```
-broadcastService.broadcast("demo-server", "/userList", allUsers());
+broadcastService.broadcast(APP_ID, "/userList", allUsers());
 ```
 
 ### 4. 使用性能统计
 
 ```
-     HiidoProfiling profiling = new HiidoProfiling("app_id");
+     HiidoProfiling profiling = new HiidoProfiling(APP_ID);
      misaka.setProfiling(profiling);
 ```
 
@@ -163,7 +162,7 @@ broadcastService.broadcast("demo-server", "/userList", allUsers());
 
 ```
 //初始化
-Login login = new Login(context, misaka, "app_id");
+Login login = new Login(context, misaka, APP_ID);
 
 //登录
 LoginRequest user = new LoginRequest();
