@@ -1,0 +1,30 @@
+//
+//  MIStompCommand.h
+//  huwai
+//
+//  Created by crazylhf on 15/4/17.
+//  Copyright (c) 2015年 zq. All rights reserved.
+//
+
+#import <Foundation/Foundation.h>
+#import "MIGlobalMacros.h"
+
+MIEXTERN_GLOBALSTRING(MIStompCmd_ABORT);
+MIEXTERN_GLOBALSTRING(MIStompCmd_BEGIN);
+MIEXTERN_GLOBALSTRING(MIStompCmd_ERROR);
+
+MIEXTERN_GLOBALSTRING(MIStompCmd_SEND);
+MIEXTERN_GLOBALSTRING(MIStompCmd_COMMIT);
+
+MIEXTERN_GLOBALSTRING(MIStompCmd_MESSAGE);
+MIEXTERN_GLOBALSTRING(MIStompCmd_RECEIPT);
+
+MIEXTERN_GLOBALSTRING(MIStompCmd_CONNECT);
+MIEXTERN_GLOBALSTRING(MIStompCmd_CONNECTED);
+MIEXTERN_GLOBALSTRING(MIStompCmd_DISCONNECT);
+
+MIEXTERN_GLOBALSTRING(MIStompCmd_SUBSCRIBE);
+MIEXTERN_GLOBALSTRING(MIStompCmd_UNSUBSCRIBE);
+
+#define IsMIStompCmdEqual(_cmd1_, _cmd2_) (_cmd1_ && _cmd2_ && [_cmd1_ isEqualToString:_cmd2_])
+

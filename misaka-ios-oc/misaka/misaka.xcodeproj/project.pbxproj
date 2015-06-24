@@ -8,46 +8,44 @@
 
 /* Begin PBXBuildFile section */
 		732788351B3957F700899FB3 /* misaka.h in Headers */ = {isa = PBXBuildFile; fileRef = 732788341B3957F700899FB3 /* misaka.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		7327883B1B3957F700899FB3 /* misaka.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7327882F1B3957F600899FB3 /* misaka.framework */; };
-		732788421B3957F700899FB3 /* misakaTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 732788411B3957F700899FB3 /* misakaTests.m */; };
-		732788721B39593400899FB3 /* HWNetworkMonitor.h in Headers */ = {isa = PBXBuildFile; fileRef = 7327884B1B39593400899FB3 /* HWNetworkMonitor.h */; };
-		732788731B39593400899FB3 /* HWNetworkMonitor.m in Sources */ = {isa = PBXBuildFile; fileRef = 7327884C1B39593400899FB3 /* HWNetworkMonitor.m */; };
-		732788741B39593400899FB3 /* HWNSObject+Notification.h in Headers */ = {isa = PBXBuildFile; fileRef = 7327884D1B39593400899FB3 /* HWNSObject+Notification.h */; };
-		732788751B39593400899FB3 /* HWNSObject+Notification.m in Sources */ = {isa = PBXBuildFile; fileRef = 7327884E1B39593400899FB3 /* HWNSObject+Notification.m */; };
-		732788761B39593400899FB3 /* HWNSString+QuoteString.h in Headers */ = {isa = PBXBuildFile; fileRef = 7327884F1B39593400899FB3 /* HWNSString+QuoteString.h */; };
-		732788771B39593400899FB3 /* HWNSString+QuoteString.m in Sources */ = {isa = PBXBuildFile; fileRef = 732788501B39593400899FB3 /* HWNSString+QuoteString.m */; };
-		732788781B39593400899FB3 /* HWRandomUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = 732788511B39593400899FB3 /* HWRandomUtil.h */; };
-		732788791B39593400899FB3 /* HWRandomUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 732788521B39593400899FB3 /* HWRandomUtil.m */; };
-		7327887A1B39593400899FB3 /* HWStompClient.h in Headers */ = {isa = PBXBuildFile; fileRef = 732788531B39593400899FB3 /* HWStompClient.h */; };
-		7327887B1B39593400899FB3 /* HWStompClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 732788541B39593400899FB3 /* HWStompClient.m */; };
-		7327887C1B39593400899FB3 /* HWStompConnectDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 732788551B39593400899FB3 /* HWStompConnectDelegate.h */; };
-		7327887D1B39593400899FB3 /* HWStompConnectMgr.h in Headers */ = {isa = PBXBuildFile; fileRef = 732788561B39593400899FB3 /* HWStompConnectMgr.h */; };
-		7327887E1B39593400899FB3 /* HWStompConnectMgr.m in Sources */ = {isa = PBXBuildFile; fileRef = 732788571B39593400899FB3 /* HWStompConnectMgr.m */; };
-		7327887F1B39593400899FB3 /* HWStompDefs.h in Headers */ = {isa = PBXBuildFile; fileRef = 732788581B39593400899FB3 /* HWStompDefs.h */; };
-		732788801B39593400899FB3 /* HWSystemUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = 732788591B39593400899FB3 /* HWSystemUtil.h */; };
-		732788811B39593400899FB3 /* HWSystemUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 7327885A1B39593400899FB3 /* HWSystemUtil.m */; };
-		732788821B39593400899FB3 /* HWStompCommand.h in Headers */ = {isa = PBXBuildFile; fileRef = 7327885C1B39593400899FB3 /* HWStompCommand.h */; };
-		732788831B39593400899FB3 /* HWStompCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 7327885D1B39593400899FB3 /* HWStompCommand.m */; };
-		732788841B39593400899FB3 /* HWStompConnectCbk.h in Headers */ = {isa = PBXBuildFile; fileRef = 7327885E1B39593400899FB3 /* HWStompConnectCbk.h */; };
-		732788851B39593400899FB3 /* HWStompConnectCbk.m in Sources */ = {isa = PBXBuildFile; fileRef = 7327885F1B39593400899FB3 /* HWStompConnectCbk.m */; };
-		732788861B39593400899FB3 /* HWStompMessage.h in Headers */ = {isa = PBXBuildFile; fileRef = 732788601B39593400899FB3 /* HWStompMessage.h */; };
-		732788871B39593400899FB3 /* HWStompMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 732788611B39593400899FB3 /* HWStompMessage.m */; };
-		732788881B39593400899FB3 /* HWStompReply.h in Headers */ = {isa = PBXBuildFile; fileRef = 732788621B39593400899FB3 /* HWStompReply.h */; };
-		732788891B39593400899FB3 /* HWStompReply.m in Sources */ = {isa = PBXBuildFile; fileRef = 732788631B39593400899FB3 /* HWStompReply.m */; };
-		7327888A1B39593400899FB3 /* HWStompRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = 732788641B39593400899FB3 /* HWStompRequest.h */; };
-		7327888B1B39593400899FB3 /* HWStompRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 732788651B39593400899FB3 /* HWStompRequest.m */; };
-		7327888C1B39593400899FB3 /* HWWebSocketConfig.h in Headers */ = {isa = PBXBuildFile; fileRef = 732788661B39593400899FB3 /* HWWebSocketConfig.h */; };
-		7327888D1B39593400899FB3 /* HWWebSocketConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 732788671B39593400899FB3 /* HWWebSocketConfig.m */; };
-		7327888E1B39593400899FB3 /* HWWSObjectProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 732788681B39593400899FB3 /* HWWSObjectProtocol.h */; };
-		7327888F1B39593400899FB3 /* HWWebSocketDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 7327886A1B39593400899FB3 /* HWWebSocketDelegate.h */; };
-		732788901B39593400899FB3 /* HWWebSocketFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = 7327886B1B39593400899FB3 /* HWWebSocketFactory.h */; };
-		732788911B39593400899FB3 /* HWWebSocketFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = 7327886C1B39593400899FB3 /* HWWebSocketFactory.m */; };
-		732788921B39593400899FB3 /* HWWebSocketLocal.h in Headers */ = {isa = PBXBuildFile; fileRef = 7327886D1B39593400899FB3 /* HWWebSocketLocal.h */; };
-		732788931B39593400899FB3 /* HWWebSocketLocal.m in Sources */ = {isa = PBXBuildFile; fileRef = 7327886E1B39593400899FB3 /* HWWebSocketLocal.m */; };
-		732788941B39593400899FB3 /* HWWebSocketProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 7327886F1B39593400899FB3 /* HWWebSocketProtocol.h */; };
-		732788951B39593400899FB3 /* HWWebSocketRemote.h in Headers */ = {isa = PBXBuildFile; fileRef = 732788701B39593400899FB3 /* HWWebSocketRemote.h */; };
-		732788961B39593400899FB3 /* HWWebSocketRemote.m in Sources */ = {isa = PBXBuildFile; fileRef = 732788711B39593400899FB3 /* HWWebSocketRemote.m */; };
-		732788981B39596100899FB3 /* HWGlobalMacros.h in Headers */ = {isa = PBXBuildFile; fileRef = 732788971B39596100899FB3 /* HWGlobalMacros.h */; };
+		732788721B39593400899FB3 /* MINetworkMonitor.h in Headers */ = {isa = PBXBuildFile; fileRef = 7327884B1B39593400899FB3 /* MINetworkMonitor.h */; };
+		732788731B39593400899FB3 /* MINetworkMonitor.m in Sources */ = {isa = PBXBuildFile; fileRef = 7327884C1B39593400899FB3 /* MINetworkMonitor.m */; };
+		732788741B39593400899FB3 /* MINSObject+Notification.h in Headers */ = {isa = PBXBuildFile; fileRef = 7327884D1B39593400899FB3 /* MINSObject+Notification.h */; };
+		732788751B39593400899FB3 /* MINSObject+Notification.m in Sources */ = {isa = PBXBuildFile; fileRef = 7327884E1B39593400899FB3 /* MINSObject+Notification.m */; };
+		732788761B39593400899FB3 /* MINSString+QuoteString.h in Headers */ = {isa = PBXBuildFile; fileRef = 7327884F1B39593400899FB3 /* MINSString+QuoteString.h */; };
+		732788771B39593400899FB3 /* MINSString+QuoteString.m in Sources */ = {isa = PBXBuildFile; fileRef = 732788501B39593400899FB3 /* MINSString+QuoteString.m */; };
+		732788781B39593400899FB3 /* MIRandomUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = 732788511B39593400899FB3 /* MIRandomUtil.h */; };
+		732788791B39593400899FB3 /* MIRandomUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 732788521B39593400899FB3 /* MIRandomUtil.m */; };
+		7327887A1B39593400899FB3 /* MIMisakaClient.h in Headers */ = {isa = PBXBuildFile; fileRef = 732788531B39593400899FB3 /* MIMisakaClient.h */; };
+		7327887B1B39593400899FB3 /* MIMisakaClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 732788541B39593400899FB3 /* MIMisakaClient.m */; };
+		7327887C1B39593400899FB3 /* MIMisakaConnectDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 732788551B39593400899FB3 /* MIMisakaConnectDelegate.h */; };
+		7327887D1B39593400899FB3 /* MIStompConnectMgr.h in Headers */ = {isa = PBXBuildFile; fileRef = 732788561B39593400899FB3 /* MIStompConnectMgr.h */; };
+		7327887E1B39593400899FB3 /* MIStompConnectMgr.m in Sources */ = {isa = PBXBuildFile; fileRef = 732788571B39593400899FB3 /* MIStompConnectMgr.m */; };
+		7327887F1B39593400899FB3 /* MIStompDefs.h in Headers */ = {isa = PBXBuildFile; fileRef = 732788581B39593400899FB3 /* MIStompDefs.h */; };
+		732788801B39593400899FB3 /* MISystemUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = 732788591B39593400899FB3 /* MISystemUtil.h */; };
+		732788811B39593400899FB3 /* MISystemUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 7327885A1B39593400899FB3 /* MISystemUtil.m */; };
+		732788821B39593400899FB3 /* MIStompCommand.h in Headers */ = {isa = PBXBuildFile; fileRef = 7327885C1B39593400899FB3 /* MIStompCommand.h */; };
+		732788831B39593400899FB3 /* MIStompCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 7327885D1B39593400899FB3 /* MIStompCommand.m */; };
+		732788841B39593400899FB3 /* MIStompConnectCbk.h in Headers */ = {isa = PBXBuildFile; fileRef = 7327885E1B39593400899FB3 /* MIStompConnectCbk.h */; };
+		732788851B39593400899FB3 /* MIStompConnectCbk.m in Sources */ = {isa = PBXBuildFile; fileRef = 7327885F1B39593400899FB3 /* MIStompConnectCbk.m */; };
+		732788861B39593400899FB3 /* MIStompMessage.h in Headers */ = {isa = PBXBuildFile; fileRef = 732788601B39593400899FB3 /* MIStompMessage.h */; };
+		732788871B39593400899FB3 /* MIStompMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 732788611B39593400899FB3 /* MIStompMessage.m */; };
+		732788881B39593400899FB3 /* MIStompReply.h in Headers */ = {isa = PBXBuildFile; fileRef = 732788621B39593400899FB3 /* MIStompReply.h */; };
+		732788891B39593400899FB3 /* MIStompReply.m in Sources */ = {isa = PBXBuildFile; fileRef = 732788631B39593400899FB3 /* MIStompReply.m */; };
+		7327888A1B39593400899FB3 /* MIStompRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = 732788641B39593400899FB3 /* MIStompRequest.h */; };
+		7327888B1B39593400899FB3 /* MIStompRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 732788651B39593400899FB3 /* MIStompRequest.m */; };
+		7327888C1B39593400899FB3 /* MIWebSocketConfig.h in Headers */ = {isa = PBXBuildFile; fileRef = 732788661B39593400899FB3 /* MIWebSocketConfig.h */; };
+		7327888D1B39593400899FB3 /* MIWebSocketConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 732788671B39593400899FB3 /* MIWebSocketConfig.m */; };
+		7327888E1B39593400899FB3 /* MIWSObjectProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 732788681B39593400899FB3 /* MIWSObjectProtocol.h */; };
+		7327888F1B39593400899FB3 /* MIWebSocketDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 7327886A1B39593400899FB3 /* MIWebSocketDelegate.h */; };
+		732788901B39593400899FB3 /* MIWebSocketFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = 7327886B1B39593400899FB3 /* MIWebSocketFactory.h */; };
+		732788911B39593400899FB3 /* MIWebSocketFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = 7327886C1B39593400899FB3 /* MIWebSocketFactory.m */; };
+		732788921B39593400899FB3 /* MIWebSocketLocal.h in Headers */ = {isa = PBXBuildFile; fileRef = 7327886D1B39593400899FB3 /* MIWebSocketLocal.h */; };
+		732788931B39593400899FB3 /* MIWebSocketLocal.m in Sources */ = {isa = PBXBuildFile; fileRef = 7327886E1B39593400899FB3 /* MIWebSocketLocal.m */; };
+		732788941B39593400899FB3 /* MIWebSocketProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 7327886F1B39593400899FB3 /* MIWebSocketProtocol.h */; };
+		732788951B39593400899FB3 /* MIWebSocketRemote.h in Headers */ = {isa = PBXBuildFile; fileRef = 732788701B39593400899FB3 /* MIWebSocketRemote.h */; };
+		732788961B39593400899FB3 /* MIWebSocketRemote.m in Sources */ = {isa = PBXBuildFile; fileRef = 732788711B39593400899FB3 /* MIWebSocketRemote.m */; };
+		732788981B39596100899FB3 /* MIGlobalMacros.h in Headers */ = {isa = PBXBuildFile; fileRef = 732788971B39596100899FB3 /* MIGlobalMacros.h */; };
 		7327891F1B395DC100899FB3 /* JSONKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 7327891C1B395DC100899FB3 /* JSONKit.h */; };
 		732789201B395DC100899FB3 /* JSONKit.m in Sources */ = {isa = PBXBuildFile; fileRef = 7327891D1B395DC100899FB3 /* JSONKit.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		732789211B395DC100899FB3 /* README.md in Sources */ = {isa = PBXBuildFile; fileRef = 7327891E1B395DC100899FB3 /* README.md */; };
@@ -55,16 +53,10 @@
 		732789251B395EBC00899FB3 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 732789241B395EBC00899FB3 /* CFNetwork.framework */; };
 		732789271B395EC300899FB3 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 732789261B395EC300899FB3 /* Security.framework */; };
 		732789291B395ECC00899FB3 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 732789281B395ECC00899FB3 /* Foundation.framework */; };
+		736028771B3A5D4F00CAE911 /* libSocketRocket.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 732789141B395CDB00899FB3 /* libSocketRocket.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		7327883C1B3957F700899FB3 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 732788261B3957F600899FB3 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 7327882E1B3957F600899FB3;
-			remoteInfo = misaka;
-		};
 		732789131B395CDB00899FB3 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 732788DB1B395CDB00899FB3 /* SocketRocket.xcodeproj */;
@@ -99,47 +91,44 @@
 		7327882F1B3957F600899FB3 /* misaka.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = misaka.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		732788331B3957F700899FB3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		732788341B3957F700899FB3 /* misaka.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = misaka.h; sourceTree = "<group>"; };
-		7327883A1B3957F700899FB3 /* misakaTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = misakaTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		732788401B3957F700899FB3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		732788411B3957F700899FB3 /* misakaTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = misakaTests.m; sourceTree = "<group>"; };
-		7327884B1B39593400899FB3 /* HWNetworkMonitor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HWNetworkMonitor.h; sourceTree = "<group>"; };
-		7327884C1B39593400899FB3 /* HWNetworkMonitor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HWNetworkMonitor.m; sourceTree = "<group>"; };
-		7327884D1B39593400899FB3 /* HWNSObject+Notification.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "HWNSObject+Notification.h"; sourceTree = "<group>"; };
-		7327884E1B39593400899FB3 /* HWNSObject+Notification.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "HWNSObject+Notification.m"; sourceTree = "<group>"; };
-		7327884F1B39593400899FB3 /* HWNSString+QuoteString.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "HWNSString+QuoteString.h"; sourceTree = "<group>"; };
-		732788501B39593400899FB3 /* HWNSString+QuoteString.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "HWNSString+QuoteString.m"; sourceTree = "<group>"; };
-		732788511B39593400899FB3 /* HWRandomUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HWRandomUtil.h; sourceTree = "<group>"; };
-		732788521B39593400899FB3 /* HWRandomUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HWRandomUtil.m; sourceTree = "<group>"; };
-		732788531B39593400899FB3 /* HWStompClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HWStompClient.h; sourceTree = "<group>"; };
-		732788541B39593400899FB3 /* HWStompClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HWStompClient.m; sourceTree = "<group>"; };
-		732788551B39593400899FB3 /* HWStompConnectDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HWStompConnectDelegate.h; sourceTree = "<group>"; };
-		732788561B39593400899FB3 /* HWStompConnectMgr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HWStompConnectMgr.h; sourceTree = "<group>"; };
-		732788571B39593400899FB3 /* HWStompConnectMgr.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HWStompConnectMgr.m; sourceTree = "<group>"; };
-		732788581B39593400899FB3 /* HWStompDefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HWStompDefs.h; sourceTree = "<group>"; };
-		732788591B39593400899FB3 /* HWSystemUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HWSystemUtil.h; sourceTree = "<group>"; };
-		7327885A1B39593400899FB3 /* HWSystemUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HWSystemUtil.m; sourceTree = "<group>"; };
-		7327885C1B39593400899FB3 /* HWStompCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HWStompCommand.h; sourceTree = "<group>"; };
-		7327885D1B39593400899FB3 /* HWStompCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HWStompCommand.m; sourceTree = "<group>"; };
-		7327885E1B39593400899FB3 /* HWStompConnectCbk.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HWStompConnectCbk.h; sourceTree = "<group>"; };
-		7327885F1B39593400899FB3 /* HWStompConnectCbk.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HWStompConnectCbk.m; sourceTree = "<group>"; };
-		732788601B39593400899FB3 /* HWStompMessage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HWStompMessage.h; sourceTree = "<group>"; };
-		732788611B39593400899FB3 /* HWStompMessage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HWStompMessage.m; sourceTree = "<group>"; };
-		732788621B39593400899FB3 /* HWStompReply.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HWStompReply.h; sourceTree = "<group>"; };
-		732788631B39593400899FB3 /* HWStompReply.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HWStompReply.m; sourceTree = "<group>"; };
-		732788641B39593400899FB3 /* HWStompRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HWStompRequest.h; sourceTree = "<group>"; };
-		732788651B39593400899FB3 /* HWStompRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HWStompRequest.m; sourceTree = "<group>"; };
-		732788661B39593400899FB3 /* HWWebSocketConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HWWebSocketConfig.h; sourceTree = "<group>"; };
-		732788671B39593400899FB3 /* HWWebSocketConfig.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HWWebSocketConfig.m; sourceTree = "<group>"; };
-		732788681B39593400899FB3 /* HWWSObjectProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HWWSObjectProtocol.h; sourceTree = "<group>"; };
-		7327886A1B39593400899FB3 /* HWWebSocketDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HWWebSocketDelegate.h; sourceTree = "<group>"; };
-		7327886B1B39593400899FB3 /* HWWebSocketFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HWWebSocketFactory.h; sourceTree = "<group>"; };
-		7327886C1B39593400899FB3 /* HWWebSocketFactory.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HWWebSocketFactory.m; sourceTree = "<group>"; };
-		7327886D1B39593400899FB3 /* HWWebSocketLocal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HWWebSocketLocal.h; sourceTree = "<group>"; };
-		7327886E1B39593400899FB3 /* HWWebSocketLocal.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HWWebSocketLocal.m; sourceTree = "<group>"; };
-		7327886F1B39593400899FB3 /* HWWebSocketProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HWWebSocketProtocol.h; sourceTree = "<group>"; };
-		732788701B39593400899FB3 /* HWWebSocketRemote.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HWWebSocketRemote.h; sourceTree = "<group>"; };
-		732788711B39593400899FB3 /* HWWebSocketRemote.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HWWebSocketRemote.m; sourceTree = "<group>"; };
-		732788971B39596100899FB3 /* HWGlobalMacros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HWGlobalMacros.h; sourceTree = "<group>"; };
+		7327884B1B39593400899FB3 /* MINetworkMonitor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MINetworkMonitor.h; sourceTree = "<group>"; };
+		7327884C1B39593400899FB3 /* MINetworkMonitor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MINetworkMonitor.m; sourceTree = "<group>"; };
+		7327884D1B39593400899FB3 /* MINSObject+Notification.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "MINSObject+Notification.h"; sourceTree = "<group>"; };
+		7327884E1B39593400899FB3 /* MINSObject+Notification.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "MINSObject+Notification.m"; sourceTree = "<group>"; };
+		7327884F1B39593400899FB3 /* MINSString+QuoteString.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "MINSString+QuoteString.h"; sourceTree = "<group>"; };
+		732788501B39593400899FB3 /* MINSString+QuoteString.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "MINSString+QuoteString.m"; sourceTree = "<group>"; };
+		732788511B39593400899FB3 /* MIRandomUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MIRandomUtil.h; sourceTree = "<group>"; };
+		732788521B39593400899FB3 /* MIRandomUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MIRandomUtil.m; sourceTree = "<group>"; };
+		732788531B39593400899FB3 /* MIMisakaClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MIMisakaClient.h; sourceTree = "<group>"; };
+		732788541B39593400899FB3 /* MIMisakaClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MIMisakaClient.m; sourceTree = "<group>"; };
+		732788551B39593400899FB3 /* MIMisakaConnectDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MIMisakaConnectDelegate.h; sourceTree = "<group>"; };
+		732788561B39593400899FB3 /* MIStompConnectMgr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MIStompConnectMgr.h; sourceTree = "<group>"; };
+		732788571B39593400899FB3 /* MIStompConnectMgr.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MIStompConnectMgr.m; sourceTree = "<group>"; };
+		732788581B39593400899FB3 /* MIStompDefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MIStompDefs.h; sourceTree = "<group>"; };
+		732788591B39593400899FB3 /* MISystemUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MISystemUtil.h; sourceTree = "<group>"; };
+		7327885A1B39593400899FB3 /* MISystemUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MISystemUtil.m; sourceTree = "<group>"; };
+		7327885C1B39593400899FB3 /* MIStompCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MIStompCommand.h; sourceTree = "<group>"; };
+		7327885D1B39593400899FB3 /* MIStompCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MIStompCommand.m; sourceTree = "<group>"; };
+		7327885E1B39593400899FB3 /* MIStompConnectCbk.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MIStompConnectCbk.h; sourceTree = "<group>"; };
+		7327885F1B39593400899FB3 /* MIStompConnectCbk.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MIStompConnectCbk.m; sourceTree = "<group>"; };
+		732788601B39593400899FB3 /* MIStompMessage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MIStompMessage.h; sourceTree = "<group>"; };
+		732788611B39593400899FB3 /* MIStompMessage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MIStompMessage.m; sourceTree = "<group>"; };
+		732788621B39593400899FB3 /* MIStompReply.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MIStompReply.h; sourceTree = "<group>"; };
+		732788631B39593400899FB3 /* MIStompReply.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MIStompReply.m; sourceTree = "<group>"; };
+		732788641B39593400899FB3 /* MIStompRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MIStompRequest.h; sourceTree = "<group>"; };
+		732788651B39593400899FB3 /* MIStompRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MIStompRequest.m; sourceTree = "<group>"; };
+		732788661B39593400899FB3 /* MIWebSocketConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MIWebSocketConfig.h; sourceTree = "<group>"; };
+		732788671B39593400899FB3 /* MIWebSocketConfig.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MIWebSocketConfig.m; sourceTree = "<group>"; };
+		732788681B39593400899FB3 /* MIWSObjectProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MIWSObjectProtocol.h; sourceTree = "<group>"; };
+		7327886A1B39593400899FB3 /* MIWebSocketDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MIWebSocketDelegate.h; sourceTree = "<group>"; };
+		7327886B1B39593400899FB3 /* MIWebSocketFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MIWebSocketFactory.h; sourceTree = "<group>"; };
+		7327886C1B39593400899FB3 /* MIWebSocketFactory.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MIWebSocketFactory.m; sourceTree = "<group>"; };
+		7327886D1B39593400899FB3 /* MIWebSocketLocal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MIWebSocketLocal.h; sourceTree = "<group>"; };
+		7327886E1B39593400899FB3 /* MIWebSocketLocal.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MIWebSocketLocal.m; sourceTree = "<group>"; };
+		7327886F1B39593400899FB3 /* MIWebSocketProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MIWebSocketProtocol.h; sourceTree = "<group>"; };
+		732788701B39593400899FB3 /* MIWebSocketRemote.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MIWebSocketRemote.h; sourceTree = "<group>"; };
+		732788711B39593400899FB3 /* MIWebSocketRemote.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MIWebSocketRemote.m; sourceTree = "<group>"; };
+		732788971B39596100899FB3 /* MIGlobalMacros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MIGlobalMacros.h; sourceTree = "<group>"; };
 		732788C91B395CDA00899FB3 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		732788CA1B395CDA00899FB3 /* .gitmodules */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitmodules; sourceTree = "<group>"; };
 		732788CD1B395CDA00899FB3 /* LICENSE.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
@@ -150,7 +139,6 @@
 		732788D31B395CDA00899FB3 /* SocketRocket-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SocketRocket-Prefix.pch"; sourceTree = "<group>"; };
 		732788D41B395CDA00899FB3 /* SRWebSocket.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SRWebSocket.h; sourceTree = "<group>"; };
 		732788D51B395CDA00899FB3 /* SRWebSocket.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SRWebSocket.m; sourceTree = "<group>"; };
-		732788D61B395CDA00899FB3 /* SocketRocket-master.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = "SocketRocket-master.xcodeproj"; sourceTree = "<group>"; };
 		732788DA1B395CDB00899FB3 /* SocketRocket.podspec */ = {isa = PBXFileReference; lastKnownFileType = text; path = SocketRocket.podspec; sourceTree = "<group>"; };
 		732788DB1B395CDB00899FB3 /* SocketRocket.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = SocketRocket.xcodeproj; sourceTree = "<group>"; };
 		732788DF1B395CDB00899FB3 /* SocketRocketOSX-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "SocketRocketOSX-Info.plist"; sourceTree = "<group>"; };
@@ -201,18 +189,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				736028771B3A5D4F00CAE911 /* libSocketRocket.a in Frameworks */,
 				732789291B395ECC00899FB3 /* Foundation.framework in Frameworks */,
 				732789271B395EC300899FB3 /* Security.framework in Frameworks */,
 				732789251B395EBC00899FB3 /* CFNetwork.framework in Frameworks */,
 				732789231B395EB400899FB3 /* libicucore.dylib in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		732788371B3957F700899FB3 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				7327883B1B3957F700899FB3 /* misaka.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -229,7 +210,6 @@
 				7327891B1B395DC100899FB3 /* JSONKit-NoWarning-master */,
 				732788C81B395CDA00899FB3 /* SocketRocket-master */,
 				732788311B3957F600899FB3 /* misaka */,
-				7327883E1B3957F700899FB3 /* misakaTests */,
 				732788301B3957F600899FB3 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -238,7 +218,6 @@
 			isa = PBXGroup;
 			children = (
 				7327882F1B3957F600899FB3 /* misaka.framework */,
-				7327883A1B3957F700899FB3 /* misakaTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -246,23 +225,23 @@
 		732788311B3957F600899FB3 /* misaka */ = {
 			isa = PBXGroup;
 			children = (
-				732788971B39596100899FB3 /* HWGlobalMacros.h */,
-				7327884B1B39593400899FB3 /* HWNetworkMonitor.h */,
-				7327884C1B39593400899FB3 /* HWNetworkMonitor.m */,
-				7327884D1B39593400899FB3 /* HWNSObject+Notification.h */,
-				7327884E1B39593400899FB3 /* HWNSObject+Notification.m */,
-				7327884F1B39593400899FB3 /* HWNSString+QuoteString.h */,
-				732788501B39593400899FB3 /* HWNSString+QuoteString.m */,
-				732788511B39593400899FB3 /* HWRandomUtil.h */,
-				732788521B39593400899FB3 /* HWRandomUtil.m */,
-				732788531B39593400899FB3 /* HWStompClient.h */,
-				732788541B39593400899FB3 /* HWStompClient.m */,
-				732788551B39593400899FB3 /* HWStompConnectDelegate.h */,
-				732788561B39593400899FB3 /* HWStompConnectMgr.h */,
-				732788571B39593400899FB3 /* HWStompConnectMgr.m */,
-				732788581B39593400899FB3 /* HWStompDefs.h */,
-				732788591B39593400899FB3 /* HWSystemUtil.h */,
-				7327885A1B39593400899FB3 /* HWSystemUtil.m */,
+				732788971B39596100899FB3 /* MIGlobalMacros.h */,
+				7327884B1B39593400899FB3 /* MINetworkMonitor.h */,
+				7327884C1B39593400899FB3 /* MINetworkMonitor.m */,
+				7327884D1B39593400899FB3 /* MINSObject+Notification.h */,
+				7327884E1B39593400899FB3 /* MINSObject+Notification.m */,
+				7327884F1B39593400899FB3 /* MINSString+QuoteString.h */,
+				732788501B39593400899FB3 /* MINSString+QuoteString.m */,
+				732788511B39593400899FB3 /* MIRandomUtil.h */,
+				732788521B39593400899FB3 /* MIRandomUtil.m */,
+				732788531B39593400899FB3 /* MIMisakaClient.h */,
+				732788541B39593400899FB3 /* MIMisakaClient.m */,
+				732788551B39593400899FB3 /* MIMisakaConnectDelegate.h */,
+				732788561B39593400899FB3 /* MIStompConnectMgr.h */,
+				732788571B39593400899FB3 /* MIStompConnectMgr.m */,
+				732788581B39593400899FB3 /* MIStompDefs.h */,
+				732788591B39593400899FB3 /* MISystemUtil.h */,
+				7327885A1B39593400899FB3 /* MISystemUtil.m */,
 				7327885B1B39593400899FB3 /* stomptypes */,
 				732788691B39593400899FB3 /* websocket */,
 				732788341B3957F700899FB3 /* misaka.h */,
@@ -279,39 +258,22 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		7327883E1B3957F700899FB3 /* misakaTests */ = {
-			isa = PBXGroup;
-			children = (
-				732788411B3957F700899FB3 /* misakaTests.m */,
-				7327883F1B3957F700899FB3 /* Supporting Files */,
-			);
-			path = misakaTests;
-			sourceTree = "<group>";
-		};
-		7327883F1B3957F700899FB3 /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				732788401B3957F700899FB3 /* Info.plist */,
-			);
-			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
 		7327885B1B39593400899FB3 /* stomptypes */ = {
 			isa = PBXGroup;
 			children = (
-				7327885C1B39593400899FB3 /* HWStompCommand.h */,
-				7327885D1B39593400899FB3 /* HWStompCommand.m */,
-				7327885E1B39593400899FB3 /* HWStompConnectCbk.h */,
-				7327885F1B39593400899FB3 /* HWStompConnectCbk.m */,
-				732788601B39593400899FB3 /* HWStompMessage.h */,
-				732788611B39593400899FB3 /* HWStompMessage.m */,
-				732788621B39593400899FB3 /* HWStompReply.h */,
-				732788631B39593400899FB3 /* HWStompReply.m */,
-				732788641B39593400899FB3 /* HWStompRequest.h */,
-				732788651B39593400899FB3 /* HWStompRequest.m */,
-				732788661B39593400899FB3 /* HWWebSocketConfig.h */,
-				732788671B39593400899FB3 /* HWWebSocketConfig.m */,
-				732788681B39593400899FB3 /* HWWSObjectProtocol.h */,
+				7327885C1B39593400899FB3 /* MIStompCommand.h */,
+				7327885D1B39593400899FB3 /* MIStompCommand.m */,
+				7327885E1B39593400899FB3 /* MIStompConnectCbk.h */,
+				7327885F1B39593400899FB3 /* MIStompConnectCbk.m */,
+				732788601B39593400899FB3 /* MIStompMessage.h */,
+				732788611B39593400899FB3 /* MIStompMessage.m */,
+				732788621B39593400899FB3 /* MIStompReply.h */,
+				732788631B39593400899FB3 /* MIStompReply.m */,
+				732788641B39593400899FB3 /* MIStompRequest.h */,
+				732788651B39593400899FB3 /* MIStompRequest.m */,
+				732788661B39593400899FB3 /* MIWebSocketConfig.h */,
+				732788671B39593400899FB3 /* MIWebSocketConfig.m */,
+				732788681B39593400899FB3 /* MIWSObjectProtocol.h */,
 			);
 			path = stomptypes;
 			sourceTree = "<group>";
@@ -319,14 +281,14 @@
 		732788691B39593400899FB3 /* websocket */ = {
 			isa = PBXGroup;
 			children = (
-				7327886A1B39593400899FB3 /* HWWebSocketDelegate.h */,
-				7327886B1B39593400899FB3 /* HWWebSocketFactory.h */,
-				7327886C1B39593400899FB3 /* HWWebSocketFactory.m */,
-				7327886D1B39593400899FB3 /* HWWebSocketLocal.h */,
-				7327886E1B39593400899FB3 /* HWWebSocketLocal.m */,
-				7327886F1B39593400899FB3 /* HWWebSocketProtocol.h */,
-				732788701B39593400899FB3 /* HWWebSocketRemote.h */,
-				732788711B39593400899FB3 /* HWWebSocketRemote.m */,
+				7327886A1B39593400899FB3 /* MIWebSocketDelegate.h */,
+				7327886B1B39593400899FB3 /* MIWebSocketFactory.h */,
+				7327886C1B39593400899FB3 /* MIWebSocketFactory.m */,
+				7327886D1B39593400899FB3 /* MIWebSocketLocal.h */,
+				7327886E1B39593400899FB3 /* MIWebSocketLocal.m */,
+				7327886F1B39593400899FB3 /* MIWebSocketProtocol.h */,
+				732788701B39593400899FB3 /* MIWebSocketRemote.h */,
+				732788711B39593400899FB3 /* MIWebSocketRemote.m */,
 			);
 			path = websocket;
 			sourceTree = "<group>";
@@ -341,7 +303,6 @@
 				732788D01B395CDA00899FB3 /* Makefile */,
 				732788D11B395CDA00899FB3 /* README.rst */,
 				732788D21B395CDA00899FB3 /* SocketRocket */,
-				732788D61B395CDA00899FB3 /* SocketRocket-master.xcodeproj */,
 				732788DA1B395CDB00899FB3 /* SocketRocket.podspec */,
 				732788DB1B395CDB00899FB3 /* SocketRocket.xcodeproj */,
 				732788DE1B395CDB00899FB3 /* SocketRocketOSX */,
@@ -378,13 +339,6 @@
 				732788D51B395CDA00899FB3 /* SRWebSocket.m */,
 			);
 			path = SocketRocket;
-			sourceTree = "<group>";
-		};
-		732788D71B395CDA00899FB3 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 		732788DC1B395CDB00899FB3 /* Products */ = {
@@ -525,30 +479,30 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				732788881B39593400899FB3 /* HWStompReply.h in Headers */,
-				7327888A1B39593400899FB3 /* HWStompRequest.h in Headers */,
-				732788901B39593400899FB3 /* HWWebSocketFactory.h in Headers */,
+				732788881B39593400899FB3 /* MIStompReply.h in Headers */,
+				7327888A1B39593400899FB3 /* MIStompRequest.h in Headers */,
+				732788901B39593400899FB3 /* MIWebSocketFactory.h in Headers */,
 				732788351B3957F700899FB3 /* misaka.h in Headers */,
-				732788761B39593400899FB3 /* HWNSString+QuoteString.h in Headers */,
-				732788951B39593400899FB3 /* HWWebSocketRemote.h in Headers */,
-				7327887A1B39593400899FB3 /* HWStompClient.h in Headers */,
-				7327888C1B39593400899FB3 /* HWWebSocketConfig.h in Headers */,
-				732788981B39596100899FB3 /* HWGlobalMacros.h in Headers */,
-				7327887D1B39593400899FB3 /* HWStompConnectMgr.h in Headers */,
-				732788861B39593400899FB3 /* HWStompMessage.h in Headers */,
-				732788801B39593400899FB3 /* HWSystemUtil.h in Headers */,
-				7327888E1B39593400899FB3 /* HWWSObjectProtocol.h in Headers */,
-				732788781B39593400899FB3 /* HWRandomUtil.h in Headers */,
-				7327887F1B39593400899FB3 /* HWStompDefs.h in Headers */,
-				7327887C1B39593400899FB3 /* HWStompConnectDelegate.h in Headers */,
-				732788721B39593400899FB3 /* HWNetworkMonitor.h in Headers */,
+				732788761B39593400899FB3 /* MINSString+QuoteString.h in Headers */,
+				732788951B39593400899FB3 /* MIWebSocketRemote.h in Headers */,
+				7327887A1B39593400899FB3 /* MIMisakaClient.h in Headers */,
+				7327888C1B39593400899FB3 /* MIWebSocketConfig.h in Headers */,
+				732788981B39596100899FB3 /* MIGlobalMacros.h in Headers */,
+				7327887D1B39593400899FB3 /* MIStompConnectMgr.h in Headers */,
+				732788861B39593400899FB3 /* MIStompMessage.h in Headers */,
+				732788801B39593400899FB3 /* MISystemUtil.h in Headers */,
+				7327888E1B39593400899FB3 /* MIWSObjectProtocol.h in Headers */,
+				732788781B39593400899FB3 /* MIRandomUtil.h in Headers */,
+				7327887F1B39593400899FB3 /* MIStompDefs.h in Headers */,
+				7327887C1B39593400899FB3 /* MIMisakaConnectDelegate.h in Headers */,
+				732788721B39593400899FB3 /* MINetworkMonitor.h in Headers */,
 				7327891F1B395DC100899FB3 /* JSONKit.h in Headers */,
-				7327888F1B39593400899FB3 /* HWWebSocketDelegate.h in Headers */,
-				732788841B39593400899FB3 /* HWStompConnectCbk.h in Headers */,
-				732788921B39593400899FB3 /* HWWebSocketLocal.h in Headers */,
-				732788821B39593400899FB3 /* HWStompCommand.h in Headers */,
-				732788941B39593400899FB3 /* HWWebSocketProtocol.h in Headers */,
-				732788741B39593400899FB3 /* HWNSObject+Notification.h in Headers */,
+				7327888F1B39593400899FB3 /* MIWebSocketDelegate.h in Headers */,
+				732788841B39593400899FB3 /* MIStompConnectCbk.h in Headers */,
+				732788921B39593400899FB3 /* MIWebSocketLocal.h in Headers */,
+				732788821B39593400899FB3 /* MIStompCommand.h in Headers */,
+				732788941B39593400899FB3 /* MIWebSocketProtocol.h in Headers */,
+				732788741B39593400899FB3 /* MINSObject+Notification.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -573,24 +527,6 @@
 			productReference = 7327882F1B3957F600899FB3 /* misaka.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		732788391B3957F700899FB3 /* misakaTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 732788481B3957F700899FB3 /* Build configuration list for PBXNativeTarget "misakaTests" */;
-			buildPhases = (
-				732788361B3957F700899FB3 /* Sources */,
-				732788371B3957F700899FB3 /* Frameworks */,
-				732788381B3957F700899FB3 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				7327883D1B3957F700899FB3 /* PBXTargetDependency */,
-			);
-			name = misakaTests;
-			productName = misakaTests;
-			productReference = 7327883A1B3957F700899FB3 /* misakaTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -601,9 +537,6 @@
 				ORGANIZATIONNAME = yy;
 				TargetAttributes = {
 					7327882E1B3957F600899FB3 = {
-						CreatedOnToolsVersion = 6.3.2;
-					};
-					732788391B3957F700899FB3 = {
 						CreatedOnToolsVersion = 6.3.2;
 					};
 				};
@@ -620,10 +553,6 @@
 			projectDirPath = "";
 			projectReferences = (
 				{
-					ProductGroup = 732788D71B395CDA00899FB3 /* Products */;
-					ProjectRef = 732788D61B395CDA00899FB3 /* SocketRocket-master.xcodeproj */;
-				},
-				{
 					ProductGroup = 732788DC1B395CDB00899FB3 /* Products */;
 					ProjectRef = 732788DB1B395CDB00899FB3 /* SocketRocket.xcodeproj */;
 				},
@@ -631,7 +560,6 @@
 			projectRoot = "";
 			targets = (
 				7327882E1B3957F600899FB3 /* misaka */,
-				732788391B3957F700899FB3 /* misakaTests */,
 			);
 		};
 /* End PBXProject section */
@@ -675,13 +603,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		732788381B3957F700899FB3 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -689,44 +610,28 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				732788961B39593400899FB3 /* HWWebSocketRemote.m in Sources */,
-				732788871B39593400899FB3 /* HWStompMessage.m in Sources */,
-				7327887E1B39593400899FB3 /* HWStompConnectMgr.m in Sources */,
-				7327888B1B39593400899FB3 /* HWStompRequest.m in Sources */,
+				732788961B39593400899FB3 /* MIWebSocketRemote.m in Sources */,
+				732788871B39593400899FB3 /* MIStompMessage.m in Sources */,
+				7327887E1B39593400899FB3 /* MIStompConnectMgr.m in Sources */,
+				7327888B1B39593400899FB3 /* MIStompRequest.m in Sources */,
 				732789201B395DC100899FB3 /* JSONKit.m in Sources */,
-				7327887B1B39593400899FB3 /* HWStompClient.m in Sources */,
+				7327887B1B39593400899FB3 /* MIMisakaClient.m in Sources */,
 				732789211B395DC100899FB3 /* README.md in Sources */,
-				732788811B39593400899FB3 /* HWSystemUtil.m in Sources */,
-				732788771B39593400899FB3 /* HWNSString+QuoteString.m in Sources */,
-				732788831B39593400899FB3 /* HWStompCommand.m in Sources */,
-				7327888D1B39593400899FB3 /* HWWebSocketConfig.m in Sources */,
-				732788731B39593400899FB3 /* HWNetworkMonitor.m in Sources */,
-				732788891B39593400899FB3 /* HWStompReply.m in Sources */,
-				732788851B39593400899FB3 /* HWStompConnectCbk.m in Sources */,
-				732788911B39593400899FB3 /* HWWebSocketFactory.m in Sources */,
-				732788931B39593400899FB3 /* HWWebSocketLocal.m in Sources */,
-				732788751B39593400899FB3 /* HWNSObject+Notification.m in Sources */,
-				732788791B39593400899FB3 /* HWRandomUtil.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		732788361B3957F700899FB3 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				732788421B3957F700899FB3 /* misakaTests.m in Sources */,
+				732788811B39593400899FB3 /* MISystemUtil.m in Sources */,
+				732788771B39593400899FB3 /* MINSString+QuoteString.m in Sources */,
+				732788831B39593400899FB3 /* MIStompCommand.m in Sources */,
+				7327888D1B39593400899FB3 /* MIWebSocketConfig.m in Sources */,
+				732788731B39593400899FB3 /* MINetworkMonitor.m in Sources */,
+				732788891B39593400899FB3 /* MIStompReply.m in Sources */,
+				732788851B39593400899FB3 /* MIStompConnectCbk.m in Sources */,
+				732788911B39593400899FB3 /* MIWebSocketFactory.m in Sources */,
+				732788931B39593400899FB3 /* MIWebSocketLocal.m in Sources */,
+				732788751B39593400899FB3 /* MINSObject+Notification.m in Sources */,
+				732788791B39593400899FB3 /* MIRandomUtil.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		7327883D1B3957F700899FB3 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 7327882E1B3957F600899FB3 /* misaka */;
-			targetProxy = 7327883C1B3957F700899FB3 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		732788E11B395CDB00899FB3 /* InfoPlist.strings */ = {
@@ -844,6 +749,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.3;
 				MTL_ENABLE_DEBUG_INFO = NO;
+				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
@@ -882,36 +788,6 @@
 			};
 			name = Release;
 		};
-		732788491B3957F700899FB3 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
-				);
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				INFOPLIST_FILE = misakaTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Debug;
-		};
-		7327884A1B3957F700899FB3 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
-				);
-				INFOPLIST_FILE = misakaTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -929,15 +805,6 @@
 			buildConfigurations = (
 				732788461B3957F700899FB3 /* Debug */,
 				732788471B3957F700899FB3 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		732788481B3957F700899FB3 /* Build configuration list for PBXNativeTarget "misakaTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				732788491B3957F700899FB3 /* Debug */,
-				7327884A1B3957F700899FB3 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

@@ -47,6 +47,36 @@
 
 ### maven 依赖
 
+maven 库
+```
+<repositories>
+        <repository>
+            <name>nexus public repository</name>
+            <id>jrepo1</id>
+            <url>http://172.19.102.35/nexus/content/groups/public</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </repository>
+        <repository>
+            <name>nexus public repository</name>
+            <id>jrepo2</id>
+            <url>http://172.19.102.35/nexus/content/repositories/releases</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </repository>
+        <repository>
+            <id>jrepo3</id>
+            <name>nexus public repository</name>
+            <url>http://172.19.102.35/nexus/content/repositories/snapshots</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </repository>
+    </repositories>
+```
+
 ```
 <dependency>
             <groupId>com.yy</groupId>

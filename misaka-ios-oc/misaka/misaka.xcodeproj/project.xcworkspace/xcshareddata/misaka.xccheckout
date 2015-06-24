@@ -7,30 +7,26 @@
 	<key>IDESourceControlProjectIdentifier</key>
 	<string>56709B9E-5916-4FC0-9C56-43A51C3B2DEE</string>
 	<key>IDESourceControlProjectName</key>
-	<string>misaka</string>
+	<string>project</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
 		<key>78f94985-635b-4728-ab42-083be982b135++1604</key>
 		<string>https://svn.yy.com/repos/src/app/misaka/trunk</string>
 		<key>78f94985-635b-4728-ab42-083be982b135++8971</key>
 		<string>https://svn.yy.com/repos/src/app/misaka</string>
-		<key>EC25F0FA7FE46C3167C3EF44DF8C75887DCE2BB1</key>
-		<string>https://github.com/xuduo/misaka</string>
 		<key>F4046EACE6EB3EF5C5F5C6E81A719CDBD753B1E9</key>
 		<string>https://github.com/xuduo/Huwai</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
-	<string>misaka-ios-oc/misaka/misaka.xcodeproj</string>
+	<string>misaka-ios-oc/misaka/misaka.xcodeproj/project.xcworkspace</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
 		<key>78f94985-635b-4728-ab42-083be982b135++1604</key>
 		<string>../../../..</string>
 		<key>78f94985-635b-4728-ab42-083be982b135++8971</key>
 		<string>../../../../..</string>
-		<key>EC25F0FA7FE46C3167C3EF44DF8C75887DCE2BB1</key>
-		<string>../../../..</string>
 		<key>F4046EACE6EB3EF5C5F5C6E81A719CDBD753B1E9</key>
-		<string>../../../../../../Huwai</string>
+		<string>../../../../../Huwai</string>
 	</dict>
 	<key>IDESourceControlProjectRepositoryRootDictionary</key>
 	<dict>
@@ -44,7 +40,7 @@
 	<key>IDESourceControlProjectVersion</key>
 	<integer>111</integer>
 	<key>IDESourceControlProjectWCCIdentifier</key>
-	<string>EC25F0FA7FE46C3167C3EF44DF8C75887DCE2BB1</string>
+	<string>78f94985-635b-4728-ab42-083be982b135++1604</string>
 	<key>IDESourceControlProjectWCConfigurations</key>
 	<array>
 		<dict>
@@ -67,7 +63,7 @@
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
 			<string>public.vcs.git</string>
 			<key>IDESourceControlWCCIdentifierKey</key>
-			<string>EC25F0FA7FE46C3167C3EF44DF8C75887DCE2BB1</string>
+			<string>78f94985-635b-4728-ab42-083be982b135++1604</string>
 			<key>IDESourceControlWCCName</key>
 			<string>trunk</string>
 		</dict>
