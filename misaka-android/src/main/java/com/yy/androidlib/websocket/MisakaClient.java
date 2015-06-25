@@ -17,6 +17,7 @@ import com.google.gson.JsonSerializer;
 import com.yy.androidlib.hiido.profiling.HiidoProfiling;
 import com.yy.androidlib.hiido.profiling.ProfileData;
 import com.yy.androidlib.util.apache.RandomStringUtils;
+import com.yy.androidlib.util.http.Profiler;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -101,12 +102,13 @@ public class MisakaClient implements StompConnectManager.StompListener {
             if (request != null && request.getReplyHandler() != null) {
                 request.getReplyHandler().handle(gson, message.getBody(), respCode, msg, config.getServerDataParseErrorTips());
             }
-            if(profiling != null ){
-                int status ;
-                if(respCode == 1){
-                    status = ProfileData.Status.SUCCESS.value;
-                }else{ // fail
-                    status = ProfileData.Status.ERROR.value;
+            if (profiling != null) {
+                int status;
+                if (respCode == 1) {
+                    status = Profiler
+                            .Status.SUCCESS.value;
+                } else { // fail
+                    status = Profiler.Status.ERROR.value;
                 }
                 report(request, status);
             }
@@ -225,7 +227,8 @@ public class MisakaClient implements StompConnectManager.StompListener {
     public void setProfiling(HiidoProfiling profiling) {
         this.profiling = profiling;
     }
-    public void enableProfiling(HiidoProfiling profiling){
+
+    public void enableProfiling(HiidoProfiling profiling) {
         setProfiling(profiling);
     }
 
@@ -247,11 +250,9 @@ public class MisakaClient implements StompConnectManager.StompListener {
         }
         profiling.setAppId(_appId);
         long startTime = request.getTimestamp();
-        profiling.report(startTime,interfaceName,status, ProfileData.ChannelType.MISAKA.value);
+        profiling.report(startTime, interfaceName, status);
 
     }
-
-
 
 
 }

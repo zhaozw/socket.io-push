@@ -1,13 +1,9 @@
-apply plugin: 'android-library'
+apply plugin: 'java'
 
 dependencies {
     compile 'com.google.code.gson:gson:2.3.1'
-    compile 'com.yy.androidlib:util:1.0.8'
-    compile 'com.yy.androidlib:hiido-profiling:1.0.15'
-//    compile 'com.koushikdutta.async:androidasync:2.0.9'
-//    androidTestCompile 'org.robolectric:robolectric:2.4'
-//    androidTestCompile 'junit:junit:4.10'
-
+    compile 'com.yy.androidlib:util:1.0.18'
+    compile 'com.yy.androidlib:hiido-profiling:1.0.18'
 }
 
 android {
@@ -28,7 +24,7 @@ android {
 apply plugin: 'maven'
 
 group = 'com.yy'
-version = '1.0.21'
+version = '1.0.22'
 
 task androidSourcesJar(type: Jar) {
     classifier = 'sources'
