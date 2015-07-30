@@ -4,7 +4,6 @@ import com.koushikdutta.async.DataSink;
 import com.koushikdutta.async.callback.CompletedCallback;
 import com.koushikdutta.async.http.Headers;
 import com.koushikdutta.async.http.Multimap;
-
 import org.apache.http.NameValuePair;
 
 import java.io.File;

@@ -8,13 +8,11 @@ import com.koushikdutta.async.future.Future;
 import com.koushikdutta.async.future.TransformFuture;
 import com.koushikdutta.async.http.body.DocumentBody;
 import com.koushikdutta.async.stream.ByteBufferListInputStream;
-
 import org.w3c.dom.Document;
-
-import java.lang.reflect.Type;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import java.lang.reflect.Type;
 
 /**
  * Created by koush on 8/3/13.

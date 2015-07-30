@@ -2,15 +2,9 @@ package com.koushikdutta.async.http;
 
 import android.net.Uri;
 import android.util.Log;
-
 import com.koushikdutta.async.AsyncSSLException;
 import com.koushikdutta.async.http.body.AsyncHttpRequestBody;
-
-import org.apache.http.Header;
-import org.apache.http.HeaderIterator;
-import org.apache.http.HttpRequest;
-import org.apache.http.ProtocolVersion;
-import org.apache.http.RequestLine;
+import org.apache.http.*;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.params.HttpParams;
 

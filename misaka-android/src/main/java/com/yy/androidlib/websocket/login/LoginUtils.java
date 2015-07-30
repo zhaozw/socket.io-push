@@ -2,17 +2,9 @@ package com.yy.androidlib.websocket.login;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.os.Build;
-import android.os.Bundle;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLDecoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.UUID;

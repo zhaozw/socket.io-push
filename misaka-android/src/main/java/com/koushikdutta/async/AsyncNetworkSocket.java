@@ -1,7 +1,6 @@
 package com.koushikdutta.async;
 
 import android.util.Log;
-
 import com.koushikdutta.async.callback.CompletedCallback;
 import com.koushikdutta.async.callback.DataCallback;
 import com.koushikdutta.async.callback.WritableCallback;

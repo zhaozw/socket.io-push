@@ -1,38 +1,76 @@
 apply plugin: 'java'
 
+configurations {
+    provided
+}
+
+sourceSets {
+    main.compileClasspath += configurations.provided
+    test.compileClasspath += configurations.provided
+    test.runtimeClasspath += configurations.provided
+}
+
 dependencies {
     compile 'com.google.code.gson:gson:2.3.1'
-    compile 'com.yy.androidlib:util:1.0.18'
+    compile 'com.yy.androidlib:util:1.0.22'
     compile 'com.yy.androidlib:hiido-profiling:1.0.18'
+    provided 'com.google.android:android:4.1.1.4'
 }
 
-android {
-    compileSdkVersion 19
-    buildToolsVersion '19.1.0'
-
-    defaultConfig {
-        minSdkVersion 15
-        targetSdkVersion 19
-        versionCode 1
-        versionName "1.0"
-    }
-    lintOptions {
-        abortOnError false
-    }
-}
+//android {
+//    compileSdkVersion 19
+//    buildToolsVersion '19.1.0'
+//
+//    defaultConfig {
+//        minSdkVersion 15
+//        targetSdkVersion 19
+//        versionCode 1
+//        versionName "1.0"
+//    }
+//    lintOptions {
+//        abortOnError false
+//    }
+//}
 
 apply plugin: 'maven'
+apply plugin: 'signing'
+apply plugin: 'maven-publish'
 
 group = 'com.yy'
-version = '1.0.22'
+version = '1.0.25'
 
-task androidSourcesJar(type: Jar) {
+compileJava {
+    options.encoding = "UTF-8"
+}
+
+task sourcesJar(type: Jar) {
     classifier = 'sources'
-    from android.sourceSets.main.java.sourceFiles
+    from sourceSets.main.allSource
 }
 
 artifacts {
-    archives androidSourcesJar
+    archives sourcesJar
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+}
+
+//task androidSourcesJar(type: Jar) {
+//    classifier = 'sources'
+//    from android.sourceSets.main.java.sourceFiles
+//}
+
+//artifacts {
+//    archives androidSourcesJar
+//}
+
+signing {
+    sign configurations.archives
 }
 
 uploadArchives {
@@ -74,28 +112,6 @@ uploadArchives {
     }
 }
 
-
-//------
-
-//apply plugin: 'maven'
-//apply plugin: 'signing'
-//
-//group = 'com.yy'
-//version = '1.0.0'
-//
-//signing {
-//    sign configurations.archives
-//}
-//
-//task androidSourcesJar(type: Jar) {
-//    classifier = 'sources'
-//    from android.sourceSets.main.java.sourceFiles
-//}
-//
-//artifacts {
-//    archives androidSourcesJar
-//}
-//
 //uploadArchives {
 //    repositories {
 //        mavenDeployer {
@@ -106,15 +122,16 @@ uploadArchives {
 //            }
 //
 //            pom.project {
-//                name 'stomp-android'
+//                name 'misaka-android'
 //                packaging 'aar'
-//                description 'stomp-android'
+//                description 'misaka-android'
+//                description 'misaka-android'
 //                url 'https://github.com/xuduo/stomp-app'
 //
 //                scm {
-//                    url 'https://github.com/xuduo/stomp-app'
-//                    connection 'https://github.com/xuduo/stomp-app'
-//                    developerConnection 'https://github.com/xuduo/stomp-app'
+//                    url 'https://github.com/xuduo/AndroidNotificationCenter'
+//                    connection 'https://github.com/xuduo/AndroidNotificationCenter'
+//                    developerConnection 'https://github.com/xuduo/AndroidNotificationCenter'
 //                }
 //
 //                licenses {
@@ -132,6 +149,7 @@ uploadArchives {
 //                    }
 //                }
 //            }
+//
 //        }
 //    }
 //}

@@ -3,7 +3,6 @@ package com.koushikdutta.async;
 import android.annotation.TargetApi;
 import android.os.Build;
 import android.os.Looper;
-
 import com.koushikdutta.async.util.Charsets;
 
 import java.io.IOException;

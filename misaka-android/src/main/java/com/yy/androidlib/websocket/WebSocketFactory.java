@@ -1,7 +1,6 @@
 package com.yy.androidlib.websocket;
 
 import android.os.Build;
-import android.os.Handler;
 import android.util.Log;
 
 import java.net.URI;

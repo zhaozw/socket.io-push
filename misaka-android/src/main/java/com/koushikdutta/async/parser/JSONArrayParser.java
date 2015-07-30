@@ -5,9 +5,7 @@ import com.koushikdutta.async.DataSink;
 import com.koushikdutta.async.callback.CompletedCallback;
 import com.koushikdutta.async.future.Future;
 import com.koushikdutta.async.future.TransformFuture;
-
 import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.lang.reflect.Type;
 

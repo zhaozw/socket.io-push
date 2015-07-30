@@ -9,12 +9,7 @@ package com.koushikdutta.async;
 // removed link to collections framework docs
 // END android-note
 
-import java.util.AbstractCollection;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 /**
  * Resizable-array implementation of the {@link Deque} interface.  Array

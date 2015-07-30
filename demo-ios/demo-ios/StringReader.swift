@@ -19,7 +19,7 @@ class StringReader {
     
     func readline() -> String {
         var line = ""
-        while index < string.utf16Count {
+        while index < count(string.utf16) {
             var char =  string[index++]
             if char == "\n" {
                 break
@@ -31,7 +31,7 @@ class StringReader {
     
     func read() -> String {
         var char = "\000"
-        if index < string.utf16Count {
+        if index < count(string.utf16) {
             char =  string[index++]
         }
         return char

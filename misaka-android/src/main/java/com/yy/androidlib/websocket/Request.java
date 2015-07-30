@@ -5,33 +5,23 @@ package com.yy.androidlib.websocket;
  */
 public class Request {
 
-    private String appId;
-    private String destination;
+    private String url;
     private Object body;
     private ReplyHandler replyHandler;
     private long timestamp = System.currentTimeMillis();
 
-    public Request(String appId, String destination, Object body, ReplyHandler replyHandler) {
-        this.appId = appId;
-        this.destination = destination;
+    public Request(String url, Object body, ReplyHandler replyHandler) {
+        this.url = url;
         this.body = body;
         this.replyHandler = replyHandler;
     }
 
-    public String getAppId() {
-        return appId;
+    public String getUrl() {
+        return url;
     }
 
-    public void setAppId(String appId) {
-        this.appId = appId;
-    }
-
-    public String getDestination() {
-        return destination;
-    }
-
-    public void setDestination(String destination) {
-        this.destination = destination;
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     public Object getBody() {

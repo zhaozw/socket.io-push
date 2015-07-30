@@ -8,8 +8,6 @@ import com.koushikdutta.async.callback.CompletedCallback;
 import com.koushikdutta.async.callback.DataCallback;
 import com.koushikdutta.async.http.AsyncHttpRequest;
 import com.koushikdutta.async.http.Multimap;
-import com.koushikdutta.async.util.Charsets;
-
 import org.apache.http.NameValuePair;
 
 import java.io.UnsupportedEncodingException;

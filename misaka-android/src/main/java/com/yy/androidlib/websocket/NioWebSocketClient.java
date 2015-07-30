@@ -1,6 +1,5 @@
 package com.yy.androidlib.websocket;
 
-import android.os.Handler;
 import android.util.Log;
 import com.koushikdutta.async.callback.CompletedCallback;
 import com.koushikdutta.async.http.AsyncHttpClient;

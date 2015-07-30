@@ -2,13 +2,14 @@ package com.yy.androidlib.websocket.login;
 
 import android.content.Context;
 import com.yy.androidlib.websocket.Callback;
-import com.yy.androidlib.websocket.ReplyHandler;
 import com.yy.androidlib.websocket.MisakaClient;
+import com.yy.androidlib.websocket.ReplyHandler;
 
 public class Login {
 
     private MisakaClient misakaClient;
     private String appId = "login";
+    private String loginHost = "http://uaas.yy.com";
     private LoginRequest request;
     private Context context;
 
@@ -20,10 +21,11 @@ public class Login {
         }
     }
 
-    public Login(Context context, MisakaClient misakaClient, final String loginAppId) {
+    public Login(Context context, MisakaClient misakaClient, final String loginAppId, String loginHost) {
         this.context = context;
         this.misakaClient = misakaClient;
         this.appId = loginAppId;
+        this.loginHost = loginHost;
         misakaClient.addConnectionCallback(new Callback() {
             @Override
             public void onConnected() {
@@ -40,7 +42,7 @@ public class Login {
             user.setPhone("86" + user.getPhone());
             user.setPassword(LoginUtils.EncryptSha256(LoginUtils.EncryptSha256(user.getPassword())));
         }
-        misakaClient.request("login", "/login", user, new ReplyHandler<LoginRequest>(LoginRequest.class) {
+        misakaClient.request(loginHost, "/login", user, new ReplyHandler<LoginRequest>(LoginRequest.class) {
 
             @Override
             public void onSuccess(LoginRequest result) {

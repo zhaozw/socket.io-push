@@ -1,7 +1,6 @@
 package com.koushikdutta.async.http;
 
 import android.net.Uri;
-
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 

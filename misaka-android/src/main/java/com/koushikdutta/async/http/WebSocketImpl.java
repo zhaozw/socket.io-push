@@ -2,12 +2,7 @@ package com.koushikdutta.async.http;
 
 import android.text.TextUtils;
 import android.util.Base64;
-
-import com.koushikdutta.async.AsyncServer;
-import com.koushikdutta.async.AsyncSocket;
-import com.koushikdutta.async.BufferedDataSink;
-import com.koushikdutta.async.ByteBufferList;
-import com.koushikdutta.async.Util;
+import com.koushikdutta.async.*;
 import com.koushikdutta.async.callback.CompletedCallback;
 import com.koushikdutta.async.callback.DataCallback;
 import com.koushikdutta.async.callback.WritableCallback;

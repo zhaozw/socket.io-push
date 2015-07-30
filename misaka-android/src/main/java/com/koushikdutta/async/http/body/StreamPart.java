@@ -1,13 +1,12 @@
 package com.koushikdutta.async.http.body;
 
+import com.koushikdutta.async.DataSink;
+import com.koushikdutta.async.callback.CompletedCallback;
+import org.apache.http.NameValuePair;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
-
-import org.apache.http.NameValuePair;
-
-import com.koushikdutta.async.DataSink;
-import com.koushikdutta.async.callback.CompletedCallback;
 
 public abstract class StreamPart extends Part {
     public StreamPart(String name, long length, List<NameValuePair> contentDisposition) {

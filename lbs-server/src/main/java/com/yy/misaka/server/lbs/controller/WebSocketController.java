@@ -1,11 +1,13 @@
 package com.yy.misaka.server.lbs.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yy.misaka.server.lbs.domain.LoginRequest;
 import com.yy.misaka.server.lbs.domain.RegisterRequest;
 import com.yy.misaka.server.lbs.service.StompService;
 import com.yy.misaka.server.support.BaseMessageController;
 import com.yy.misaka.server.support.StompPrincipal;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.handler.annotation.Header;
@@ -18,6 +20,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.socket.config.WebSocketMessageBrokerStats;
 
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Controller
@@ -30,12 +34,24 @@ public class WebSocketController extends BaseMessageController {
     private ObjectMapper objectMapper = new ObjectMapper();
 
     @MessageMapping("/request")
-    public void onMessage(Message<Object> message, @Header String url, @Header String appId, @Header(required = false, defaultValue = "false") boolean dataAsBody, @Payload(required = false) byte[] payload, StompPrincipal principal) throws Exception {
+    public void onMessage(Message<Object> message, @Header String url, @Header(required = false , defaultValue = "0") String appId,@Header(required = false , defaultValue = "{}") String headers, @Header(required = false, defaultValue = "false") boolean dataAsBody, @Payload(required = false) byte[] payload, StompPrincipal principal) throws Exception {
         String payloadText;
         if (payload == null) {
             payloadText = "";
         } else {
             payloadText = new String(payload);
+        }
+        TypeReference<HashMap<String,String>> typeRef
+                = new TypeReference<HashMap<String,String>>() {};
+        Map<String,String> headerMap;
+        try {
+            headerMap = objectMapper.readValue(headers, typeRef);
+        } catch (Exception e) {
+            headerMap = new HashMap<>();
+        }
+
+        if (!"0".equals(appId)) {
+            headerMap.put(appId,"");
         }
         logger.info("onMessage url {} payload {} appId {} dataAsBody {}", url, payloadText, appId, dataAsBody);
         if ("login".equals(appId)) {
@@ -51,7 +67,7 @@ public class WebSocketController extends BaseMessageController {
                 stompService.register(message, principal, registerRequest);
             }
         } else {
-            stompService.request(appId, principal, url, payload, dataAsBody,message);
+            stompService.request(headerMap, principal, url, payload, dataAsBody,message);
         }
     }
 

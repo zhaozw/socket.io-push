@@ -1,9 +1,8 @@
 package com.koushikdutta.async.http;
 
+import javax.net.ssl.SSLEngine;
 import java.lang.reflect.Field;
 import java.util.Hashtable;
-
-import javax.net.ssl.SSLEngine;
 
 /**
  * Created by koush on 12/8/14.

@@ -46,13 +46,12 @@
 		732788951B39593400899FB3 /* MIWebSocketRemote.h in Headers */ = {isa = PBXBuildFile; fileRef = 732788701B39593400899FB3 /* MIWebSocketRemote.h */; };
 		732788961B39593400899FB3 /* MIWebSocketRemote.m in Sources */ = {isa = PBXBuildFile; fileRef = 732788711B39593400899FB3 /* MIWebSocketRemote.m */; };
 		732788981B39596100899FB3 /* MIGlobalMacros.h in Headers */ = {isa = PBXBuildFile; fileRef = 732788971B39596100899FB3 /* MIGlobalMacros.h */; };
-		7327891F1B395DC100899FB3 /* JSONKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 7327891C1B395DC100899FB3 /* JSONKit.h */; };
-		732789201B395DC100899FB3 /* JSONKit.m in Sources */ = {isa = PBXBuildFile; fileRef = 7327891D1B395DC100899FB3 /* JSONKit.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		732789211B395DC100899FB3 /* README.md in Sources */ = {isa = PBXBuildFile; fileRef = 7327891E1B395DC100899FB3 /* README.md */; };
 		732789231B395EB400899FB3 /* libicucore.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 732789221B395EB400899FB3 /* libicucore.dylib */; };
 		732789251B395EBC00899FB3 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 732789241B395EBC00899FB3 /* CFNetwork.framework */; };
 		732789271B395EC300899FB3 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 732789261B395EC300899FB3 /* Security.framework */; };
 		732789291B395ECC00899FB3 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 732789281B395ECC00899FB3 /* Foundation.framework */; };
+		7346E5D01B3BDDAB00BA7DF5 /* JSONKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 7346E5CE1B3BDDAB00BA7DF5 /* JSONKit.h */; };
+		7346E5D11B3BDDAB00BA7DF5 /* JSONKit.m in Sources */ = {isa = PBXBuildFile; fileRef = 7346E5CF1B3BDDAB00BA7DF5 /* JSONKit.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		736028771B3A5D4F00CAE911 /* libSocketRocket.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 732789141B395CDB00899FB3 /* libSocketRocket.a */; };
 /* End PBXBuildFile section */
 
@@ -175,13 +174,12 @@
 		7327890A1B395CDB00899FB3 /* setup.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = setup.py; sourceTree = "<group>"; };
 		7327890C1B395CDB00899FB3 /* __init__.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = __init__.py; sourceTree = "<group>"; };
 		7327890D1B395CDB00899FB3 /* runner.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = runner.py; sourceTree = "<group>"; };
-		7327891C1B395DC100899FB3 /* JSONKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JSONKit.h; sourceTree = "<group>"; };
-		7327891D1B395DC100899FB3 /* JSONKit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JSONKit.m; sourceTree = "<group>"; };
-		7327891E1B395DC100899FB3 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		732789221B395EB400899FB3 /* libicucore.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libicucore.dylib; path = usr/lib/libicucore.dylib; sourceTree = SDKROOT; };
 		732789241B395EBC00899FB3 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		732789261B395EC300899FB3 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		732789281B395ECC00899FB3 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		7346E5CE1B3BDDAB00BA7DF5 /* JSONKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JSONKit.h; sourceTree = "<group>"; };
+		7346E5CF1B3BDDAB00BA7DF5 /* JSONKit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JSONKit.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -207,7 +205,6 @@
 				732789261B395EC300899FB3 /* Security.framework */,
 				732789241B395EBC00899FB3 /* CFNetwork.framework */,
 				732789221B395EB400899FB3 /* libicucore.dylib */,
-				7327891B1B395DC100899FB3 /* JSONKit-NoWarning-master */,
 				732788C81B395CDA00899FB3 /* SocketRocket-master */,
 				732788311B3957F600899FB3 /* misaka */,
 				732788301B3957F600899FB3 /* Products */,
@@ -225,6 +222,8 @@
 		732788311B3957F600899FB3 /* misaka */ = {
 			isa = PBXGroup;
 			children = (
+				7346E5CE1B3BDDAB00BA7DF5 /* JSONKit.h */,
+				7346E5CF1B3BDDAB00BA7DF5 /* JSONKit.m */,
 				732788971B39596100899FB3 /* MIGlobalMacros.h */,
 				7327884B1B39593400899FB3 /* MINetworkMonitor.h */,
 				7327884C1B39593400899FB3 /* MINetworkMonitor.m */,
@@ -461,17 +460,6 @@
 			path = srtestharness;
 			sourceTree = "<group>";
 		};
-		7327891B1B395DC100899FB3 /* JSONKit-NoWarning-master */ = {
-			isa = PBXGroup;
-			children = (
-				7327891C1B395DC100899FB3 /* JSONKit.h */,
-				7327891D1B395DC100899FB3 /* JSONKit.m */,
-				7327891E1B395DC100899FB3 /* README.md */,
-			);
-			name = "JSONKit-NoWarning-master";
-			path = "../../../../Huwai/ios/thirdparty/JSONKit-NoWarning-master";
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -496,7 +484,7 @@
 				7327887F1B39593400899FB3 /* MIStompDefs.h in Headers */,
 				7327887C1B39593400899FB3 /* MIMisakaConnectDelegate.h in Headers */,
 				732788721B39593400899FB3 /* MINetworkMonitor.h in Headers */,
-				7327891F1B395DC100899FB3 /* JSONKit.h in Headers */,
+				7346E5D01B3BDDAB00BA7DF5 /* JSONKit.h in Headers */,
 				7327888F1B39593400899FB3 /* MIWebSocketDelegate.h in Headers */,
 				732788841B39593400899FB3 /* MIStompConnectCbk.h in Headers */,
 				732788921B39593400899FB3 /* MIWebSocketLocal.h in Headers */,
@@ -614,9 +602,8 @@
 				732788871B39593400899FB3 /* MIStompMessage.m in Sources */,
 				7327887E1B39593400899FB3 /* MIStompConnectMgr.m in Sources */,
 				7327888B1B39593400899FB3 /* MIStompRequest.m in Sources */,
-				732789201B395DC100899FB3 /* JSONKit.m in Sources */,
+				7346E5D11B3BDDAB00BA7DF5 /* JSONKit.m in Sources */,
 				7327887B1B39593400899FB3 /* MIMisakaClient.m in Sources */,
-				732789211B395DC100899FB3 /* README.md in Sources */,
 				732788811B39593400899FB3 /* MISystemUtil.m in Sources */,
 				732788771B39593400899FB3 /* MINSString+QuoteString.m in Sources */,
 				732788831B39593400899FB3 /* MIStompCommand.m in Sources */,

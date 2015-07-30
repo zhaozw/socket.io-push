@@ -2,10 +2,7 @@ package com.koushikdutta.async.http;
 
 
 import android.text.TextUtils;
-
-import com.koushikdutta.async.http.server.AsyncHttpServer;
 import com.koushikdutta.async.util.TaggedList;
-
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
 

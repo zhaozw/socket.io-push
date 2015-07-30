@@ -3,7 +3,6 @@ package com.yy.androidlib.websocket;
 import android.content.Context;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.os.Looper;
 import android.util.Log;
 import com.yy.androidlib.websocket.util.NetworkMonitor;
 

@@ -15,7 +15,7 @@ class ViewController: UIViewController , StompDelegate{
 //        fatalError("init(coder:) has not been implemented")
 //    }
 //    
-   var stomp = StompClient(scheme: "http", host: "172.19.149.31:8080", path: "/stomp")
+   var stomp = StompClient(scheme: "http", host: "mlbs.yy.com:8080", path: "/stomp")
     
     @IBOutlet weak var username: UITextField!
     @IBOutlet weak var password: UITextField!
@@ -23,9 +23,9 @@ class ViewController: UIViewController , StompDelegate{
     
     @IBAction func login(sender: AnyObject) {
         //stomp.writeString(Message.toMessageString("SEND", headers: [:],  payload: ""))
-        stomp.request("/login", payload: ["username": username.text,"password":password.text],successHandler:{(json:JSON?)->() in
-            println("login success \(json)")
-        })
+//        stomp.request("/login", payload: ["username": username.text,"password":password.text],successHandler:{(json:JSON?)->() in
+//            println("login success \(json)")
+//        })
     }
     
     override func viewDidLoad() {
@@ -36,11 +36,11 @@ class ViewController: UIViewController , StompDelegate{
     }
     
     func stompDidConnect() {
-        stomp.subscribe("/topic/time", handler: { (json:JSON?) -> () in
-            let value = json?["message"].stringValue
-            println("qqqqq \(json)")
-            self.time.text = json?["message"].stringValue
-        })
+//        stomp.subscribe("/topic/time", handler: { (json:JSON?) -> () in
+//            let value = json?["message"].stringValue
+//            println("qqqqq \(json)")
+//            self.time.text = json?["message"].stringValue
+//        })
     }
    
 }

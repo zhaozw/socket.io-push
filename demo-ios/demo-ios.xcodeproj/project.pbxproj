@@ -19,6 +19,7 @@
 		739179381A39A7E500C5C778 /* SwiftyJson.swift in Sources */ = {isa = PBXBuildFile; fileRef = 739179371A39A7E500C5C778 /* SwiftyJson.swift */; };
 		7391793A1A39A80700C5C778 /* StompClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 739179391A39A80700C5C778 /* StompClient.swift */; };
 		7391793E1A39AE6D00C5C778 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7391793D1A39AE6D00C5C778 /* User.swift */; };
+		73E37BCC1B4A928E004FD4D7 /* Security.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73E37BCB1B4A928E004FD4D7 /* Security.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -48,11 +49,12 @@
 		7391792B1A397DA000C5C778 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		739179311A39884600C5C778 /* Message.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
 		739179331A398B6D00C5C778 /* StringReader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StringReader.swift; sourceTree = "<group>"; };
-		739179351A399FE900C5C778 /* WebSocket.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebSocket.swift; sourceTree = "<group>"; };
+		739179351A399FE900C5C778 /* WebSocket.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = WebSocket.swift; path = ../WebSocket.swift; sourceTree = "<group>"; };
 		739179371A39A7E500C5C778 /* SwiftyJson.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftyJson.swift; sourceTree = "<group>"; };
 		739179391A39A80700C5C778 /* StompClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StompClient.swift; sourceTree = "<group>"; };
 		7391793C1A39AA3700C5C778 /* demo-ios-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "demo-ios-Bridging-Header.h"; sourceTree = "<group>"; };
 		7391793D1A39AE6D00C5C778 /* User.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
+		73E37BCB1B4A928E004FD4D7 /* Security.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Security.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -76,7 +78,6 @@
 		739178E11A3976F700C5C778 = {
 			isa = PBXGroup;
 			children = (
-				739179351A399FE900C5C778 /* WebSocket.swift */,
 				7391792B1A397DA000C5C778 /* Foundation.framework */,
 				739179291A397D9800C5C778 /* Security.framework */,
 				739179271A397D9200C5C778 /* CFNetwork.framework */,
@@ -110,7 +111,9 @@
 				739179331A398B6D00C5C778 /* StringReader.swift */,
 				739179371A39A7E500C5C778 /* SwiftyJson.swift */,
 				739179391A39A80700C5C778 /* StompClient.swift */,
+				739179351A399FE900C5C778 /* WebSocket.swift */,
 				7391793D1A39AE6D00C5C778 /* User.swift */,
+				73E37BCB1B4A928E004FD4D7 /* Security.swift */,
 			);
 			path = "demo-ios";
 			sourceTree = "<group>";
@@ -245,6 +248,7 @@
 				739179321A39884600C5C778 /* Message.swift in Sources */,
 				739179341A398B6D00C5C778 /* StringReader.swift in Sources */,
 				7391793E1A39AE6D00C5C778 /* User.swift in Sources */,
+				73E37BCC1B4A928E004FD4D7 /* Security.swift in Sources */,
 				739178F01A3976F800C5C778 /* AppDelegate.swift in Sources */,
 				7391793A1A39A80700C5C778 /* StompClient.swift in Sources */,
 				739179381A39A7E500C5C778 /* SwiftyJson.swift in Sources */,
@@ -374,6 +378,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				INFOPLIST_FILE = "demo-ios/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "demo-ios/demo-ios-Bridging-Header.h";
@@ -387,6 +392,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				INFOPLIST_FILE = "demo-ios/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "demo-ios/demo-ios-Bridging-Header.h";

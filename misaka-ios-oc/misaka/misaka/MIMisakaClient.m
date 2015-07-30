@@ -101,7 +101,7 @@ MIDEFINE_NOTIFCATION(KMIMisakaClientDisconnectedNotify);
         
         NSDictionary * headerDic = nil;
         if (self.wsConfig.isDataAsBody) {
-            headerDic = @{ @"url" : reqUrl, @"appId" : reqAppId, @"dataAsBody" : @"true" };
+            headerDic = @{ @"url" : reqUrl, @"appId" : reqAppId, @"useNyy" : @"true" };
         } else {
             headerDic = @{ @"url" : reqUrl, @"appId" : reqAppId };
         }

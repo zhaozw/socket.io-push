@@ -4,30 +4,13 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
+import com.google.gson.*;
 import com.yy.androidlib.hiido.profiling.HiidoProfiling;
-import com.yy.androidlib.hiido.profiling.ProfileData;
 import com.yy.androidlib.util.apache.RandomStringUtils;
 import com.yy.androidlib.util.http.Profiler;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class MisakaClient implements StompConnectManager.StompListener {
 
@@ -37,7 +20,6 @@ public class MisakaClient implements StompConnectManager.StompListener {
     private Map<String, Request> replyCallbacks = new HashMap<String, Request>();
     private Map<String, ReplyHandler> subscribeCallbacks = new HashMap<String, ReplyHandler>();
     private AntPathMatcher matcher = new AntPathMatcher();
-    private Router router = new Router();
     private Gson gson = new GsonBuilder().registerTypeAdapter(Date.class, new JsonDeserializer() {
         @Override
         public Object deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
@@ -63,8 +45,8 @@ public class MisakaClient implements StompConnectManager.StompListener {
             List<Request> values = new ArrayList<Request>(replyCallbacks.values());
             replyCallbacks.clear();
             for (Request request : values) {
-                Log.i(TAG, "StompClient onConnected repost request " + request.getDestination());
-                request(request.getAppId(), request.getDestination(), request.getBody(), request.getReplyHandler());
+                Log.i(TAG, "StompClient onConnected repost request " + request.getUrl());
+                request(request.getUrl(), request.getBody(), null, request.getReplyHandler());
             }
         }
     }
@@ -121,10 +103,6 @@ public class MisakaClient implements StompConnectManager.StompListener {
         }
     }
 
-    public void addRoute(String appId, String url) {
-        router.addRoute(appId, url);
-    }
-
     public static abstract class SubscribeHandler<T> extends ReplyHandler<T> {
 
         public SubscribeHandler(Class clazz) {
@@ -145,7 +123,7 @@ public class MisakaClient implements StompConnectManager.StompListener {
                 Map.Entry<String, Request> pair = it.next();
                 Request request = pair.getValue();
                 if (request.timeoutForRequest()) {
-                    Log.i(TAG, "StompClient timeoutForRequest " + request.getDestination());
+                    Log.i(TAG, "StompClient timeoutForRequest " + request.getUrl());
                     if (request.getReplyHandler() != null) {
                         request.getReplyHandler().onError(-2, config.getServerReplyTimeOutTips());
                     }
@@ -153,7 +131,7 @@ public class MisakaClient implements StompConnectManager.StompListener {
                     continue;
                 }
                 if (request.timeoutForReconnect() && stomp.isConnected()) {
-                    Log.i(TAG, "StompClient timeoutForReconnect reconnect " + request.getDestination());
+                    Log.i(TAG, "StompClient timeoutForReconnect reconnect " + request.getUrl());
                     stomp.reconnect();
                 }
             }
@@ -169,8 +147,18 @@ public class MisakaClient implements StompConnectManager.StompListener {
         mainHandler.post(timeoutTask);
     }
 
-    public void request(String appId, String destination, Object body, final ReplyHandler replyHandler) {
-        String url = router.getRequestUrl(appId, destination);
+    public void request(String host, String destination, Object body, final ReplyHandler replyHandler) {
+        String url = host + destination;
+        request(url, body, null, replyHandler);
+    }
+
+    public void request(String host, String destination, String[] headerMap, Object body, final ReplyHandler replyHandler) {
+        String url = host + destination;
+        request(url, body, headerMap, replyHandler);
+    }
+
+    private void request(String url, Object body, String[] headerMap, final ReplyHandler replyHandler) {
+
         String json;
         if (body != null) {
             if (body instanceof String) {
@@ -181,18 +169,28 @@ public class MisakaClient implements StompConnectManager.StompListener {
         } else {
             json = "";
         }
+
+        if (config.getNyyLocalRequest() != null) {
+            config.getNyyLocalRequest().request(url, json, headerMap, replyHandler);
+            return;
+        }
+
+
         if (stomp.isConnected()) {
             String[] headers;
-            if (config.isDataAsBody()) {
-                headers = new String[]{"url", url, "appId", appId, "dataAsBody", "true"};
+            if (config.isUseNyy()) {
+                headers = new String[]{"url", url};
             } else {
-                headers = new String[]{"url", url, "appId", appId};
+                headers = new String[]{"url", url, "dataAsBody", "true"};
+            }
+            if (headerMap != null) {
+                headers = concat(headerMap, headers);
             }
             int key = stomp.send("/request", json, headers);
             if (key > 0) {
                 if (replyHandler != null) {
                     final String keyStr = String.valueOf(key);
-                    replyCallbacks.put(keyStr, new Request(appId, destination, body, replyHandler));
+                    replyCallbacks.put(keyStr, new Request(url, body, replyHandler));
                 }
             } else {
                 if (replyHandler != null) {
@@ -201,8 +199,14 @@ public class MisakaClient implements StompConnectManager.StompListener {
             }
         } else {
             //等待连接完成再发请求
-            replyCallbacks.put(RandomStringUtils.randomAlphanumeric(12), new Request(appId, destination, body, replyHandler));
+            replyCallbacks.put(RandomStringUtils.randomAlphanumeric(12), new Request(url, body, replyHandler));
         }
+    }
+
+    public static <T> T[] concat(T[] first, T[] second) {
+        T[] result = Arrays.copyOf(first, first.length + second.length);
+        System.arraycopy(second, 0, result, first.length, second.length);
+        return result;
     }
 
     public void subscribeBroadcast(String pushId, ReplyHandler handler) {
@@ -236,19 +240,8 @@ public class MisakaClient implements StompConnectManager.StompListener {
         if (this.profiling == null || request == null) {
             return;
         }
-        String appId = request.getAppId();
-        String interfaceName = request.getDestination();
-        int _appId;
-        if (appId != null || "".equals(appId)) {
-            _appId = 0;
-        } else {
-            try {
-                _appId = Integer.parseInt(appId);
-            } catch (Exception e) {
-                _appId = 0;
-            }
-        }
-        profiling.setAppId(_appId);
+        String interfaceName = request.getUrl();
+        profiling.setAppId(0);
         long startTime = request.getTimestamp();
         profiling.report(startTime, interfaceName, status);
 

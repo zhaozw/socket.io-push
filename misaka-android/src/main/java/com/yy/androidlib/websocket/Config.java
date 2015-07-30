@@ -7,15 +7,19 @@ public class Config {
     private String serverReplyTimeOutTips = "请求服务器超时!";
     private long serverReplyTimeOut = 10000L;
     private Mode mode = Mode.LOCAL;
-    private boolean dataAsBody = false;
+    private boolean useNyy = true;
     private HostResolver hostResolver;
+    private NyyLocalRequest nyyLocalRequest;
 
-    public Config dataAsBody(boolean dataAsBody) {
-        this.dataAsBody = dataAsBody;
+    public Config useNyy(boolean useNyy) {
+        this.useNyy = useNyy;
         return this;
     }
     public enum Mode {LOCAL, REMOTE}
 
+    public NyyLocalRequest getNyyLocalRequest() {
+        return nyyLocalRequest;
+    }
 
     public String getCannotConnectToServerTips() {
         return cannotConnectToServerTips;
@@ -59,6 +63,11 @@ public class Config {
         return this;
     }
 
+    public Config nyyLocalRequest(NyyLocalRequest nyyLocalRequest) {
+        this.nyyLocalRequest = nyyLocalRequest;
+        return this;
+    }
+
     public HostResolver getHostResolver() {
         return hostResolver;
     }
@@ -67,11 +76,11 @@ public class Config {
         return mode;
     }
 
-    public boolean isDataAsBody() {
-        return dataAsBody;
+    public boolean isUseNyy() {
+        return useNyy;
     }
 
-    public void setDataAsBody(boolean dataAsBody) {
-        this.dataAsBody = dataAsBody;
+    public void setUseNyy(boolean useNyy) {
+        this.useNyy = useNyy;
     }
 }

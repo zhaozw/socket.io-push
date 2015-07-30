@@ -1,7 +1,6 @@
 package com.koushikdutta.async.http;
 
 import android.text.TextUtils;
-
 import com.koushikdutta.async.AsyncSocket;
 import com.koushikdutta.async.DataEmitter;
 import com.koushikdutta.async.LineEmitter;

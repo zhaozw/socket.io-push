@@ -1,7 +1,6 @@
 package com.koushikdutta.async.http;
 
 import android.net.Uri;
-
 import com.koushikdutta.async.ArrayDeque;
 import com.koushikdutta.async.AsyncSocket;
 import com.koushikdutta.async.ByteBufferList;

@@ -2,23 +2,17 @@ package com.koushikdutta.async.http;
 
 import android.net.Uri;
 import android.text.TextUtils;
-
-import com.koushikdutta.async.AsyncSSLSocket;
-import com.koushikdutta.async.AsyncSSLSocketWrapper;
-import com.koushikdutta.async.AsyncSocket;
-import com.koushikdutta.async.LineEmitter;
-import com.koushikdutta.async.Util;
+import com.koushikdutta.async.*;
 import com.koushikdutta.async.callback.CompletedCallback;
 import com.koushikdutta.async.callback.ConnectCallback;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.TrustManager;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AsyncSSLSocketMiddleware extends AsyncSocketMiddleware {
     public AsyncSSLSocketMiddleware(AsyncHttpClient client) {

@@ -54,7 +54,7 @@ public class StompService {
         principal.setLoginAppId(registerRequest.getAppId());
     }
 
-    public void request(String appId, final StompPrincipal principal, String url, byte[] payload, final boolean dataAsBody, final Message<Object> message) {
+    public void request(Map<String,String> headerMap, final StompPrincipal principal, String url, byte[] payload, final boolean dataAsBody, final Message<Object> message) {
         String uid = principal.getUserId();
         String data = "";
         String myIp = System.getProperty("dragon.ip");
@@ -72,10 +72,14 @@ public class StompService {
         } else {
             builder.setHeader("Content-Type", "application/x-www-form-urlencoded");
             builder.addQueryParam("data", data)
-                    .addQueryParam("appId", appId).addQueryParam("sign", "");
+                    .addQueryParam("appId", headerMap.get("appId")).addQueryParam("sign", "");
         }
 
         for (Map.Entry<String, String> headers : principal.headers().entrySet()) {
+            builder.setHeader(headers.getKey(), headers.getValue());
+        }
+
+        for (Map.Entry<String, String> headers : headerMap.entrySet()) {
             builder.setHeader(headers.getKey(), headers.getValue());
         }
 

@@ -7,7 +7,6 @@ import com.koushikdutta.async.callback.CompletedCallback;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.async.http.AsyncHttpRequest;
 import com.koushikdutta.async.parser.JSONObjectParser;
-
 import org.json.JSONObject;
 
 public class JSONObjectBody implements AsyncHttpRequestBody<JSONObject> {

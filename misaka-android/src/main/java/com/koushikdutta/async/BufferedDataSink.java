@@ -3,8 +3,6 @@ package com.koushikdutta.async;
 import com.koushikdutta.async.callback.CompletedCallback;
 import com.koushikdutta.async.callback.WritableCallback;
 
-import java.nio.ByteBuffer;
-
 public class BufferedDataSink implements DataSink {
     DataSink mDataSink;
     public BufferedDataSink(DataSink datasink) {

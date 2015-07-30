@@ -7,16 +7,14 @@ import com.koushikdutta.async.callback.CompletedCallback;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.async.http.AsyncHttpRequest;
 import com.koushikdutta.async.parser.DocumentParser;
-
 import org.w3c.dom.Document;
-
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStreamWriter;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStreamWriter;
 
 /**
  * Created by koush on 8/30/13.

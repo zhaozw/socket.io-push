@@ -50,20 +50,26 @@ class StompClient : WebSocketDelegate {
   
     }
     
-   internal func websocketDidConnect() {
+//    func websocketDidConnect(socket: WebSocket)
+//    func websocketDidDisconnect(socket: WebSocket, error: NSError?)
+//    func websocketDidReceiveMessage(socket: WebSocket, text: String)
+//    func websocketDidReceiveData(socket: WebSocket, data: NSData)
+    
+    func websocketDidConnect(socket: WebSocket) {
         println("websocket is connected")
         webSocket.writeString(Message.toMessageString("CONNECT", headers: [:],  payload: ""))
     }
     
-    internal func websocketDidDisconnect(error: NSError?) {
+    func websocketDidDisconnect(socket: WebSocket,error: NSError?) {
         println("websocket is disconnected")
     }
     
-    internal func websocketDidWriteError(error: NSError?) {
+    func websocketDidWriteError(socket: WebSocket,error: NSError?) {
         println("wez got an error from the websocket: \(error!.localizedDescription)")
     }
     
-    internal func websocketDidReceiveMessage(text: String) {
+    func websocketDidReceiveMessage(socket: WebSocket,text: String) {
+        //var text = NSString(data:data,encoding:NSUTF8StringEncoding) as! String
         println("got some text: \(text)")
         var stomp = Message.parse(text)
         println("parseMessage \n\(stomp.command)")
@@ -86,7 +92,7 @@ class StompClient : WebSocketDelegate {
         }
     }
     
-    internal func websocketDidReceiveData(data: NSData) {
+    func websocketDidReceiveData(socket: WebSocket,data: NSData) {
         println("got some data: \(data.length)")
     }
     

@@ -12,6 +12,10 @@
 	<dict>
 		<key>0382023525B00F8630E26172111B7E1AC2987C7B</key>
 		<string>https://github.com/xuduo/stomp-app.git</string>
+		<key>78f94985-635b-4728-ab42-083be982b135++1604</key>
+		<string>https://svn.yy.com/repos/src/app/misaka/trunk</string>
+		<key>78f94985-635b-4728-ab42-083be982b135++8971</key>
+		<string>https://svn.yy.com/repos/src/app/misaka</string>
 		<key>ABB939127996C66F7E852A780552ADEEF03C6B13</key>
 		<string>https://github.com/square/SocketRocket</string>
 	</dict>
@@ -20,18 +24,37 @@
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
 		<key>0382023525B00F8630E26172111B7E1AC2987C7B</key>
+		<string>../../../../stomp-app</string>
+		<key>78f94985-635b-4728-ab42-083be982b135++1604</key>
 		<string>../../..</string>
+		<key>78f94985-635b-4728-ab42-083be982b135++8971</key>
+		<string>../../../..</string>
 		<key>ABB939127996C66F7E852A780552ADEEF03C6B13</key>
-		<string>../../../demo-ios/SocketRocket</string>
+		<string>../../../../stomp-app/demo-ios/SocketRocket</string>
+	</dict>
+	<key>IDESourceControlProjectRepositoryRootDictionary</key>
+	<dict>
+		<key>78f94985-635b-4728-ab42-083be982b135++1604</key>
+		<string>https://svn.yy.com/repos</string>
+		<key>78f94985-635b-4728-ab42-083be982b135++8971</key>
+		<string>https://svn.yy.com/repos</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
-	<string>https://github.com/xuduo/stomp-app.git</string>
+	<string>https://github.com/xuduo/misaka</string>
 	<key>IDESourceControlProjectVersion</key>
 	<integer>111</integer>
 	<key>IDESourceControlProjectWCCIdentifier</key>
-	<string>0382023525B00F8630E26172111B7E1AC2987C7B</string>
+	<string>78f94985-635b-4728-ab42-083be982b135++1604</string>
 	<key>IDESourceControlProjectWCConfigurations</key>
 	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.subversion</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>78f94985-635b-4728-ab42-083be982b135++8971</string>
+			<key>IDESourceControlWCCName</key>
+			<string></string>
+		</dict>
 		<dict>
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
 			<string>public.vcs.git</string>
@@ -47,6 +70,22 @@
 			<string>0382023525B00F8630E26172111B7E1AC2987C7B</string>
 			<key>IDESourceControlWCCName</key>
 			<string>stomp-app</string>
+		</dict>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>78f94985-635b-4728-ab42-083be982b135++1604</string>
+			<key>IDESourceControlWCCName</key>
+			<string>trunk</string>
+		</dict>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.subversion</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>78f94985-635b-4728-ab42-083be982b135++1604</string>
+			<key>IDESourceControlWCCName</key>
+			<string>trunk</string>
 		</dict>
 	</array>
 </dict>

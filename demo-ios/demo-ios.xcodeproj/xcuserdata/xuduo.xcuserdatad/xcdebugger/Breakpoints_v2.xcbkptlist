@@ -168,12 +168,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "demo-ios/StompClient.swift"
-            timestampString = "439990992.880616"
+            timestampString = "457873810.927"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "67"
-            endingLineNumber = "67"
-            landmarkName = "websocketDidReceiveMessage(_:)"
+            startingLineNumber = "73"
+            endingLineNumber = "73"
+            landmarkName = "websocketDidReceiveMessage(_:text:)"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
@@ -190,38 +190,6 @@
             startingLineNumber = "47"
             endingLineNumber = "47"
             landmarkName = "request(_:payload:successHandler:)"
-            landmarkType = "5">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "demo-ios/ViewController.swift"
-            timestampString = "439991274.750525"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "42"
-            endingLineNumber = "42"
-            landmarkName = "stompDidConnect()"
-            landmarkType = "5">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "demo-ios/ViewController.swift"
-            timestampString = "439991307.538308"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "41"
-            endingLineNumber = "41"
-            landmarkName = "stompDidConnect()"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>

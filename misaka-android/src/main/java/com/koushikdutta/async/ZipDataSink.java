@@ -1,12 +1,12 @@
 package com.koushikdutta.async;
 
+import com.koushikdutta.async.callback.CompletedCallback;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-
-import com.koushikdutta.async.callback.CompletedCallback;
 
 public class ZipDataSink extends FilteredDataSink {
     public ZipDataSink(DataSink sink) {

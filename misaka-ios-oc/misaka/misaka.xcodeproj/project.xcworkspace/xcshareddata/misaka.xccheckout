@@ -7,7 +7,7 @@
 	<key>IDESourceControlProjectIdentifier</key>
 	<string>56709B9E-5916-4FC0-9C56-43A51C3B2DEE</string>
 	<key>IDESourceControlProjectName</key>
-	<string>project</string>
+	<string>misaka</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
 		<key>78f94985-635b-4728-ab42-083be982b135++1604</key>
@@ -18,7 +18,7 @@
 		<string>https://github.com/xuduo/Huwai</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
-	<string>misaka-ios-oc/misaka/misaka.xcodeproj/project.xcworkspace</string>
+	<string>misaka-ios-oc/misaka/misaka.xcodeproj</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
 		<key>78f94985-635b-4728-ab42-083be982b135++1604</key>
@@ -26,7 +26,7 @@
 		<key>78f94985-635b-4728-ab42-083be982b135++8971</key>
 		<string>../../../../..</string>
 		<key>F4046EACE6EB3EF5C5F5C6E81A719CDBD753B1E9</key>
-		<string>../../../../../Huwai</string>
+		<string>../../../../../../Huwai</string>
 	</dict>
 	<key>IDESourceControlProjectRepositoryRootDictionary</key>
 	<dict>

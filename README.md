@@ -88,7 +88,7 @@ maven 库
 ### 初始化
 
 ```
-        misaka = new MisakaClient(context, lbsHost, new Config().dataAsBody(true)); // dataAsBody true表示整个对象序列化为json,post到业务服务器,否则使用nyy协议
+        misaka = new MisakaClient(context, lbsHost, new Config().useNyy(true)); // useNyy true表示整个对象序列化为json,post到业务服务器,否则使用nyy协议
         misaka.addRoute("demo-server", demoHost);      // appId,业务服务器地址
         misaka.addRoute("login", "http://uaas.yy.com"); // 使用登录服务
         misaka.addConnectionCallback(new Callback() {
