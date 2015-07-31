@@ -35,7 +35,7 @@ public class NioWebSocketClient implements IWebSocketClient, AsyncHttpClient.Web
         url = url + "/stomp/1/" + RandomStringUtils.randomAlphanumeric(32) + "/websocket";
         AsyncHttpGet get = new AsyncHttpGet(url);
         Log.v(TAG, "AndroidAsyncClient connect " + url);
-        get.setTimeout(4000);
+        get.setTimeout(5000);
         webSocketFuture = AsyncHttpClient.getDefaultInstance().websocket(get, null, NioWebSocketClient.this);
         if (webSocket != null) {
             webSocket.setStringCallback(null);
