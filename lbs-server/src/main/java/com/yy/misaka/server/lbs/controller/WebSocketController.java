@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.socket.config.WebSocketMessageBrokerStats;
 
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
@@ -45,12 +46,13 @@ public class WebSocketController extends BaseMessageController {
                 = new TypeReference<HashMap<String,String>>() {};
         Map<String,String> headerMap;
         try {
-            headerMap = objectMapper.readValue(headers, typeRef);
+            String unescaped = URLDecoder.decode(headers,"UTF-8");
+            headerMap = objectMapper.readValue(unescaped, typeRef);
         } catch (Exception e) {
             headerMap = new HashMap<>();
         }
 
-        if (!"0".equals(appId)) {
+        if (!"0".equals(appId) || !headerMap.containsKey("appId")) {
             headerMap.put(appId,"");
         }
         logger.info("onMessage url {} payload {} appId {} dataAsBody {}", url, payloadText, appId, dataAsBody);
