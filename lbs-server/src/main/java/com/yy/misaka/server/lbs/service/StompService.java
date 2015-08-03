@@ -9,6 +9,7 @@ import com.yy.misaka.server.lbs.service.Uaas.RegisterResult;
 import com.yy.misaka.server.lbs.service.Uaas.SmsResult;
 import com.yy.misaka.server.support.ReplyMessagingTemplate;
 import com.yy.misaka.server.support.StompPrincipal;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +55,7 @@ public class StompService {
         principal.setLoginAppId(registerRequest.getAppId());
     }
 
-    public void request(Map<String,String> headerMap, final StompPrincipal principal, String url, byte[] payload, final boolean dataAsBody, final Message<Object> message) {
+    public void request(Map<String, String> headerMap, final StompPrincipal principal, String url, byte[] payload, final boolean dataAsBody, final Message<Object> message) {
         String uid = principal.getUserId();
         String data = "";
         String myIp = System.getProperty("dragon.ip");
@@ -133,13 +134,24 @@ public class StompService {
                                     } else {
                                         try {
                                             JsonNode nyy = mapper.readTree(response.getResponseBody());
-                                            if (nyy != null && nyy.get("data") != null) {
+                                            JsonNode data = nyy.get("data");
+                                            JsonNode nyyCode = nyy.get("code");
+                                            if (nyy != null && data != null) {
                                                 messagingTemplate.replyToUserSuccess(message, nyy.get("data").toString());
+                                            } else if (nyy != null && nyyCode != null && nyyCode.isInt()) {
+                                                JsonNode nyyMsg = nyy.get("msg");
+                                                String msg;
+                                                if (nyyMsg.isTextual()) {
+                                                    msg = nyyMsg.textValue();
+                                                } else {
+                                                    msg = "解析服务器数据错误!";
+                                                }
+                                                messagingTemplate.replyToUser(message, null, nyyCode.asInt(), msg);
                                             } else {
-                                                messagingTemplate.replyToUser(message, null, -2, "解析服务器数据错误!");
+                                                messagingTemplate.replyToUser(message, null, -10004, "解析服务器数据错误!");
                                             }
                                         } catch (Exception e) {
-                                            messagingTemplate.replyToUser(message, null, -2, "解析服务器数据错误!");
+                                            messagingTemplate.replyToUser(message, null, -10004, "解析服务器数据错误!");
                                         }
                                     }
                                 }

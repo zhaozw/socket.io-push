@@ -52,8 +52,8 @@ public class WebSocketController extends BaseMessageController {
             headerMap = new HashMap<>();
         }
 
-        if (!"0".equals(appId) || !headerMap.containsKey("appId")) {
-            headerMap.put(appId,"");
+        if (!"0".equals(appId) && !headerMap.containsKey("appId")) {
+            headerMap.put("appId", appId);
         }
         logger.info("onMessage url {} payload {} appId {} dataAsBody {}", url, payloadText, appId, dataAsBody);
         if ("login".equals(appId)) {
