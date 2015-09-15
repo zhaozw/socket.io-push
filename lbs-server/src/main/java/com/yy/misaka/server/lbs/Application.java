@@ -37,28 +37,6 @@ public class Application extends WebMvcConfigurerAdapter {
         return asyncHttpClient;
     }
 
-    /**
-     * 设置tomcat连接数
-     * @return
-     */
-    @Bean
-    public EmbeddedServletContainerFactory servletContainer() {
-        TomcatEmbeddedServletContainerFactory tomcat = new TomcatEmbeddedServletContainerFactory();
-        tomcat.addConnectorCustomizers(new TomcatConnectorCustomizer() {
-            @Override
-            public void customize(Connector connector) {
-                if (connector.getProtocolHandler() instanceof Http11NioProtocol) {
-                    Http11NioProtocol protocol = (Http11NioProtocol) connector.getProtocolHandler();
-                    NioEndpoint endpoint = protocol.getEndpoint();
-                    endpoint.setMaxConnections(5000000);
-                }
-                connector.setMaxParameterCount(500);
-            }
-        });
-        return tomcat;
-    }
-
-
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
     }

@@ -24,7 +24,9 @@ import java.io.File;
 public enum AppModel {
     INSTANCE;
 
-    private String lbsHost = "http://" + "dev.yypm.com:8080"; //lbs服务器地址
+//    private String lbsHost = "http://" + "183.61.6.33:8080"; //lbs服务器地址
+//    private String lbsHost = "http://" + "172.19.103.101:8080"; //lbs服务器地址
+    private String lbsHost = "http://" + "172.19.207.3:8080"; //lbs服务器地址
     //        private String lbsHost = "http://" + "172.19.207.244:8080"; //lbs服务器地址
     private String demoHost = "http://" + "dev.yypm.com:8091"; //demo服务器地址
     //        private String demoHost = "http://" + "172.19.207.244:8091"; //demo服务器地址
@@ -46,7 +48,7 @@ public enum AppModel {
         initLogging();
         Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler());
 
-        misaka = new MisakaClient(application, lbsHost, new Config().useNyy(true).nyyLocalRequest(new NyyLocalRequest()));
+        misaka = new MisakaClient(application, lbsHost, new Config().useNyy(true));
 
         misaka.request("http://172.19.12.25:8096", "/video/recommend/list", new String[]{"appId", "111"}, new Test(), new ReplyHandler<JsonElement>(JsonElement.class) {
             @Override
