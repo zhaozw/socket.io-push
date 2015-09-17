@@ -25,8 +25,8 @@ public class StompConnectManager implements WebSocketListener, NetworkMonitor.Ne
         public void run() {
             doConnect();
             checkHeartbeat();
-            socketHandler.removeCallbacks(this);
-            socketHandler.postDelayed(this, 3000L);
+            socketHandler.removeCallbacks(connectTask);
+            socketHandler.postDelayed(connectTask, 3000L);
         }
     };
 
@@ -141,6 +141,7 @@ public class StompConnectManager implements WebSocketListener, NetworkMonitor.Ne
     }
 
     public void reconnect() {
+        lastHeartbeat = 0;
         subscribeConnected = false;
         webSocket.close();
     }

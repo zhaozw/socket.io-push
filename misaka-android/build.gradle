@@ -12,36 +12,38 @@ sourceSets {
 
 dependencies {
     compile 'com.google.code.gson:gson:2.3.1'
-    compile 'com.koushikdutta.async:androidasync:2.+'
+    compile 'com.koushikdutta.async:androidasync:2.1.6'
     compile 'com.yy.androidlib:util:1.0.22'
     compile 'com.yy.androidlib:hiido-profiling:1.0.18'
     provided 'com.google.android:android:4.1.1.4'
 }
 
-//android {
-//    compileSdkVersion 19
-//    buildToolsVersion '19.1.0'
-//
-//    defaultConfig {
-//        minSdkVersion 15
-//        targetSdkVersion 19
-//        versionCode 1
-//        versionName "1.0"
-//    }
-//    lintOptions {
-//        abortOnError false
-//    }
-//}
-
 apply plugin: 'maven'
 apply plugin: 'signing'
-apply plugin: 'maven-publish'
 
 group = 'com.yy'
-version = '1.0.25'
+version = '1.0.27'
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+javadoc {
+    options {
+        encoding "UTF-8"
+        charSet 'UTF-8'
+        author true // 支持author标记
+        version true // 支持version标记
+    }
+}
 
 compileJava {
     options.encoding = "UTF-8"
+}
+
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
 }
 
 task sourcesJar(type: Jar) {
@@ -49,90 +51,33 @@ task sourcesJar(type: Jar) {
     from sourceSets.main.allSource
 }
 
+
 artifacts {
-    archives sourcesJar
+    archives javadocJar, sourcesJar
 }
-
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
-        }
-    }
-}
-
-//task androidSourcesJar(type: Jar) {
-//    classifier = 'sources'
-//    from android.sourceSets.main.java.sourceFiles
-//}
-
-//artifacts {
-//    archives androidSourcesJar
-//}
 
 signing {
     sign configurations.archives
 }
 
-uploadArchives {
-    repositories {
-        mavenDeployer {
-
-            repository(url: "http://jrepo.yypm.com/nexus/content/repositories/releases") {
-                authentication(userName: "admin", password: "admin123")
-            }
-
-            pom.project {
-                name 'misaka-android'
-                packaging 'aar'
-                description 'misaka-android'
-                url 'https://github.com/xuduo/stomp-app'
-
-                scm {
-                    url 'https://github.com/xuduo/stomp-app'
-                    connection 'https://github.com/xuduo/stomp-app'
-                    developerConnection 'https://github.com/xuduo/stomp-app'
-                }
-
-                licenses {
-                    license {
-                        name 'The Apache Software License, Version 2.0'
-                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                        distribution 'repo'
-                    }
-                }
-
-                developers {
-                    developer {
-                        id 'xuduo'
-                        name 'xuduo'
-                    }
-                }
-            }
-        }
-    }
-}
-
 //uploadArchives {
 //    repositories {
 //        mavenDeployer {
-//            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 //
-//            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-//                authentication(userName: sonatypeUsername, password: sonatypePassword)
+//            repository(url: "http://jrepo.yypm.com/nexus/content/repositories/releases") {
+//                authentication(userName: "admin", password: "admin123")
 //            }
 //
 //            pom.project {
 //                name 'misaka-android'
 //                packaging 'aar'
 //                description 'misaka-android'
-//                description 'misaka-android'
 //                url 'https://github.com/xuduo/stomp-app'
 //
 //                scm {
-//                    url 'https://github.com/xuduo/AndroidNotificationCenter'
-//                    connection 'https://github.com/xuduo/AndroidNotificationCenter'
-//                    developerConnection 'https://github.com/xuduo/AndroidNotificationCenter'
+//                    url 'https://github.com/xuduo/stomp-app'
+//                    connection 'https://github.com/xuduo/stomp-app'
+//                    developerConnection 'https://github.com/xuduo/stomp-app'
 //                }
 //
 //                licenses {
@@ -150,7 +95,48 @@ uploadArchives {
 //                    }
 //                }
 //            }
-//
 //        }
 //    }
 //}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: sonatypeUsername, password: sonatypePassword)
+            }
+
+            pom.project {
+                name 'misaka-android'
+                packaging 'jar'
+                description 'misaka-android'
+                description 'misaka-android'
+                url 'https://github.com/xuduo/misaka'
+
+                scm {
+                    url 'https://github.com/xuduo/AndroidNotificationCenter'
+                    connection 'https://github.com/xuduo/AndroidNotificationCenter'
+                    developerConnection 'https://github.com/xuduo/AndroidNotificationCenter'
+                }
+
+                licenses {
+                    license {
+                        name 'The Apache Software License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        distribution 'repo'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id 'xuduo'
+                        name 'xuduo'
+                    }
+                }
+            }
+
+        }
+    }
+}
