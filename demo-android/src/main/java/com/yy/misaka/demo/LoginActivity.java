@@ -8,12 +8,23 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.inputmethod.InputMethodSession;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.koushikdutta.async.LineEmitter;
+import com.koushikdutta.async.http.AsyncHttpClient;
+import com.koushikdutta.async.http.socketio.Acknowledge;
+import com.koushikdutta.async.http.socketio.ConnectCallback;
+import com.koushikdutta.async.http.socketio.JSONCallback;
+import com.koushikdutta.async.http.socketio.SocketIOClient;
 import com.yy.androidlib.websocket.Destination;
 import com.yy.androidlib.websocket.ReplyHandler;
 import com.yy.androidlib.websocket.login.LoginRequest;
 import com.yy.misaka.demo.appmodel.AppModel;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 
 public class LoginActivity extends Activity {
@@ -32,6 +43,35 @@ public class LoginActivity extends Activity {
         usernameEdit.setText(getHistoryUsername());
         final EditText passwordEdit = (EditText) findViewById(R.id.et_password);
         passwordEdit.setText(getHistoryPassword());
+
+
+        SocketIOClient.connect(AsyncHttpClient.getDefaultInstance(), "http://127.0.0.1:9092/", new ConnectCallback() {
+            @Override
+            public void onConnectCompleted(Exception ex, SocketIOClient client) {
+                if (ex != null) {
+                    ex.printStackTrace();
+                    return;
+                }
+                client.setStringCallback(new LineEmitter.StringCallback() {
+                    @Override
+                    public void onString(String string) {
+                        System.out.println(string);
+                    }
+                });
+                client.on("someEvent", new InputMethodSession.EventCallback() {
+                    @Override
+                    public void onEvent(JSONArray argument, Acknowledge acknowledge) {
+                        System.out.println("args: " + argument.toString());
+                    }
+                });
+                client.setJSONCallback(new JSONCallback() {
+                    @Override
+                    public void onJSON(JSONObject json) {
+                        System.out.println("json: " + json.toString());
+                    }
+                });
+            }
+        });
 
         findViewById(R.id.btn_login).setOnClickListener(new OnClickListener() {
             @Override

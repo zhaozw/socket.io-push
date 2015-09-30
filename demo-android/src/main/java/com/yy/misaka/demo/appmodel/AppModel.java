@@ -26,7 +26,7 @@ public enum AppModel {
 
 //    private String lbsHost = "http://" + "183.61.6.33:8080"; //lbs服务器地址
 //    private String lbsHost = "http://" + "172.19.103.101:8080"; //lbs服务器地址
-    private String lbsHost = "http://" + "172.19.207.3:8080"; //lbs服务器地址
+    private String lbsHost = "http://" + "172.19.12.176:8080"; //lbs服务器地址
     //        private String lbsHost = "http://" + "172.19.207.244:8080"; //lbs服务器地址
     private String demoHost = "http://" + "dev.yypm.com:8091"; //demo服务器地址
     //        private String demoHost = "http://" + "172.19.207.244:8091"; //demo服务器地址
@@ -48,27 +48,27 @@ public enum AppModel {
         initLogging();
         Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler());
 
-        misaka = new MisakaClient(application, lbsHost, new Config().useNyy(true));
-
-        misaka.request("http://172.19.12.25:8096", "/video/recommend/list", new String[]{"appId", "111"}, new Test(), new ReplyHandler<JsonElement>(JsonElement.class) {
-            @Override
-            public void onSuccess(JsonElement result) {
-                Log.i("123", result + "");//172.19.12.25:8096/video/recommend/list?appId=111&data={%22auth%22:%22no%22,%22lastOrderId%22:0,%22limit%22:7,%22uid%22:100000400}
-            }
-
-            @Override
-            public void onError(int code, String message) {
-                Log.i("123", message + "");
-            }
-
-        });
-        misaka.addConnectionCallback(new Callback() {
-            @Override
-            public void onConnected() {
-                im.onConnected();
-            }
-        });
-        login = new Login(application, misaka, "fm141027", "http://uaas.yy.com");
+//        misaka = new MisakaClient(application, lbsHost, new Config().useNyy(true));
+//
+//        misaka.request("http://172.19.12.25:8096", "/video/recommend/list", new String[]{"appId", "111"}, new Test(), new ReplyHandler<JsonElement>(JsonElement.class) {
+//            @Override
+//            public void onSuccess(JsonElement result) {
+//                Log.i("123", result + "");//172.19.12.25:8096/video/recommend/list?appId=111&data={%22auth%22:%22no%22,%22lastOrderId%22:0,%22limit%22:7,%22uid%22:100000400}
+//            }
+//
+//            @Override
+//            public void onError(int code, String message) {
+//                Log.i("123", message + "");
+//            }
+//
+//        });
+//        misaka.addConnectionCallback(new Callback() {
+//            @Override
+//            public void onConnected() {
+//                im.onConnected();
+//            }
+//        });
+//        login = new Login(application, misaka, "fm141027", "http://uaas.yy.com");
         im = new ImModel(application, misaka, login);
         pm = new ProfileModel(application, misaka, demoHost);
     }
