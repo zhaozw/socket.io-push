@@ -75,6 +75,46 @@ public class Application extends WebMvcConfigurerAdapter {
 
 
     public static void main(String[] args) {
+        final SocketIOServer server = new SocketIOServer(config);
+        server.addEventListener("httpProxy", HttpProxyRequest.class, new DataListener<HttpProxyRequest>() {
+            @Override
+            public void onData(SocketIOClient client, HttpProxyRequest data, AckRequest ackRequest) {
+                // broadcast messages to all clients
+
+                logger.debug("recieved httpProxy event {}", data);
+                AsyncHttpClient.BoundRequestBuilder builder = asyncHttpClient.preparePost(data.getUrl());
+                builder.setHeader("Content-Type", "application/x-www-form-urlencoded");
+                // builder.addQueryParam("data","12345");
+                builder.setBody("data=11111");
+                asyncHttpClient.executeRequest(builder.build(), new AsyncCompletionHandler<Object>() {
+                    @Override
+                    public Object onCompleted(Response response) throws Exception {
+                        byte[] body =
+                                response.getResponseBodyAsBytes();
+                        logger.debug("body ", new String (body));
+                        return null;
+                    }
+                });
+                server.getBroadcastOperations().sendEvent("httpProxy", data);
+            }
+        });
+
+        server.addConnectListener(new ConnectListener() {
+            @Override
+            public void onConnect(SocketIOClient client) {
+                logger.info(" client connected {}", client.getSessionId());
+
+            }
+        });
+
+        server.addDisconnectListener(new DisconnectListener() {
+            @Override
+            public void onDisconnect(SocketIOClient client) {
+                logger.info(" client disconnected {}", client.getSessionId());
+            }
+        });
+
+        server.start();
         SpringApplication.run(Application.class, args);
     }
 
