@@ -6,6 +6,8 @@ import com.corundumstudio.socketio.SocketIOServer;
 import com.corundumstudio.socketio.listener.ConnectListener;
 import com.corundumstudio.socketio.listener.DataListener;
 import com.corundumstudio.socketio.listener.DisconnectListener;
+import com.corundumstudio.socketio.store.RedissonStoreFactory;
+import com.corundumstudio.socketio.store.StoreFactory;
 import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
@@ -14,6 +16,8 @@ import com.yy.misaka.server.lbs.socketio.ProxyRequest;
 import com.yy.misaka.server.lbs.socketio.ProxyResponse;
 import com.yy.misaka.server.support.ReplyMessagingTemplate;
 
+import org.redisson.Config;
+import org.redisson.Redisson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -81,9 +85,19 @@ public class Application extends WebMvcConfigurerAdapter {
 //    }
 
     @Bean
-    public SocketIOServer socketIOServer(final AsyncHttpClient asyncHttpClient) {
+    public StoreFactory reddison(){
+        Config config = new Config();
+        config.useSingleServer().setAddress("127.0.0.1:6379");
+
+        Redisson redisson = Redisson.create(config);
+        return new RedissonStoreFactory(redisson);
+    }
+
+    @Bean
+    public SocketIOServer socketIOServer(final AsyncHttpClient asyncHttpClient,StoreFactory storeFactory) {
 
         com.corundumstudio.socketio.Configuration config = new com.corundumstudio.socketio.Configuration();
+        config.setStoreFactory(storeFactory);
         config.setPort(8080);
         final SocketIOServer server = new SocketIOServer(config);
         server.addEventListener("httpProxy", ProxyRequest.class, new DataListener<ProxyRequest>() {
