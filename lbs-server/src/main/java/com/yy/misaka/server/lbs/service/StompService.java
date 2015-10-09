@@ -27,7 +27,7 @@ public class StompService {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
     @Autowired
     private ReplyMessagingTemplate messagingTemplate;
-    @Autowired
+//    @Autowired
     private AsyncHttpClient asyncHttpClient;
     @Autowired
     private Uaas uaas;
