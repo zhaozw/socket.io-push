@@ -107,7 +107,7 @@ public class LoginActivity extends Activity {
         final EditText passwordEdit = (EditText) findViewById(R.id.et_password);
         passwordEdit.setText(getHistoryPassword());
 
-        proxyClient = new ProxyClient(getApplicationContext(), "http://172.19.12.176:8080", new Config());
+        proxyClient = new ProxyClient(getApplicationContext(), "http://183.61.6.33:8080", new Config());
 
         findViewById(R.id.btn_login).setOnClickListener(new OnClickListener() {
             @Override

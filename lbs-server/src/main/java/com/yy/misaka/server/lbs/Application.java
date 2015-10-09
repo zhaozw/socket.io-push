@@ -20,6 +20,8 @@ import org.redisson.Config;
 import org.redisson.Redisson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -32,10 +34,13 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 @EnableAutoConfiguration
 @ComponentScan
 @EnableAsync
-public class Application extends WebMvcConfigurerAdapter {
+public class Application extends WebMvcConfigurerAdapter implements InitializingBean{
 
     private int timeout;
     private Logger logger = LoggerFactory.getLogger(this.getClass());
+
+    @Autowired
+    private SocketIOServer server;
 
     @Bean
     public ReplyMessagingTemplate messagingTemplate() {
@@ -88,6 +93,7 @@ public class Application extends WebMvcConfigurerAdapter {
     public StoreFactory reddison(){
         Config config = new Config();
         config.useSingleServer().setAddress("127.0.0.1:6379");
+      //  config.useSingleServer().setAddress("dev.yypm.com:7000");
 
         Redisson redisson = Redisson.create(config);
         return new RedissonStoreFactory(redisson);
@@ -153,14 +159,16 @@ public class Application extends WebMvcConfigurerAdapter {
             }
         });
 
-        server.start();
         return server;
     }
 
 
     public static void main(String[] args) {
-
         SpringApplication.run(Application.class, args);
     }
 
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        server.start();
+    }
 }
