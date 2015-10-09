@@ -15,14 +15,15 @@ dependencies {
     compile 'com.koushikdutta.async:androidasync:2.1.6'
     compile 'com.yy.androidlib:util:1.0.22'
     compile 'com.yy.androidlib:hiido-profiling:1.0.18'
-    provided 'com.google.android:android:4.1.1.4'
+    compile 'com.google.android:android:4.1.1.4'
+    compile 'io.socket:socket.io-client:0.6.1'
 }
 
 apply plugin: 'maven'
 apply plugin: 'signing'
 
 group = 'com.yy'
-version = '1.0.27'
+version = '1.0.28'
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
@@ -101,42 +102,43 @@ signing {
 
 uploadArchives {
     repositories {
-        mavenDeployer {
-            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                authentication(userName: "admin", password: "admin123")
-            }
-
-            pom.project {
-                name 'misaka-android'
-                packaging 'jar'
-                description 'misaka-android'
-                description 'misaka-android'
-                url 'https://github.com/xuduo/misaka'
-
-                scm {
-                    url 'https://github.com/xuduo/AndroidNotificationCenter'
-                    connection 'https://github.com/xuduo/AndroidNotificationCenter'
-                    developerConnection 'https://github.com/xuduo/AndroidNotificationCenter'
-                }
-
-                licenses {
-                    license {
-                        name 'The Apache Software License, Version 2.0'
-                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                        distribution 'repo'
-                    }
-                }
-
-                developers {
-                    developer {
-                        id 'xuduo'
-                        name 'xuduo'
-                    }
-                }
-            }
-
-        }
+        mavenLocal()
+//        mavenDeployer {
+//            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+//
+//            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+//                authentication(userName: "admin", password: "admin123")
+//            }
+//
+//            pom.project {
+//                name 'misaka-android'
+//                packaging 'jar'
+//                description 'misaka-android'
+//                description 'misaka-android'
+//                url 'https://github.com/xuduo/misaka'
+//
+//                scm {
+//                    url 'https://github.com/xuduo/AndroidNotificationCenter'
+//                    connection 'https://github.com/xuduo/AndroidNotificationCenter'
+//                    developerConnection 'https://github.com/xuduo/AndroidNotificationCenter'
+//                }
+//
+//                licenses {
+//                    license {
+//                        name 'The Apache Software License, Version 2.0'
+//                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+//                        distribution 'repo'
+//                    }
+//                }
+//
+//                developers {
+//                    developer {
+//                        id 'xuduo'
+//                        name 'xuduo'
+//                    }
+//                }
+//            }
+//
+//        }
     }
 }

@@ -5,26 +5,30 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
-import android.util.Log;
+
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.inputmethod.InputMethodSession;
 import android.widget.EditText;
-import android.widget.Toast;
 
-import com.koushikdutta.async.LineEmitter;
-import com.koushikdutta.async.http.AsyncHttpClient;
-import com.koushikdutta.async.http.socketio.Acknowledge;
-import com.koushikdutta.async.http.socketio.ConnectCallback;
-import com.koushikdutta.async.http.socketio.JSONCallback;
-import com.koushikdutta.async.http.socketio.SocketIOClient;
-import com.yy.androidlib.websocket.Destination;
-import com.yy.androidlib.websocket.ReplyHandler;
-import com.yy.androidlib.websocket.login.LoginRequest;
-import com.yy.misaka.demo.appmodel.AppModel;
-
-import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
+
+import android.util.Log;
+
+import com.yy.androidlib.websocket.Config;
+import com.yy.androidlib.websocket.ReplyHandler;
+import com.yy.httpproxy.ProxyClient;
+
+import java.net.URISyntaxException;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
+
+import io.socket.client.IO;
+import io.socket.client.Socket;
+import io.socket.emitter.Emitter;
 
 
 public class LoginActivity extends Activity {
@@ -33,6 +37,65 @@ public class LoginActivity extends Activity {
     private static final String PREFERENCE_NAME = "DEMO";
     private static final String KEY_USERNAME = "USERNAME";
     private static final String KEY_PASSWORD = "PASSWORD";
+
+    private ProxyClient proxyClient;
+
+    public static class AndroidLoggingHandler extends Handler {
+
+        public static void reset(Handler rootHandler) {
+            Logger rootLogger = LogManager.getLogManager().getLogger("");
+            Handler[] handlers = rootLogger.getHandlers();
+            for (Handler handler : handlers) {
+                rootLogger.removeHandler(handler);
+            }
+            LogManager.getLogManager().getLogger("").addHandler(rootHandler);
+        }
+
+        @Override
+        public void close() {
+        }
+
+        @Override
+        public void flush() {
+        }
+
+        @Override
+        public void publish(LogRecord record) {
+            if (!super.isLoggable(record))
+                return;
+
+            String name = record.getLoggerName();
+            int maxLength = 30;
+            String tag = name.length() > maxLength ? name.substring(name.length() - maxLength) : name;
+
+            try {
+                int level = getAndroidLevel(record.getLevel());
+                Log.println(level, tag, record.getMessage());
+                if (record.getThrown() != null) {
+                    Log.println(level, tag, Log.getStackTraceString(record.getThrown()));
+                }
+            } catch (RuntimeException e) {
+                Log.e("AndroidLoggingHandler", "Error logging message.", e);
+            }
+        }
+
+        static int getAndroidLevel(Level level) {
+            int value = level.intValue();
+            if (value >= 1000) {
+                return Log.ERROR;
+            } else if (value >= 900) {
+                return Log.WARN;
+            } else if (value >= 800) {
+                return Log.INFO;
+            } else {
+                return Log.DEBUG;
+            }
+        }
+    }
+
+    public static class Test {
+        public String data;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,87 +107,24 @@ public class LoginActivity extends Activity {
         final EditText passwordEdit = (EditText) findViewById(R.id.et_password);
         passwordEdit.setText(getHistoryPassword());
 
-
-        SocketIOClient.connect(AsyncHttpClient.getDefaultInstance(), "http://127.0.0.1:9092/", new ConnectCallback() {
-            @Override
-            public void onConnectCompleted(Exception ex, SocketIOClient client) {
-                if (ex != null) {
-                    ex.printStackTrace();
-                    return;
-                }
-                client.setStringCallback(new LineEmitter.StringCallback() {
-                    @Override
-                    public void onString(String string) {
-                        System.out.println(string);
-                    }
-                });
-                client.on("someEvent", new InputMethodSession.EventCallback() {
-                    @Override
-                    public void onEvent(JSONArray argument, Acknowledge acknowledge) {
-                        System.out.println("args: " + argument.toString());
-                    }
-                });
-                client.setJSONCallback(new JSONCallback() {
-                    @Override
-                    public void onJSON(JSONObject json) {
-                        System.out.println("json: " + json.toString());
-                    }
-                });
-            }
-        });
+        proxyClient = new ProxyClient(getApplicationContext(), "http://172.19.12.176:8080", new Config());
 
         findViewById(R.id.btn_login).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                LoginRequest user = new LoginRequest();
-                final String username = usernameEdit.getText().toString();
-                final String password = passwordEdit.getText().toString();
-                user.setPhone(username);
-                user.setPassword(password);
 
-//                User usr = new User();
-//                usr.setNick("qqq");
-//                usr.setPortrait("ppp");
-//                AppModel.INSTANCE.getStomp().request("demo-server", "/echo", usr, new ReplyHandler<User>(User.class) {
-//                    @Override
-//                    public void onSuccess(User result) {
-//                        Toast.makeText(LoginActivity.this, "request success " + result, Toast.LENGTH_LONG).show();
-//                    }
-//
-//                    @Override
-//                    public void onError(int code, String message) {
-//                        Toast.makeText(LoginActivity.this, "request error!code:" + code + " ,message:" + message, Toast.LENGTH_LONG).show();
-//                    }
-//                });
-
-//                AppModel.INSTANCE.getStomp().request("1001", "/getGuruList", new PageRequest(), new ReplyHandler<TeacherData>(TeacherData.class) {
-//                    @Override
-//                    public void onSuccess(TeacherData result) {
-//                        Log.i("stomp", " result " + result.actualEndIndex);
-//                    }
-//
-//                    @Override
-//                    public void onError(int code, String message) {
-//                        Log.i("stomp", " error " + message);
-//                    }
-//                });
-
-                AppModel.INSTANCE.getLogin().login(user, new ReplyHandler<LoginRequest>(LoginRequest.class) {
+                proxyClient.request("http://mlbs.yy.com:8080", "/echo", new Test(), new ReplyHandler<Test>(Test.class) {
                     @Override
-                    public void onSuccess(LoginRequest result) {
-                        Log.i(TAG, "onSuccess " + result);
-                        Toast.makeText(LoginActivity.this, "login success uid :" +AppModel.INSTANCE.getLogin().getCurrentUid(), Toast.LENGTH_LONG).show();
-                        saveAccount(username, password);
-                        Intent intent = new Intent(LoginActivity.this, ImUserListActivity.class);
-                        startActivity(intent);
-                        AppModel.INSTANCE.getProfile().queryMyInfo();
+                    public void onSuccess(Test result) {
+                        Log.d(TAG,"success " + result.data);
                     }
 
                     @Override
                     public void onError(int code, String message) {
-                        Toast.makeText(LoginActivity.this, "request error!code:" + code + " ,message:" + message, Toast.LENGTH_LONG).show();
+                        Log.d(TAG,"error " + message);
                     }
                 });
+
             }
         });
 
@@ -135,6 +135,7 @@ public class LoginActivity extends Activity {
                 startActivity(intent);
             }
         });
+
     }
 
     static class TeacherData {
