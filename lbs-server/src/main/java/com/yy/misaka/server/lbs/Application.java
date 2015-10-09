@@ -34,23 +34,23 @@ public class Application extends WebMvcConfigurerAdapter {
         return new ReplyMessagingTemplate();
     }
 
-    @Bean
-    public AsyncHttpClient asyncHttpClient() {
-        timeout = 3000;
-        AsyncHttpClient asyncHttpClient = new AsyncHttpClient(new AsyncHttpClientConfig.Builder().setConnectTimeout(timeout).setReadTimeout(timeout).setRequestTimeout(timeout).build());
-        return asyncHttpClient;
-    }
-
-
-    @Bean
-    public StoreFactory reddison(){
-        Config config = new Config();
-        config.useSingleServer().setAddress("127.0.0.1:6379");
-      //  config.useSingleServer().setAddress("dev.yypm.com:7000");
-
-        Redisson redisson = Redisson.create(config);
-        return new RedissonStoreFactory(redisson);
-    }
+//    @Bean
+//    public AsyncHttpClient asyncHttpClient() {
+//        timeout = 3000;
+//        AsyncHttpClient asyncHttpClient = new AsyncHttpClient(new AsyncHttpClientConfig.Builder().setConnectTimeout(timeout).setReadTimeout(timeout).setRequestTimeout(timeout).build());
+//        return asyncHttpClient;
+//    }
+//
+//
+//    @Bean
+//    public StoreFactory reddison(){
+//        Config config = new Config();
+//        config.useSingleServer().setAddress("127.0.0.1:6379");
+//      //  config.useSingleServer().setAddress("dev.yypm.com:7000");
+//
+//        Redisson redisson = Redisson.create(config);
+//        return new RedissonStoreFactory(redisson);
+//    }
 
 
     public static void main(String[] args) {

@@ -30,11 +30,20 @@ public class Server {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Bean
-    public SocketIOServer socketIOServer(final AsyncHttpClient asyncHttpClient,StoreFactory storeFactory) {
-
+    public SocketIOServer socketIOServer() {
         logger.info("start initialize server");
+
+        timeout = 3000;
+        final AsyncHttpClient asyncHttpClient = new AsyncHttpClient(new AsyncHttpClientConfig.Builder().setConnectTimeout(timeout).setReadTimeout(timeout).setRequestTimeout(timeout).build());
+
+        Config configRedisson = new Config();
+        configRedisson.useSingleServer().setAddress("127.0.0.1:6379");
+        //  config.useSingleServer().setAddress("dev.yypm.com:7000");
+
+        Redisson redisson = Redisson.create(configRedisson);
+
         com.corundumstudio.socketio.Configuration config = new com.corundumstudio.socketio.Configuration();
-        config.setStoreFactory(storeFactory);
+        config.setStoreFactory(new RedissonStoreFactory(redisson));
         config.setPort(8080);
         final SocketIOServer server = new SocketIOServer(config);
         server.addEventListener("httpProxy", ProxyRequest.class, new DataListener<ProxyRequest>() {
