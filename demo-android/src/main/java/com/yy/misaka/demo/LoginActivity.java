@@ -107,21 +107,24 @@ public class LoginActivity extends Activity {
         final EditText passwordEdit = (EditText) findViewById(R.id.et_password);
         passwordEdit.setText(getHistoryPassword());
 
-        proxyClient = new ProxyClient(getApplicationContext(), "http://183.61.6.33:8080", new Config());
+//        proxyClient = new ProxyClient(getApplicationContext(), "http://172.19.12.176:8080", new Config());
+        proxyClient = new ProxyClient(getApplicationContext(), "http://183.61.6.33:8085", new Config());
 
         findViewById(R.id.btn_login).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
 
+                Test test = new Test();
+                test.data = "55555";
                 proxyClient.request("http://mlbs.yy.com:8080", "/echo", new Test(), new ReplyHandler<Test>(Test.class) {
                     @Override
                     public void onSuccess(Test result) {
-                        Log.d(TAG,"success " + result.data);
+                        Log.d(TAG, "success " + result.data);
                     }
 
                     @Override
                     public void onError(int code, String message) {
-                        Log.d(TAG,"error " + message);
+                        Log.d(TAG, "error " + message);
                     }
                 });
 

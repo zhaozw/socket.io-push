@@ -71,7 +71,7 @@ dependencies {
     compile 'org.apache.httpcomponents:httpasyncclient:4.0.2'
     compile 'com.ning:async-http-client:1.9.8'
     compile 'org.slf4j:slf4j-api:1.7.7'
-    compile 'org.redisson:redisson:2.1.3'
+    compile 'org.redisson:redisson:1.1.5'
     compile 'commons-lang:commons-lang:2.6'
     testCompile 'junit:junit:4.10'
 }
