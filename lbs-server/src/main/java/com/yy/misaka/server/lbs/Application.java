@@ -123,7 +123,7 @@ public class Application extends WebMvcConfigurerAdapter implements Initializing
                                 response.getResponseBodyAsBytes();
                         logger.debug("body ", new String(body));
                         ProxyResponse proxyResponse = new ProxyResponse();
-                        proxyResponse.setResponse(new String(body));
+                        proxyResponse.setResponse("{data='test555'}");
                         proxyResponse.setSequenceId(data.getSequenceId());
                         server.getBroadcastOperations().sendEvent("httpProxy", proxyResponse);
                         return null;
