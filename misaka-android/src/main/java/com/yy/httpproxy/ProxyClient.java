@@ -1,6 +1,7 @@
 package com.yy.httpproxy;
 
 import android.content.Context;
+import android.os.Handler;
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -23,6 +24,7 @@ import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.logging.Level;
 
@@ -32,7 +34,9 @@ import io.socket.emitter.Emitter;
 
 public class ProxyClient {
 
+    private static String TAG = "ProxyClient";
     private Map<Integer, Request> replyCallbacks = new HashMap<Integer, Request>();
+    private Handler handler = new Handler();
     private Gson gson = new GsonBuilder().registerTypeAdapter(Date.class, new JsonDeserializer() {
         @Override
         public Object deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
@@ -44,7 +48,26 @@ public class ProxyClient {
             return src == null ? new JsonPrimitive(0l) : new JsonPrimitive(src.getTime());
         }
     }).create();
-
+    private Runnable timeoutTask = new Runnable() {
+        @Override
+        public void run() {
+            Iterator<Map.Entry<Integer, Request>> it = replyCallbacks.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry<Integer, Request> pair = it.next();
+                Request request = pair.getValue();
+                if (request.timeoutForRequest()) {
+                    Log.i(TAG, "StompClient timeoutForRequest " + request.getUrl());
+                    if (request.getReplyHandler() != null) {
+                        request.getReplyHandler().onError(-2, "timeout");
+                    }
+                    it.remove();
+                    continue;
+                }
+            }
+            handler.removeCallbacks(this);
+            handler.postDelayed(this, 1000);
+        }
+    };
     private int sequenceId;
 
     private final Emitter.Listener httpProxyListener = new Emitter.Listener() {
