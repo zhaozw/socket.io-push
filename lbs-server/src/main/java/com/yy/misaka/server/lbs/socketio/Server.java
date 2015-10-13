@@ -40,10 +40,10 @@ public class Server {
         configRedisson.useSingleServer().setAddress("127.0.0.1:6379");
         //  config.useSingleServer().setAddress("dev.yypm.com:7000");
 
-        Redisson redisson = Redisson.create(configRedisson);
+//        Redisson redisson = Redisson.create(configRedisson);
 
         com.corundumstudio.socketio.Configuration config = new com.corundumstudio.socketio.Configuration();
-        config.setStoreFactory(new RedissonStoreFactory(redisson));
+//        config.setStoreFactory(new RedissonStoreFactory(redisson));
         config.setPort(8080);
         final SocketIOServer server = new SocketIOServer(config);
         server.addEventListener("httpProxy", ProxyRequest.class, new DataListener<ProxyRequest>() {
