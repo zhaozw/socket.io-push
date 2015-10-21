@@ -12,18 +12,16 @@ sourceSets {
 
 dependencies {
     compile 'com.google.code.gson:gson:2.3.1'
-    compile 'com.koushikdutta.async:androidasync:2.1.6'
-    compile 'com.yy.androidlib:util:1.0.22'
-    compile 'com.yy.androidlib:hiido-profiling:1.0.18'
-    compile 'com.google.android:android:4.1.1.4'
+    provided 'com.google.android:android:4.1.1.4'
     compile 'io.socket:socket.io-client:0.6.1'
+    provided 'com.loopj.android:android-async-http:1.4.8'
 }
 
 apply plugin: 'maven'
 apply plugin: 'signing'
 
 group = 'com.yy'
-version = '1.0.28'
+version = '1.0.35'
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
@@ -61,48 +59,9 @@ signing {
     sign configurations.archives
 }
 
-//uploadArchives {
-//    repositories {
-//        mavenDeployer {
-//
-//            repository(url: "http://jrepo.yypm.com/nexus/content/repositories/releases") {
-//                authentication(userName: "admin", password: "admin123")
-//            }
-//
-//            pom.project {
-//                name 'misaka-android'
-//                packaging 'aar'
-//                description 'misaka-android'
-//                url 'https://github.com/xuduo/stomp-app'
-//
-//                scm {
-//                    url 'https://github.com/xuduo/stomp-app'
-//                    connection 'https://github.com/xuduo/stomp-app'
-//                    developerConnection 'https://github.com/xuduo/stomp-app'
-//                }
-//
-//                licenses {
-//                    license {
-//                        name 'The Apache Software License, Version 2.0'
-//                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-//                        distribution 'repo'
-//                    }
-//                }
-//
-//                developers {
-//                    developer {
-//                        id 'xuduo'
-//                        name 'xuduo'
-//                    }
-//                }
-//            }
-//        }
-//    }
-//}
 
 uploadArchives {
     repositories {
-//        mavenLocal()
         mavenDeployer {
             beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 

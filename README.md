@@ -108,7 +108,7 @@ maven 库
  message.setContent("hello!");
  message.setToUid(12345);
  
- misaka.request(APP_ID, "/sendMessage", message, new ReplyHandler<Message>(Message.class) {
+ misaka.requestInfo(APP_ID, "/sendMessage", message, new ReplyHandler<Message>(Message.class) {
 
                     @Override
                     public void onSuccess(Message result) {
@@ -117,7 +117,7 @@ maven 库
 
                     @Override
                     public void onError(int code, String message) {
-                        Toast.makeText(DemoActivity.this, "request error!code:" + code + " ,message:" + message, Toast.LENGTH_LONG).show();
+                        Toast.makeText(DemoActivity.this, "requestInfo error!code:" + code + " ,message:" + message, Toast.LENGTH_LONG).show();
                     }
                 });
 ```
@@ -209,7 +209,7 @@ login.login(user, new ReplyHandler<LoginRequest>(LoginRequest.class) {
                  
      @Override
      public void onError(int code, String message) {
-         Toast.makeText(LoginActivity.this, "request error!code:" + code + " ,message:" + message, Toast.LENGTH_LONG).show();
+         Toast.makeText(LoginActivity.this, "requestInfo error!code:" + code + " ,message:" + message, Toast.LENGTH_LONG).show();
       }
 });
 

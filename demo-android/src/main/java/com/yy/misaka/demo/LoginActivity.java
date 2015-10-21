@@ -1,34 +1,31 @@
 package com.yy.misaka.demo;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
-
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.EditText;
+import android.widget.Toast;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import android.util.Log;
-
-import com.yy.androidlib.websocket.Config;
-import com.yy.androidlib.websocket.ReplyHandler;
 import com.yy.httpproxy.ProxyClient;
+import com.yy.httpproxy.PushHandler;
+import com.yy.httpproxy.ReplyHandler;
+import com.yy.httpproxy.nyy.NyyRequestData;
+import com.yy.httpproxy.nyy.NyySerializer;
+import com.yy.httpproxy.serializer.StringPushSerializer;
+import com.yy.httpproxy.socketio.SocketIoClient;
+import com.yy.httpproxy.subscribe.SharedPreferencePushGenerator;
 
-import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
-
-import io.socket.client.IO;
-import io.socket.client.Socket;
-import io.socket.emitter.Emitter;
 
 
 public class LoginActivity extends Activity {
@@ -94,7 +91,7 @@ public class LoginActivity extends Activity {
     }
 
     public static class Test {
-        public String data;
+        public int uid;
     }
 
     @Override
@@ -108,18 +105,37 @@ public class LoginActivity extends Activity {
         passwordEdit.setText(getHistoryPassword());
 
 //        proxyClient = new ProxyClient(getApplicationContext(), "http://172.19.12.176:8080", new Config());
-        proxyClient = new ProxyClient(getApplicationContext(), "http://183.61.6.33:8080", new Config());
+        com.yy.httpproxy.Config config = new com.yy.httpproxy.Config();
+        SocketIoClient requester = new SocketIoClient("http://183.61.6.33:80");
+        config.setRequester(requester);
+        config.setRequestSerializer(new NyySerializer());
+        config.setPusher(requester);
+        config.setPushSerializer(new StringPushSerializer());
+        config.setPushGenerator(new SharedPreferencePushGenerator(this.getApplicationContext()));
+        proxyClient = new ProxyClient(config);
+        proxyClient.subscribe("/topic/test", new PushHandler<String>(String.class) {
+            @Override
+            public void onSuccess(String result) {
+                Toast toast = Toast.makeText(LoginActivity.this, "push recived " + result, Toast.LENGTH_SHORT);
+                toast.show();
+            }
+        });
 
         findViewById(R.id.btn_login).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
 
+                Map<String, String> headers = new HashMap<String, String>();
+                headers.put("Content-Type", "application/x-www-form-urlencoded");
                 Test test = new Test();
-                test.data = "55555";
-                proxyClient.request("http://mlbs.yy.com:8080", "/echo", new Test(), new ReplyHandler<Test>(Test.class) {
+                test.uid = 1000008;
+                NyyRequestData data = new NyyRequestData();
+                data.setAppId("100001");
+                data.setData(test);
+                proxyClient.request("POST", "http", "google.com", 8080, "/echo2", headers, data, new ReplyHandler<Test>(Test.class) {
                     @Override
                     public void onSuccess(Test result) {
-                        Log.d(TAG, "success " + result.data);
+                        Log.d(TAG, "success " + result.uid);
                     }
 
                     @Override
@@ -131,13 +147,13 @@ public class LoginActivity extends Activity {
             }
         });
 
-        findViewById(R.id.btn_to_register).setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
-                startActivity(intent);
-            }
-        });
+//        findViewById(R.id.btn_to_register).setOnClickListener(new OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
+//                startActivity(intent);
+//            }
+//        });
 
     }
 

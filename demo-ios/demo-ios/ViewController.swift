@@ -23,7 +23,7 @@ class ViewController: UIViewController , StompDelegate{
     
     @IBAction func login(sender: AnyObject) {
         //stomp.writeString(Message.toMessageString("SEND", headers: [:],  payload: ""))
-//        stomp.request("/login", payload: ["username": username.text,"password":password.text],successHandler:{(json:JSON?)->() in
+//        stomp.requestInfo("/login", payload: ["username": username.text,"password":password.text],successHandler:{(json:JSON?)->() in
 //            println("login success \(json)")
 //        })
     }

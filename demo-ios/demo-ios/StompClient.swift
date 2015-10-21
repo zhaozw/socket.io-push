@@ -41,12 +41,12 @@ class StompClient : WebSocketDelegate {
         webSocket.writeString(Message.toMessageString(command, headers: headers,  payload: payload))
     }
     
-    func request(destination:String, payload:AnyObject,successHandler:(JSON)->()) {
+    func requestInfo(destination:String, payload:AnyObject,successHandler:(JSON)->()) {
         let json = JSON(payload)
         let raw = json.rawString()!
         let requestId = String(seq++)
         requestHandlers[requestId] = successHandler
-        write("SEND",headers:["request-id":requestId,"destination":destination],payload:raw)
+        write("SEND",headers:["requestInfo-id":requestId,"destination":destination],payload:raw)
   
     }
     
@@ -80,7 +80,7 @@ class StompClient : WebSocketDelegate {
         } else if(stomp.command == "MESSAGE"){
             let destination  = stomp.destination()
             if(destination == "/user/queue/reply"){
-                let requestId = stomp.headers["request-id"]
+                let requestId = stomp.headers["requestInfo-id"]
                 let handler = requestHandlers.removeValueForKey(requestId!)
                 let json = JSON(stomp.payload)
                 handler?(json)

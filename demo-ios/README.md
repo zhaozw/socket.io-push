@@ -19,9 +19,9 @@ change http://172.19.99.97:8080/stomp in DemoActivity.java to your running pc ip
 
 Client-side  
  
-request-response
+requestInfo-response
 
-    stomp.request("/login", user, new StompJsonClient.ReplyHandler() {
+    stomp.requestInfo("/login", user, new StompJsonClient.ReplyHandler() {
 
       @Override
       public void onSuccess(Object result) {
@@ -30,7 +30,7 @@ request-response
 
      @Override
      public void onError(int code, String message) {
-         Toast.makeText(DemoActivity.this, "request error!code:" + code + " ,message:" + message, Toast.LENGTH_LONG).show();
+         Toast.makeText(DemoActivity.this, "requestInfo error!code:" + code + " ,message:" + message, Toast.LENGTH_LONG).show();
      }
     });
                 

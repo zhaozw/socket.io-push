@@ -1,1 +1,1 @@
-include ':demo-android', ':misaka-server', ':demo-server' ,  ':lbs-server',':misaka-android'
+include ':demo-android',  ':demo-server' ,  ':misaka-android'

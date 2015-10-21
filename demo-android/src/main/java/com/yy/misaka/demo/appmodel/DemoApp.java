@@ -1,8 +1,6 @@
 package com.yy.misaka.demo.appmodel;
 
 import android.app.Application;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 /**
  * Created by xuduo on 3/4/15.
@@ -12,8 +10,8 @@ public class DemoApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        AppModel.INSTANCE.init(this);
-        ImageLoaderConfiguration configuration = new ImageLoaderConfiguration.Builder(this).build();
-        ImageLoader.getInstance().init(configuration);
+       // AppModel.INSTANCE.init(this);
+//        ImageLoaderConfiguration configuration = new ImageLoaderConfiguration.Builder(this).build();
+//        ImageLoader.getInstance().init(configuration);
     }
 }

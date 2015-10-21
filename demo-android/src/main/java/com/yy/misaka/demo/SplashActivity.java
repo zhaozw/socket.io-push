@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.Window;
 
-import com.yy.misaka.demo.appmodel.AppModel;
 
 
 public class SplashActivity extends Activity {
