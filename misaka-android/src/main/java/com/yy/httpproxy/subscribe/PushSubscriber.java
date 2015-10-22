@@ -3,9 +3,9 @@ package com.yy.httpproxy.subscribe;
 /**
  * Created by xuduo on 10/20/15.
  */
-public interface Pusher {
+public interface PushSubscriber {
 
-    void setPushGenerator(PushGenerator pushGenerator);
+    void setPushIdGenerator(PushIdGenerator pushIdGenerator);
 
     void subscribe(String topic);
 

@@ -3,8 +3,8 @@ package com.yy.httpproxy;
 import com.yy.httpproxy.requester.HttpRequester;
 import com.yy.httpproxy.serializer.PushSerializer;
 import com.yy.httpproxy.serializer.RequestSerializer;
-import com.yy.httpproxy.subscribe.PushGenerator;
-import com.yy.httpproxy.subscribe.Pusher;
+import com.yy.httpproxy.subscribe.PushIdGenerator;
+import com.yy.httpproxy.subscribe.PushSubscriber;
 
 /**
  * Created by xuduo on 10/19/15.
@@ -13,8 +13,8 @@ public class Config {
 
     private HttpRequester requester;
     private RequestSerializer requestSerializer;
-    private Pusher pusher;
-    private PushGenerator pushGenerator;
+    private PushSubscriber pushSubscriber;
+    private PushIdGenerator pushIdGenerator;
     private PushSerializer pushSerializer;
 
 
@@ -36,21 +36,21 @@ public class Config {
         return this;
     }
 
-    public Pusher getPusher() {
-        return pusher;
+    public PushSubscriber getPushSubscriber() {
+        return pushSubscriber;
     }
 
-    public Config setPusher(Pusher pusher) {
-        this.pusher = pusher;
+    public Config setPushSubscriber(PushSubscriber pushSubscriber) {
+        this.pushSubscriber = pushSubscriber;
         return this;
     }
 
-    public PushGenerator getPushGenerator() {
-        return pushGenerator;
+    public PushIdGenerator getPushIdGenerator() {
+        return pushIdGenerator;
     }
 
-    public Config setPushGenerator(PushGenerator pushGenerator) {
-        this.pushGenerator = pushGenerator;
+    public Config setPushIdGenerator(PushIdGenerator pushIdGenerator) {
+        this.pushIdGenerator = pushIdGenerator;
         return this;
     }
 

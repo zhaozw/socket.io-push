@@ -9,11 +9,11 @@ import java.security.SecureRandom;
 /**
  * Created by xuduo on 10/20/15.
  */
-public class SharedPreferencePushGenerator implements PushGenerator {
+public class SharedPreferencePushIdGenerator implements PushIdGenerator {
 
     private Context context;
 
-    public SharedPreferencePushGenerator(Context context) {
+    public SharedPreferencePushIdGenerator(Context context) {
         this.context = context;
     }
 

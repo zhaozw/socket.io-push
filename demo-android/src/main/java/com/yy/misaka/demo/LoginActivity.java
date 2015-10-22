@@ -16,8 +16,8 @@ import com.yy.httpproxy.ReplyHandler;
 import com.yy.httpproxy.nyy.NyyRequestData;
 import com.yy.httpproxy.nyy.NyySerializer;
 import com.yy.httpproxy.serializer.StringPushSerializer;
-import com.yy.httpproxy.socketio.SocketIoClient;
-import com.yy.httpproxy.subscribe.SharedPreferencePushGenerator;
+import com.yy.httpproxy.socketio.SocketIOProxyClient;
+import com.yy.httpproxy.subscribe.SharedPreferencePushIdGenerator;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -106,12 +106,12 @@ public class LoginActivity extends Activity {
 
 //        proxyClient = new ProxyClient(getApplicationContext(), "http://172.19.12.176:8080", new Config());
         com.yy.httpproxy.Config config = new com.yy.httpproxy.Config();
-        SocketIoClient requester = new SocketIoClient("http://183.61.6.33:80");
+        SocketIOProxyClient requester = new SocketIOProxyClient("http://183.61.6.33:80");
         config.setRequester(requester);
         config.setRequestSerializer(new NyySerializer());
-        config.setPusher(requester);
+        config.setPushSubscriber(requester);
         config.setPushSerializer(new StringPushSerializer());
-        config.setPushGenerator(new SharedPreferencePushGenerator(this.getApplicationContext()));
+        config.setPushIdGenerator(new SharedPreferencePushIdGenerator(this.getApplicationContext()));
         proxyClient = new ProxyClient(config);
         proxyClient.subscribe("/topic/test", new PushHandler<String>(String.class) {
             @Override

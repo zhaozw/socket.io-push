@@ -23,9 +23,9 @@ public class ProxyClient implements PushCallback {
 
     public ProxyClient(Config config) {
         this.config = config;
-        if (config.getPusher() != null) {
-            config.getPusher().setPushGenerator(config.getPushGenerator());
-            config.getPusher().setPushCallback(this);
+        if (config.getPushSubscriber() != null) {
+            config.getPushSubscriber().setPushIdGenerator(config.getPushIdGenerator());
+            config.getPushSubscriber().setPushCallback(this);
         }
     }
 
@@ -61,7 +61,7 @@ public class ProxyClient implements PushCallback {
 
     public void subscribe(String topic, ReplyHandler handler) {
         pushHandlers.put(topic, handler);
-        config.getPusher().subscribe(topic);
+        config.getPushSubscriber().subscribe(topic);
     }
 
     @Override

@@ -10,8 +10,8 @@ import com.yy.httpproxy.requester.RequestException;
 import com.yy.httpproxy.requester.RequestInfo;
 import com.yy.httpproxy.requester.ResponseHandler;
 import com.yy.httpproxy.subscribe.PushCallback;
-import com.yy.httpproxy.subscribe.PushGenerator;
-import com.yy.httpproxy.subscribe.Pusher;
+import com.yy.httpproxy.subscribe.PushIdGenerator;
+import com.yy.httpproxy.subscribe.PushSubscriber;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -29,19 +29,19 @@ import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
 
-public class SocketIoClient implements HttpRequester, Pusher {
+public class SocketIOProxyClient implements HttpRequester, PushSubscriber {
 
     private static String TAG = "SocketIoRequester";
     private PushCallback pushCallback;
-    private PushGenerator pushGenerator;
+    private PushIdGenerator pushIdGenerator;
 
     private final Emitter.Listener connectListener = new Emitter.Listener() {
         @Override
         public void call(Object... args) {
-            if (pushGenerator != null) {
+            if (pushIdGenerator != null) {
                 JSONObject object = new JSONObject();
                 try {
-                    String pushId = pushGenerator.generatePushId();
+                    String pushId = pushIdGenerator.generatePushId();
                     if (pushId != null) {
                         object.put("id", pushId);
                     }
@@ -55,7 +55,7 @@ public class SocketIoClient implements HttpRequester, Pusher {
     private final Emitter.Listener pushIdListener = new Emitter.Listener() {
         @Override
         public void call(Object... args) {
-            if (pushGenerator != null) {
+            if (pushIdGenerator != null) {
                 JSONObject data = (JSONObject) args[0];
                 String pushId = data.optString("id");
                 Log.v(TAG, "on pushId " + pushId);
@@ -150,7 +150,7 @@ public class SocketIoClient implements HttpRequester, Pusher {
 
     private Socket mSocket;
 
-    public SocketIoClient(String host) {
+    public SocketIOProxyClient(String host) {
         AndroidLoggingHandler.reset(new AndroidLoggingHandler());
         java.util.logging.Logger.getLogger("").setLevel(Level.FINEST);
         try {
@@ -209,8 +209,8 @@ public class SocketIoClient implements HttpRequester, Pusher {
     }
 
     @Override
-    public void setPushGenerator(PushGenerator pushGenerator) {
-        this.pushGenerator = pushGenerator;
+    public void setPushIdGenerator(PushIdGenerator pushIdGenerator) {
+        this.pushIdGenerator = pushIdGenerator;
     }
 
     @Override
