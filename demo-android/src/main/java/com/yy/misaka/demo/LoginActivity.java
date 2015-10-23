@@ -106,20 +106,23 @@ public class LoginActivity extends Activity {
 
 //        proxyClient = new ProxyClient(getApplicationContext(), "http://172.19.12.176:8080", new Config());
         com.yy.httpproxy.Config config = new com.yy.httpproxy.Config();
-        SocketIOProxyClient requester = new SocketIOProxyClient("http://183.61.6.33:80");
+//        SocketIOProxyClient requester = new SocketIOProxyClient("http://172.19.12.176:9101");
+        SocketIOProxyClient requester = new SocketIOProxyClient("http://183.61.6.33:8201");
         config.setRequester(requester);
         config.setRequestSerializer(new NyySerializer());
         config.setPushSubscriber(requester);
         config.setPushSerializer(new StringPushSerializer());
         config.setPushIdGenerator(new SharedPreferencePushIdGenerator(this.getApplicationContext()));
         proxyClient = new ProxyClient(config);
-        proxyClient.subscribe("/topic/test", new PushHandler<String>(String.class) {
+        proxyClient.subscribeBroadcast("/topic/sttest", new PushHandler<String>(String.class) {
             @Override
             public void onSuccess(String result) {
-                Toast toast = Toast.makeText(LoginActivity.this, "push recived " + result, Toast.LENGTH_SHORT);
-                toast.show();
+                Log.d(TAG, "push recived " + result);
+//                Toast toast = Toast.makeText(LoginActivity.this, "push recived " + result, Toast.LENGTH_SHORT);
+//                toast.show();
             }
         });
+
 
         findViewById(R.id.btn_login).setOnClickListener(new OnClickListener() {
             @Override

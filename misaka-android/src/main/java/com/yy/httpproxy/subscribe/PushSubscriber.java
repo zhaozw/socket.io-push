@@ -7,7 +7,7 @@ public interface PushSubscriber {
 
     void setPushIdGenerator(PushIdGenerator pushIdGenerator);
 
-    void subscribe(String topic);
+    void subscribeBroadcast(String topic);
 
     void setPushCallback(PushCallback proxyClient);
 }

@@ -13,6 +13,7 @@ import com.yy.httpproxy.subscribe.PushCallback;
 import com.yy.httpproxy.subscribe.PushIdGenerator;
 import com.yy.httpproxy.subscribe.PushSubscriber;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -34,24 +35,38 @@ public class SocketIOProxyClient implements HttpRequester, PushSubscriber {
     private static String TAG = "SocketIoRequester";
     private PushCallback pushCallback;
     private PushIdGenerator pushIdGenerator;
+    private String pushId;
+    private Set<String> topics = new HashSet<>();
 
     private final Emitter.Listener connectListener = new Emitter.Listener() {
         @Override
         public void call(Object... args) {
-            if (pushIdGenerator != null) {
-                JSONObject object = new JSONObject();
-                try {
-                    String pushId = pushIdGenerator.generatePushId();
-                    if (pushId != null) {
-                        object.put("id", pushId);
-                    }
-                    mSocket.emit("pushId", object);
-                } catch (JSONException e) {
-                    Log.e(TAG, "connectListener error ", e);
-                }
-            }
+            sendPushIdAndTopicToServer();
         }
     };
+
+    private void sendPushIdAndTopicToServer() {
+        if (pushIdGenerator != null) {
+            JSONObject object = new JSONObject();
+            try {
+                pushId = pushIdGenerator.generatePushId();
+                if (pushId != null) {
+                    object.put("id", pushId);
+                }
+                if (topics.size() > 0) {
+                    JSONArray array = new JSONArray();
+                    object.put("topics", array);
+                    for (String topic : topics) {
+                        array.put(topic);
+                    }
+                }
+                mSocket.emit("pushId", object);
+            } catch (JSONException e) {
+                Log.e(TAG, "connectListener error ", e);
+            }
+        }
+    }
+
     private final Emitter.Listener pushIdListener = new Emitter.Listener() {
         @Override
         public void call(Object... args) {
@@ -71,6 +86,12 @@ public class SocketIOProxyClient implements HttpRequester, PushSubscriber {
                     JSONObject data = (JSONObject) args[0];
                     String topic = data.optString("topic");
                     String dataBase64 = data.optString("data");
+                    boolean reply = data.optBoolean("reply", false);
+                    if (reply) {
+                        data.put("pushId", pushId);
+                        data.remove("data");
+                        mSocket.emit("pushReply", data);
+                    }
                     Log.v(TAG, "on push topic " + topic + " data:" + dataBase64);
                     pushCallback.onPush(topic, Base64.decode(dataBase64, Base64.DEFAULT));
                 } catch (Exception e) {
@@ -82,7 +103,6 @@ public class SocketIOProxyClient implements HttpRequester, PushSubscriber {
     private Map<Integer, Request> replyCallbacks = new ConcurrentHashMap<>();
     private Handler handler = new Handler();
     private long timeout = 20000;
-    private Set<String> topics = new HashSet<>();
     private Runnable timeoutTask = new Runnable() {
         @Override
         public void run() {
@@ -214,7 +234,17 @@ public class SocketIOProxyClient implements HttpRequester, PushSubscriber {
     }
 
     @Override
-    public void subscribe(String topic) {
+    public void subscribeBroadcast(String topic) {
+        topics.add(topic);
+        if (mSocket.connected()) {
+            JSONObject data = new JSONObject();
+            try {
+                data.put("topic", topic);
+                mSocket.emit("subscribeTopic", data);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override

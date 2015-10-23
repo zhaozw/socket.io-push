@@ -61,7 +61,11 @@ public class ProxyClient implements PushCallback {
 
     public void subscribe(String topic, ReplyHandler handler) {
         pushHandlers.put(topic, handler);
-        config.getPushSubscriber().subscribe(topic);
+    }
+
+    public void subscribeBroadcast(String topic, ReplyHandler handler) {
+        pushHandlers.put(topic, handler);
+        config.getPushSubscriber().subscribeBroadcast(topic);
     }
 
     @Override

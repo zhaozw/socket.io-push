@@ -1,4 +1,4 @@
 .idea
 local.properties
-local.properties
 *.iml
+node_modules
