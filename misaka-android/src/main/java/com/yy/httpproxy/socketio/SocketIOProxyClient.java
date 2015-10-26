@@ -18,9 +18,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -42,8 +44,20 @@ public class SocketIOProxyClient implements HttpRequester, PushSubscriber {
         @Override
         public void call(Object... args) {
             sendPushIdAndTopicToServer();
+            reSendFailedRequest();
         }
     };
+
+    private void reSendFailedRequest() {
+        if (!replyCallbacks.isEmpty()) {
+            List<Request> values = new ArrayList<>(replyCallbacks.values());
+            replyCallbacks.clear();
+            for (Request request : values) {
+                Log.i(TAG, "StompClient onConnected repost request " + request.getRequestInfo().getUrl());
+                request(request.getRequestInfo(), request.getResponseHandler());
+            }
+        }
+    }
 
     private void sendPushIdAndTopicToServer() {
         if (pushIdGenerator != null) {
@@ -192,13 +206,16 @@ public class SocketIOProxyClient implements HttpRequester, PushSubscriber {
     public void request(RequestInfo requestInfo, ResponseHandler handler) {
 
         try {
+            sequenceId = sequenceId + 1;
+
+            Request request = new Request(requestInfo, handler);
+            replyCallbacks.put(sequenceId, request);
 
             if (!mSocket.connected()) {
-                handler.onError(new RequestException(null, RequestException.Error.CONNECT_ERROR));
                 return;
             }
 
-            sequenceId = sequenceId + 1;
+
             JSONObject headers = new JSONObject();
             if (requestInfo.getHeaders() != null) {
                 for (Map.Entry<String, String> header : requestInfo.getHeaders().entrySet()) {
@@ -215,9 +232,7 @@ public class SocketIOProxyClient implements HttpRequester, PushSubscriber {
             object.put("path", requestInfo.getPath());
             object.put("sequenceId", String.valueOf(sequenceId));
 
-            Request request = new Request(requestInfo, handler);
 
-            replyCallbacks.put(sequenceId, request);
             mSocket.emit("httpProxy", object);
 
             postTimeout();

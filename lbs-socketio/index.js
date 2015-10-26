@@ -121,18 +121,39 @@ server.use(restify.bodyParser());
 
 var handlePush = function (req, res, next) {
   var topic = req.params.topic;
+  if(!topic){
+    res.send({code:"error",message:'topic is required'});
+    return next();
+  }
+   var data = req.params.data;
+  if(!data){
+    res.send({code:"error",message:'data is required'});
+    return next();
+  }
   var pushId = req.params.pushId;
-  var data = req.params.data;
+  var pushAll = req.params.pushAll;
   console.log('push ' + JSON.stringify(req.params));
-  io.to(pushId).emit('push',{topic: topic, data :data});
-  //var clients = io.adapter.of('/').in(pushId).clients;
-  //io.clients(function (){
-
- // });
-
-  res.send({code:"sucess"});
-
-  return next();
+  var pushData = {topic: topic, data :data};
+  if(pushAll === 'true') {
+    io.to(topic).emit('push', pushData);
+    res.send({code:"success"});
+      return next();
+  } else if(!pushId){
+    res.send({code:"error",message:'pushId is required'});
+    return next();
+  } else {
+    if(typeof pushId === 'string') {
+        io.to(pushId).emit('push', pushData);
+               res.send({code:"success"});
+               return next();
+    } else {
+        pushId.forEach(function(id){
+                io.to(id).emit('push', pushData);
+        });
+        res.send({code:"success"});
+        return next();
+    }
+  }
 };
 
 
@@ -146,12 +167,11 @@ server.get('/api/stats', function(req,res,nex) {
 
 if(process.env.TIMER === '1')
 {
-
-setInterval(function(){
-    io.to("/topic/sttest").emit("push",{topic: "/topic/sttest", data :"aGVsbG93IHdvcmxk",reply:true});
-    sentCounter = sentCounter + connectCounter;
-},30000);
-
+    console.log('start st test timer')
+    setInterval(function(){
+        io.to("/topic/sttest").emit("push",{topic: "/topic/sttest", data :"aGVsbG93IHdvcmxk",reply:true});
+        sentCounter = sentCounter + connectCounter;
+    },30000);
 }
 
 

@@ -1,0 +1,19 @@
+apply plugin: 'java'
+
+jar {
+    baseName = 'java-emitter-server'
+    version = '1.0'
+}
+
+repositories {
+    // NOTE: You should declare only repositories that you need here
+    mavenLocal()
+    mavenCentral()
+    maven { url "http://repo.spring.io/release" }
+}
+
+dependencies {
+    compile 'org.msgpack:msgpack:0.6.11'
+    compile 'org.json:json:20140107'
+    compile 'redis.clients:jedis:2.7.2'
+}
