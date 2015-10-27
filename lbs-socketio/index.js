@@ -1,3 +1,5 @@
+var stats = require('./stats')();
+
 var port = process.env.LBS_PORT || 9101;
 port = parseInt(port)
 
@@ -5,9 +7,8 @@ console.log("start server on port " + port);
 var io = require('socket.io')(port);
 var redis = require('socket.io-redis');
 var http = require('http');
-var connectCounter = 0;
-var sentCounter = 0;
-var receiveCounter = 0;
+var stats = require('./stats')();
+console.log('stats ' + stats);
 
 io.adapter(redis({ host: 'localhost', port: 6379 }));
 io.set('heartbeat interval', 30000);
@@ -15,10 +16,13 @@ io.set('heartbeat timeout', 10000);
 
 io.on('connection', function (socket) {
 
+
+    stats.addSession();
+
+    console.log(stats.sessionCount);
+
     socket.on('disconnect', function () {
-            if(socket.sttest) {
-                 console.log("disconnect " + connectCounter--);
-            }
+        stats.removeSession();
     });
 
     socket.on('pushId', function (data) {
@@ -29,10 +33,6 @@ io.on('connection', function (socket) {
             topics.forEach(function(topic) {
                  socket.join(topic);
                  console.log('join topic ' + topic);
-                 if(topic === '/topic/sttest'){
-                    socket.sttest = true;
-                    console.log("subscribeTopic " + connectCounter++);
-                 }
             });
           }
           socket.join(data.id);
@@ -45,10 +45,6 @@ io.on('connection', function (socket) {
               console.log("on subscribeTopic " + JSON.stringify(data));
                var topic = data.topic;
                socket.join(topic);
-               if(topic === '/topic/sttest'){
-                   socket.sttest = true;
-                   console.log("subscribeTopic " + connectCounter++);
-               }
      });
 
     socket.on('httpProxy', function (data) {

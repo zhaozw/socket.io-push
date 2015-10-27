@@ -21,8 +21,7 @@ public class SharedPreferencePushIdGenerator implements PushIdGenerator {
         return new BigInteger(130, new SecureRandom()).toString(32);
     }
 
-    @Override
-    public String generatePushId() {
+    private String generatePushId() {
         SharedPreferences preferences = context.getSharedPreferences("SharedPreferencePushGenerator", Context.MODE_PRIVATE);
         String id = preferences.getString("pushId", null);
         if (id == null) {
@@ -30,5 +29,10 @@ public class SharedPreferencePushIdGenerator implements PushIdGenerator {
             preferences.edit().putString("pushId", id).commit();
         }
         return id;
+    }
+
+    @Override
+    public void generatePushId(PushIdCallback callback) {
+        callback.onPushIdGenerated(generatePushId());
     }
 }

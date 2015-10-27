@@ -10,6 +10,7 @@ import com.yy.httpproxy.requester.RequestException;
 import com.yy.httpproxy.requester.RequestInfo;
 import com.yy.httpproxy.requester.ResponseHandler;
 import com.yy.httpproxy.subscribe.PushCallback;
+import com.yy.httpproxy.subscribe.PushIdCallback;
 import com.yy.httpproxy.subscribe.PushIdGenerator;
 import com.yy.httpproxy.subscribe.PushSubscriber;
 
@@ -32,7 +33,8 @@ import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
 
-public class SocketIOProxyClient implements HttpRequester, PushSubscriber {
+
+public class SocketIOProxyClient implements HttpRequester, PushSubscriber, PushIdCallback {
 
     private static String TAG = "SocketIoRequester";
     private PushCallback pushCallback;
@@ -60,13 +62,11 @@ public class SocketIOProxyClient implements HttpRequester, PushSubscriber {
     }
 
     private void sendPushIdAndTopicToServer() {
-        if (pushIdGenerator != null) {
+        if (pushId != null && socket.connected()) {
+            Log.i(TAG, "sendPushIdAndTopicToServer " + pushId);
             JSONObject object = new JSONObject();
             try {
-                pushId = pushIdGenerator.generatePushId();
-                if (pushId != null) {
-                    object.put("id", pushId);
-                }
+                object.put("id", pushId);
                 if (topics.size() > 0) {
                     JSONArray array = new JSONArray();
                     object.put("topics", array);
@@ -74,7 +74,7 @@ public class SocketIOProxyClient implements HttpRequester, PushSubscriber {
                         array.put(topic);
                     }
                 }
-                mSocket.emit("pushId", object);
+                socket.emit("pushId", object);
             } catch (JSONException e) {
                 Log.e(TAG, "connectListener error ", e);
             }
@@ -104,7 +104,7 @@ public class SocketIOProxyClient implements HttpRequester, PushSubscriber {
                     if (reply) {
                         data.put("pushId", pushId);
                         data.remove("data");
-                        mSocket.emit("pushReply", data);
+                        socket.emit("pushReply", data);
                     }
                     Log.v(TAG, "on push topic " + topic + " data:" + dataBase64);
                     pushCallback.onPush(topic, Base64.decode(dataBase64, Base64.DEFAULT));
@@ -182,7 +182,7 @@ public class SocketIOProxyClient implements HttpRequester, PushSubscriber {
         }
     };
 
-    private Socket mSocket;
+    private Socket socket;
 
     public SocketIOProxyClient(String host) {
         AndroidLoggingHandler.reset(new AndroidLoggingHandler());
@@ -190,12 +190,12 @@ public class SocketIOProxyClient implements HttpRequester, PushSubscriber {
         try {
             IO.Options opts = new IO.Options();
             opts.transports = new String[]{"websocket"};
-            mSocket = IO.socket(host, opts);
-            mSocket.on("httpProxy", httpProxyListener);
-            mSocket.on(Socket.EVENT_CONNECT, connectListener);
-            mSocket.on("pushId", pushIdListener);
-            mSocket.on("push", pushListener);
-            mSocket.connect();
+            socket = IO.socket(host, opts);
+            socket.on("httpProxy", httpProxyListener);
+            socket.on(Socket.EVENT_CONNECT, connectListener);
+            socket.on("pushId", pushIdListener);
+            socket.on("push", pushListener);
+            socket.connect();
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
@@ -211,7 +211,7 @@ public class SocketIOProxyClient implements HttpRequester, PushSubscriber {
             Request request = new Request(requestInfo, handler);
             replyCallbacks.put(sequenceId, request);
 
-            if (!mSocket.connected()) {
+            if (!socket.connected()) {
                 return;
             }
 
@@ -233,7 +233,7 @@ public class SocketIOProxyClient implements HttpRequester, PushSubscriber {
             object.put("sequenceId", String.valueOf(sequenceId));
 
 
-            mSocket.emit("httpProxy", object);
+            socket.emit("httpProxy", object);
 
             postTimeout();
 
@@ -246,16 +246,17 @@ public class SocketIOProxyClient implements HttpRequester, PushSubscriber {
     @Override
     public void setPushIdGenerator(PushIdGenerator pushIdGenerator) {
         this.pushIdGenerator = pushIdGenerator;
+        this.pushIdGenerator.generatePushId(this);
     }
 
     @Override
     public void subscribeBroadcast(String topic) {
         topics.add(topic);
-        if (mSocket.connected()) {
+        if (socket.connected()) {
             JSONObject data = new JSONObject();
             try {
                 data.put("topic", topic);
-                mSocket.emit("subscribeTopic", data);
+                socket.emit("subscribeTopic", data);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -265,5 +266,11 @@ public class SocketIOProxyClient implements HttpRequester, PushSubscriber {
     @Override
     public void setPushCallback(PushCallback pushCallback) {
         this.pushCallback = pushCallback;
+    }
+
+    @Override
+    public void onPushIdGenerated(String pushId) {
+        this.pushId = pushId;
+        sendPushIdAndTopicToServer();
     }
 }
