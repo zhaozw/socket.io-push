@@ -17,12 +17,12 @@ io.set('heartbeat timeout', 10000);
 io.on('connection', function (socket) {
 
 
-    stats.addSession();
-
-    console.log(stats.sessionCount);
+//    stats.addSession();
+//
+//    console.log(stats.sessionCount);
 
     socket.on('disconnect', function () {
-        stats.removeSession();
+        //stats.removeSession();
     });
 
     socket.on('pushId', function (data) {
