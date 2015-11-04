@@ -1,6 +1,7 @@
 module.exports = ProxyServer;
 
 function ProxyServer(io,stats){
+ var http = require('http');
  if (!(this instanceof ProxyServer)) return new ProxyServer(io,stats);
  io.set('heartbeat interval', 30000);
  io.set('heartbeat timeout', 10000);
