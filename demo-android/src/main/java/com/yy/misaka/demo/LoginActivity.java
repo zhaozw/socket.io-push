@@ -106,13 +106,13 @@ public class LoginActivity extends Activity {
 
 //        proxyClient = new ProxyClient(getApplicationContext(), "http://172.19.12.176:8080", new Config());
         com.yy.httpproxy.Config config = new com.yy.httpproxy.Config();
-        SocketIOProxyClient requester = new SocketIOProxyClient("http://172.19.12.176:9101");
+        SocketIOProxyClient requester = new SocketIOProxyClient("http://172.19.207.65:9101");
 //        SocketIOProxyClient requester = new SocketIOProxyClient("http://183.61.6.33:8201");
+        requester.setPushId(new SharedPreferencePushIdGenerator(this.getApplicationContext()).generatePushId());
         config.setRequester(requester);
         config.setRequestSerializer(new NyySerializer());
         config.setPushSubscriber(requester);
         config.setPushSerializer(new StringPushSerializer());
-        config.setPushIdGenerator(new SharedPreferencePushIdGenerator(this.getApplicationContext()));
         proxyClient = new ProxyClient(config);
         proxyClient.subscribeBroadcast("/topic/sttest", new PushHandler<String>(String.class) {
             @Override

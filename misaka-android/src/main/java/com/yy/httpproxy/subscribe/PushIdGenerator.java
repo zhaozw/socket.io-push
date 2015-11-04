@@ -5,6 +5,6 @@ package com.yy.httpproxy.subscribe;
  */
 public interface PushIdGenerator {
 
-    void generatePushId(PushIdCallback callback);
+    String generatePushId();
 
 }

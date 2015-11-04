@@ -5,8 +5,6 @@ package com.yy.httpproxy.subscribe;
  */
 public interface PushSubscriber {
 
-    void setPushIdGenerator(PushIdGenerator pushIdGenerator);
-
     void subscribeBroadcast(String topic);
 
     void setPushCallback(PushCallback proxyClient);

@@ -34,7 +34,7 @@ import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
 
 
-public class SocketIOProxyClient implements HttpRequester, PushSubscriber, PushIdCallback {
+public class SocketIOProxyClient implements HttpRequester, PushSubscriber {
 
     private static String TAG = "SocketIoRequester";
     private PushCallback pushCallback;
@@ -244,12 +244,6 @@ public class SocketIOProxyClient implements HttpRequester, PushSubscriber, PushI
     }
 
     @Override
-    public void setPushIdGenerator(PushIdGenerator pushIdGenerator) {
-        this.pushIdGenerator = pushIdGenerator;
-        this.pushIdGenerator.generatePushId(this);
-    }
-
-    @Override
     public void subscribeBroadcast(String topic) {
         topics.add(topic);
         if (socket.connected()) {
@@ -268,8 +262,7 @@ public class SocketIOProxyClient implements HttpRequester, PushSubscriber, PushI
         this.pushCallback = pushCallback;
     }
 
-    @Override
-    public void onPushIdGenerated(String pushId) {
+    public void setPushId(String pushId) {
         this.pushId = pushId;
         sendPushIdAndTopicToServer();
     }

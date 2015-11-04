@@ -11,3 +11,10 @@ Stats.prototype.addSession = function(count) {
     }
     this.sessionCount += count;
 };
+
+Stats.prototype.removeSession = function(count) {
+    if(!count) {
+       count = 1;
+    }
+    this.sessionCount -= count;
+};
