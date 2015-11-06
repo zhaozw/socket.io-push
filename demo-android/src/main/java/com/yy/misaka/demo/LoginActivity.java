@@ -1,23 +1,27 @@
 package com.yy.misaka.demo;
 
 import android.app.Activity;
+import android.app.NotificationManager;
+import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.yy.httpproxy.Config;
 import com.yy.httpproxy.ProxyClient;
 import com.yy.httpproxy.PushHandler;
 import com.yy.httpproxy.ReplyHandler;
 import com.yy.httpproxy.nyy.NyyRequestData;
-import com.yy.httpproxy.nyy.NyySerializer;
 import com.yy.httpproxy.serializer.StringPushSerializer;
-import com.yy.httpproxy.socketio.SocketIOProxyClient;
-import com.yy.httpproxy.subscribe.SharedPreferencePushIdGenerator;
+import com.yy.httpproxy.service.RemoteService;
+import com.yy.httpproxy.socketio.RemoteClient;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -105,23 +109,30 @@ public class LoginActivity extends Activity {
         passwordEdit.setText(getHistoryPassword());
 
 //        proxyClient = new ProxyClient(getApplicationContext(), "http://172.19.12.176:8080", new Config());
-        com.yy.httpproxy.Config config = new com.yy.httpproxy.Config();
-        SocketIOProxyClient requester = new SocketIOProxyClient("http://172.19.207.65:9101");
-//        SocketIOProxyClient requester = new SocketIOProxyClient("http://183.61.6.33:8201");
-        requester.setPushId(new SharedPreferencePushIdGenerator(this.getApplicationContext()).generatePushId());
-        config.setRequester(requester);
-        config.setRequestSerializer(new NyySerializer());
-        config.setPushSubscriber(requester);
-        config.setPushSerializer(new StringPushSerializer());
-        proxyClient = new ProxyClient(config);
-        proxyClient.subscribeBroadcast("/topic/sttest", new PushHandler<String>(String.class) {
+
+
+        proxyClient = new ProxyClient(new Config().setPushSubscriber(new RemoteClient(this,"http://172.19.207.65:9101", new RemoteClient.CreatedCallback() {
             @Override
-            public void onSuccess(String result) {
-                Log.d(TAG, "push recived " + result);
-                Toast toast = Toast.makeText(LoginActivity.this, "push recived " + result, Toast.LENGTH_SHORT);
-                toast.show();
+            public void onCreated() {
+                proxyClient.subscribe("/topic/test", new PushHandler<String>(String.class) {
+
+                    @Override
+                    public void onSuccess(String result) {
+                        Toast toast = Toast.makeText(LoginActivity.this, "push test recived " + result, Toast.LENGTH_SHORT);
+                        toast.show();
+                    }
+                });
+
+                proxyClient.subscribeBroadcast("/topic/pushAll", new PushHandler<String>(String.class) {
+
+                    @Override
+                    public void onSuccess(String result) {
+                        Toast toast = Toast.makeText(LoginActivity.this, "pushAll recived " + result, Toast.LENGTH_SHORT);
+                        toast.show();
+                    }
+                });
             }
-        });
+        })).setPushSerializer(new StringPushSerializer()));
 
 
         findViewById(R.id.btn_login).setOnClickListener(new OnClickListener() {

@@ -3,7 +3,7 @@ module.exports = RestApi;
 function RestApi(io,stats,port){
 
  var restify = require('restify');
-
+ var randomstring = require("randomstring");
  var server = restify.createServer({
    name: 'myapp',
    version: '1.0.0'
@@ -49,6 +49,39 @@ function RestApi(io,stats,port){
    }
  };
 
+ var handleNotification = function (req, res, next) {
+     var notification = JSON.parse(req.params.notification);
+    if(!notification){
+      res.send({code:"error",message:'notification is required'});
+      return next();
+    }
+    notification.id = randomstring.generate(32);
+    var pushId = req.params.pushId;
+    var pushAll = req.params.pushAll;
+    console.log('notification ' + JSON.stringify(req.params));
+
+    if(pushAll === 'true') {
+      io.to(topic).emit('notification', notification);
+      res.send({code:"success"});
+        return next();
+    } else if(!pushId){
+      res.send({code:"error",message:'pushId is required'});
+      return next();
+    } else {
+      if(typeof pushId === 'string') {
+          io.to(pushId).emit('notification', notification);
+                 res.send({code:"success"});
+                 return next();
+      } else {
+          pushId.forEach(function(id){
+                  io.to(id).emit('notification', notification);
+          });
+          res.send({code:"success"});
+          return next();
+      }
+    }
+  };
+
  var handleStats = function (req, res, next) {
     res.send({sessionCount:stats.sessionCount});
     return next();
@@ -57,6 +90,8 @@ function RestApi(io,stats,port){
  server.get('/api/stats', handleStats);
  server.get('/api/push', handlePush);
  server.post('/api/push', handlePush);
+ server.get('/api/notification', handleNotification);
+ server.post('/api/notification', handleNotification);
 
  server.get('/api/stats', function(req,res,nex) {
        res.send({connectCounter:connectCounter,sentCounter :sentCounter , receiveCounter:receiveCounter, percent:receiveCounter/sentCounter });

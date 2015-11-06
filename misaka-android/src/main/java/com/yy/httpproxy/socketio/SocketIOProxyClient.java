@@ -38,9 +38,13 @@ public class SocketIOProxyClient implements HttpRequester, PushSubscriber {
 
     private static String TAG = "SocketIoRequester";
     private PushCallback pushCallback;
-    private PushIdGenerator pushIdGenerator;
     private String pushId;
+    private NotificationCallback notificationCallback;
     private Set<String> topics = new HashSet<>();
+
+    public interface NotificationCallback {
+        void onNotification(String id, JSONObject notification);
+    }
 
     private final Emitter.Listener connectListener = new Emitter.Listener() {
         @Override
@@ -84,10 +88,24 @@ public class SocketIOProxyClient implements HttpRequester, PushSubscriber {
     private final Emitter.Listener pushIdListener = new Emitter.Listener() {
         @Override
         public void call(Object... args) {
-            if (pushIdGenerator != null) {
-                JSONObject data = (JSONObject) args[0];
-                String pushId = data.optString("id");
-                Log.v(TAG, "on pushId " + pushId);
+            JSONObject data = (JSONObject) args[0];
+            String pushId = data.optString("id");
+            Log.v(TAG, "on pushId " + pushId);
+        }
+    };
+
+    private final Emitter.Listener notificationListener = new Emitter.Listener() {
+        @Override
+        public void call(Object... args) {
+            if (notificationCallback != null) {
+                try {
+                    JSONObject data = (JSONObject) args[0];
+                    JSONObject android = data.optJSONObject("android");
+                    Log.v(TAG, "on notification topic " + android);
+                    notificationCallback.onNotification(data.optString("id"), android);
+                } catch (Exception e) {
+                    Log.e(TAG, "handle notification error ", e);
+                }
             }
         }
     };
@@ -195,6 +213,7 @@ public class SocketIOProxyClient implements HttpRequester, PushSubscriber {
             socket.on(Socket.EVENT_CONNECT, connectListener);
             socket.on("pushId", pushIdListener);
             socket.on("push", pushListener);
+            socket.on("notification", notificationListener);
             socket.connect();
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
@@ -265,5 +284,9 @@ public class SocketIOProxyClient implements HttpRequester, PushSubscriber {
     public void setPushId(String pushId) {
         this.pushId = pushId;
         sendPushIdAndTopicToServer();
+    }
+
+    public void setNotificationCallback(NotificationCallback notificationCallback) {
+        this.notificationCallback = notificationCallback;
     }
 }

@@ -51,6 +51,18 @@
                 android:name="com.yy.misaka.demo.ChatActivity" android:label="Message" >
         </activity>
 
+        <service android:name="com.yy.httpproxy.service.RemoteService" android:process=":push" android:enabled="true"/>
+
+
+        <receiver
+            android:name=".YYNotificationReceiver"
+            android:exported="true" >
+
+            <!-- 这里com.xiaomi.mipushdemo.DemoMessageRreceiver改成app中定义的完整类名 -->
+            <intent-filter>
+                <action android:name="com.yy.httpproxy.service.RemoteService.INTENT" />
+            </intent-filter>
+        </receiver>
 
     </application>
 

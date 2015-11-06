@@ -1,20 +1,33 @@
 apply plugin: 'java'
+apply plugin: 'idea'
 
 configurations {
     provided
 }
 
 sourceSets {
-    main.compileClasspath += configurations.provided
-    test.compileClasspath += configurations.provided
-    test.runtimeClasspath += configurations.provided
+    main {
+        compileClasspath += configurations.provided
+    }
+    test {
+        compileClasspath += configurations.provided
+    }
+}
+
+sourceSets.main.compileClasspath += configurations.provided
+
+idea {
+    module{
+        scopes.PROVIDED.plus += [configurations.provided] // for Gradle 2.0
+    }
 }
 
 dependencies {
-    compile 'com.google.code.gson:gson:2.3.1'
-    provided 'com.google.android:android:4.1.1.4'
+    provided 'com.google.code.gson:gson:2.3.1'
     compile 'io.socket:socket.io-client:0.6.1'
     provided 'com.loopj.android:android-async-http:1.4.8'
+    compile files('libs/support-v4-19.1.0.jar')
+    compile files('libs/android.jar')
 }
 
 apply plugin: 'maven'
