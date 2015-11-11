@@ -113,4 +113,7 @@ public class ProxyClient implements PushCallback {
     }
 
 
+    public void setPushId(String pushId) {
+         config.getPushSubscriber().setPushId(pushId);
+    }
 }

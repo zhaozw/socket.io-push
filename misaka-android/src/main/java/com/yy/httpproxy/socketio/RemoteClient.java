@@ -10,32 +10,42 @@ import com.yy.httpproxy.service.RemoteService;
 import com.yy.httpproxy.subscribe.PushCallback;
 import com.yy.httpproxy.subscribe.PushSubscriber;
 
+import java.util.HashSet;
+import java.util.Set;
+
 
 public class RemoteClient extends BroadcastReceiver implements PushSubscriber {
 
     private Context context;
     private static final String TAG = "RemoteClient";
-    public static final String INTENT = "RemoteClient.INTENT";
+    public static final String INTENT = "com.yy.httpproxy.service.RemoteClient.INTENT";
     public static final int CMD_SUBSCRIBE_BROADCAST = 1;
+    public static final int CMD_SET_PUSH_ID = 2;
     private PushCallback pushCallback;
-    private CreatedCallback createdCallback;
+    private Set<String> topics = new HashSet<>();
 
-    public interface CreatedCallback {
-        void onCreated();
-    }
-
-    public RemoteClient(Context context, String host, CreatedCallback createdCallback) {
+    public RemoteClient(Context context, String host) {
         this.context = context;
         context.registerReceiver(this, new IntentFilter(RemoteService.INTENT));
-        this.createdCallback = createdCallback;
         Intent intent = new Intent(context, RemoteService.class);
         intent.putExtra("host", host);
         context.startService(intent);
     }
 
+    public void setPushId(String pushId){
+        Intent intent = new Intent(INTENT);
+        intent.putExtra("cmd", CMD_SET_PUSH_ID);
+        intent.putExtra("pushId", pushId);
+        context.sendBroadcast(intent);
+    }
+
 
     @Override
     public void subscribeBroadcast(String topic) {
+        doSubscribe(topic);
+    }
+
+    private void doSubscribe(String topic) {
         Intent intent = new Intent(INTENT);
         intent.putExtra("cmd", CMD_SUBSCRIBE_BROADCAST);
         intent.putExtra("topic", topic);
@@ -56,7 +66,9 @@ public class RemoteClient extends BroadcastReceiver implements PushSubscriber {
             Log.d(TAG, " recieve intent push  " + topic);
             pushCallback.onPush(topic, data);
         } else if (cmd == RemoteService.CMD_CREATED) {
-            createdCallback.onCreated();
+            for (String topic : topics) {
+                doSubscribe(topic);
+            }
         }
     }
 }

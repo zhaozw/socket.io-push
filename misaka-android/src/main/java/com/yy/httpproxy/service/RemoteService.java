@@ -34,6 +34,8 @@ public class RemoteService extends Service implements PushCallback, SocketIOProx
             if (cmd == RemoteClient.CMD_SUBSCRIBE_BROADCAST) {
                 String topic = intent.getStringExtra("topic");
                 client.subscribeBroadcast(topic);
+            } else if (cmd == RemoteClient.CMD_SET_PUSH_ID) {
+                client.setPushId(intent.getStringExtra("pushId"));
             }
         }
     };
@@ -60,7 +62,6 @@ public class RemoteService extends Service implements PushCallback, SocketIOProx
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (client == null) {
-
             String host = getFromIntentOrPref(intent, "host");
             String handlerClassName = getFromIntentOrPref(intent, "notificationHandler");
             Class handlerClass;
@@ -85,6 +86,7 @@ public class RemoteService extends Service implements PushCallback, SocketIOProx
             client.setPushCallback(this);
             client.setNotificationCallback(this);
             registerReceiver(broadcastReceiver, new IntentFilter(RemoteClient.INTENT));
+
         }
         sendCreated();
         return Service.START_STICKY;

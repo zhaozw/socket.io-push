@@ -8,4 +8,6 @@ public interface PushSubscriber {
     void subscribeBroadcast(String topic);
 
     void setPushCallback(PushCallback proxyClient);
+
+    void setPushId(String pushId);
 }

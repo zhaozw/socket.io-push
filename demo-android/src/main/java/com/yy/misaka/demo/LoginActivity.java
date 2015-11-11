@@ -22,6 +22,7 @@ import com.yy.httpproxy.nyy.NyyRequestData;
 import com.yy.httpproxy.serializer.StringPushSerializer;
 import com.yy.httpproxy.service.RemoteService;
 import com.yy.httpproxy.socketio.RemoteClient;
+import com.yy.httpproxy.subscribe.SharedPreferencePushIdGenerator;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -111,30 +112,27 @@ public class LoginActivity extends Activity {
 //        proxyClient = new ProxyClient(getApplicationContext(), "http://172.19.12.176:8080", new Config());
 
 
-        proxyClient = new ProxyClient(new Config().setPushSubscriber(new RemoteClient(this,"http://172.19.207.65:9101", new RemoteClient.CreatedCallback() {
+        proxyClient = new ProxyClient(new Config().setPushSubscriber(new RemoteClient(this,"http://172.19.207.65:9101")).setPushSerializer(new StringPushSerializer()));
+
+        proxyClient.subscribe("/topic/test", new PushHandler<String>(String.class) {
+
             @Override
-            public void onCreated() {
-                proxyClient.subscribe("/topic/test", new PushHandler<String>(String.class) {
-
-                    @Override
-                    public void onSuccess(String result) {
-                        Toast toast = Toast.makeText(LoginActivity.this, "push test recived " + result, Toast.LENGTH_SHORT);
-                        toast.show();
-                    }
-                });
-
-                proxyClient.subscribeBroadcast("/topic/pushAll", new PushHandler<String>(String.class) {
-
-                    @Override
-                    public void onSuccess(String result) {
-                        Toast toast = Toast.makeText(LoginActivity.this, "pushAll recived " + result, Toast.LENGTH_SHORT);
-                        toast.show();
-                    }
-                });
+            public void onSuccess(String result) {
+                Toast toast = Toast.makeText(LoginActivity.this, "push test recived " + result, Toast.LENGTH_SHORT);
+                toast.show();
             }
-        })).setPushSerializer(new StringPushSerializer()));
+        });
 
+        proxyClient.setPushId(new SharedPreferencePushIdGenerator(this).generatePushId());
 
+        proxyClient.subscribeBroadcast("/topic/pushAll", new PushHandler<String>(String.class) {
+
+            @Override
+            public void onSuccess(String result) {
+                Toast toast = Toast.makeText(LoginActivity.this, "pushAll recived " + result, Toast.LENGTH_SHORT);
+                toast.show();
+            }
+        });
         findViewById(R.id.btn_login).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {

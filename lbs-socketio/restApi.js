@@ -1,6 +1,6 @@
 module.exports = RestApi;
 
-function RestApi(io,stats,port){
+function RestApi(io,stats,redis,port){
 
  var restify = require('restify');
  var randomstring = require("randomstring");
@@ -69,18 +69,23 @@ function RestApi(io,stats,port){
       return next();
     } else {
       if(typeof pushId === 'string') {
-          io.to(pushId).emit('notification', notification);
-                 res.send({code:"success"});
-                 return next();
+          sendNotification(pushId,notification);
+          res.send({code:"success"});
+          return next();
       } else {
-          pushId.forEach(function(id){
-                  io.to(id).emit('notification', notification);
+          pushId.forEach(function(pushId){
+            sendNotification(pushId,notification);
           });
           res.send({code:"success"});
           return next();
       }
     }
   };
+
+ function sendNotification(pushId,notification){
+     io.to(pushId).emit('notification', notification);
+     redis.sendNotification(pushId, notification);
+ }
 
  var handleStats = function (req, res, next) {
     res.send({sessionCount:stats.sessionCount});

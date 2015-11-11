@@ -3,12 +3,17 @@ port = parseInt(port)
 
 console.log("start server on port " + port);
 var io = require('socket.io')(port);
-var redis = require('socket.io-redis');
-var stats = require('./stats')();
+var socketIoRedis = require('socket.io-redis');
+io.adapter(socketIoRedis({ host: 'localhost', port: 6379 }));
 
-io.adapter(redis({ host: 'localhost', port: 6379 }));
+var redis = require("redis")
+var redisClient = redis.createClient({ host: 'localhost', port: 6379 });
+var redisStore = require('./redisStore.js')(redisClient);
+var stats = require('./stats.js')();
 
-var proxyServer = require('./proxyServer.js')(io,stats);
+
+
+var proxyServer = require('./proxyServer.js')(io,stats, redisStore);
 
 // push
-var restApi = require('./restApi.js')(io, stats, port + 1);
+var restApi = require('./restApi.js')(io, stats,redisStore, port + 1);

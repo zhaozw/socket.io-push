@@ -1,8 +1,9 @@
 module.exports = ProxyServer;
 
-function ProxyServer(io,stats){
+function ProxyServer(io,stats,redis){
+ if (!(this instanceof ProxyServer)) return new ProxyServer(io,stats,redis);
  var http = require('http');
- if (!(this instanceof ProxyServer)) return new ProxyServer(io,stats);
+ console.log("redis2 " + redis + " stat " + stats);
  io.set('heartbeat interval', 30000);
  io.set('heartbeat timeout', 10000);
 
@@ -31,9 +32,16 @@ function ProxyServer(io,stats){
      });
 
       socket.on('subscribeTopic', function (data) {
-               console.log("on subscribeTopic " + JSON.stringify(data));
-                var topic = data.topic;
-                socket.join(topic);
+          console.log("on subscribeTopic " + JSON.stringify(data));
+          var topic = data.topic;
+          socket.join(topic);
+      });
+
+      socket.on('apnToken', function (data) {
+          console.log("on apnToken " + redis + JSON.stringify(data));
+          var pushId = data.pushId;
+          var apnToken = data.apnToken;
+          redis.setApnToken(pushId,apnToken);
       });
 
      socket.on('httpProxy', function (data) {
