@@ -25,9 +25,12 @@ RedisStore.prototype.sendNotification = function(pushId, notification) {
         if(token) {
             var note = new apn.Notification();
 
-//            note.expiry = notification.apn.expiry; // Expires 1 hour from now.
             note.badge = notification.apn.badge;
-            note.sound = notification.apn.sound;
+            if(notification.apn.sound) {
+               note.sound = notification.apn.sound;
+            } else {
+               note.sound = "default";
+            }
             note.alert = notification.apn.alert;
             if(notification.apn.payload) {
                 note.payload = notification.apn.payload;
