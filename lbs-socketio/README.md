@@ -37,11 +37,14 @@ http://183.61.6.33/api/notification?pushId=abc&notification=%7B%20%22android%22%
 
 pushId -> 客户端生成的随机ID
 
-notification -> 通知消息内容
+notification -> 通知消息内容 需要url encode
+
+```
 {
   "android" : {"title":"title","message":"message" , "payload" : {"abc":123} },
   "apn":  {"alert":"message" , "badge":5, "sound":"default", "payload":{"abc":123} }
 }
+```
 
 notification是一个json map,内容说明如下
 
