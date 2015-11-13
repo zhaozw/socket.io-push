@@ -252,7 +252,7 @@ public class SocketIOProxyClient implements HttpRequester, PushSubscriber {
             object.put("sequenceId", String.valueOf(sequenceId));
 
 
-            socket.emit("httpProxy", object);
+            socket.emit("packetProxy", object);
 
             postTimeout();
 

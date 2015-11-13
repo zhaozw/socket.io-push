@@ -37,6 +37,5 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile project(':misaka-android')
     compile 'com.android.support:appcompat-v7:19.+'
-    compile 'io.socket:socket.io-client:0.6.1'
-
+    compile 'com.google.code.gson:gson:2.4'
 }

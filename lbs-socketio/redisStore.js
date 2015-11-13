@@ -11,6 +11,10 @@ function RedisStore(redis){
  this.redis = redis;
 }
 
+RedisStore.prototype.publishPacket = function(data) {
+    this.redis.publish("packetProxy" , data);
+};
+
 RedisStore.prototype.setApnToken = function(pushId,apnToken) {
     if(pushId && apnToken){
        this.redis.set("apnToken#" + pushId, apnToken);

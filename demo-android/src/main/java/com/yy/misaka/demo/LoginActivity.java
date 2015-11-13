@@ -19,9 +19,11 @@ import com.yy.httpproxy.ProxyClient;
 import com.yy.httpproxy.PushHandler;
 import com.yy.httpproxy.ReplyHandler;
 import com.yy.httpproxy.nyy.NyyRequestData;
+import com.yy.httpproxy.nyy.NyySerializer;
 import com.yy.httpproxy.serializer.StringPushSerializer;
 import com.yy.httpproxy.service.RemoteService;
 import com.yy.httpproxy.socketio.RemoteClient;
+import com.yy.httpproxy.socketio.SocketIOProxyClient;
 import com.yy.httpproxy.subscribe.SharedPreferencePushIdGenerator;
 
 import java.util.HashMap;
@@ -111,8 +113,9 @@ public class LoginActivity extends Activity {
 
 //        proxyClient = new ProxyClient(getApplicationContext(), "http://172.19.12.176:8080", new Config());
 
+        SocketIOProxyClient requetClient = new SocketIOProxyClient("http://172.19.207.65:9101");
 
-        proxyClient = new ProxyClient(new Config().setPushSubscriber(new RemoteClient(this,"http://172.19.207.65:9101")).setPushSerializer(new StringPushSerializer()));
+        proxyClient = new ProxyClient(new Config().setRequestSerializer(new NyySerializer()).setRequester(requetClient).setPushSubscriber(new RemoteClient(this,"http://172.19.207.65:9101")).setPushSerializer(new StringPushSerializer()));
 
         proxyClient.subscribe("/topic/test", new PushHandler<String>(String.class) {
 
