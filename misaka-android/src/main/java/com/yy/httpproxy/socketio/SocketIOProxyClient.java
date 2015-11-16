@@ -205,6 +205,7 @@ public class SocketIOProxyClient implements HttpRequester, PushSubscriber {
     public SocketIOProxyClient(String host) {
         AndroidLoggingHandler.reset(new AndroidLoggingHandler());
         java.util.logging.Logger.getLogger("").setLevel(Level.FINEST);
+        topics.add("android");
         try {
             IO.Options opts = new IO.Options();
             opts.transports = new String[]{"websocket"};

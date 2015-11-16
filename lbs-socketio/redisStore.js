@@ -1,5 +1,7 @@
 module.exports = RedisStore;
 
+var debug = require('debug')('RedisStore');
+
 var apn = require('apn');
 
 var options = { production:false };
@@ -7,8 +9,8 @@ var options = { production:false };
 var apnConnection = new apn.Connection(options);
 
 function RedisStore(redis){
- if (!(this instanceof RedisStore)) return new RedisStore(redis);
- this.redis = redis;
+    if (!(this instanceof RedisStore)) return new RedisStore(redis);
+    this.redis = redis;
 }
 
 RedisStore.prototype.publishPacket = function(data) {
@@ -18,17 +20,39 @@ RedisStore.prototype.publishPacket = function(data) {
 RedisStore.prototype.setApnToken = function(pushId,apnToken) {
     if(pushId && apnToken){
        this.redis.set("apnToken#" + pushId, apnToken);
-       this.redis.expire("apnToken#" + pushId, 3600 * 24 * 7);
+       //  this.redis.expire("apnToken#" + pushId, 3600 * 24 * 7);
+       this.redis.hset("apnTokens", apnToken , "");
     }
 };
 
 RedisStore.prototype.sendNotification = function(pushId, notification) {
     this.redis.get("apnToken#" + pushId,  function(err, token) {
         // reply is null when the key is missing
-        console.log("apnToken redis " +  token);
+        debug("apnToken redis %s", token);
         if(token) {
-            var note = new apn.Notification();
+            var note = toApnNotification(notification);
+            apnConnection.pushNotification(note, token);
+        } else {
+            io.to(pushId).emit('notification', notification);
+        }
+    });
+};
 
+
+
+RedisStore.prototype.sendNotificationToAll = function(notification,io) {
+    io.to("android").emit('notification', notification);
+    this.redis.hkeys("apnTokens", function (err, replies) {
+      debug(replies.length + " replies:");
+      var note = toApnNotification(notification);
+      if(replies.length > 0){
+        apnConnection.pushNotification(note, replies);
+      }
+    });
+};
+
+function toApnNotification(notification){
+            var note = new apn.Notification();
             note.badge = notification.apn.badge;
             if(notification.apn.sound) {
                note.sound = notification.apn.sound;
@@ -41,14 +65,8 @@ RedisStore.prototype.sendNotification = function(pushId, notification) {
             } else {
                 note.payload = {};
             }
+            return note;
+}
 
 
-//note.expiry = Math.floor(Date.now() / 1000) + 3600; // Expires 1 hour from now.
-//note.badge = 3;
-//note.sound = "ping.aiff";
-//note.alert = "\uD83D\uDCE7 \u2709 You have a new message";
-//note.payload = {'messageFrom': 'Caroline'};
-            apnConnection.pushNotification(note, new apn.Device(token));
-        }
-    });
-};
+

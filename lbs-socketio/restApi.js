@@ -61,20 +61,20 @@ function RestApi(io,stats,redis,port){
     console.log('notification ' + JSON.stringify(req.params));
 
     if(pushAll === 'true') {
-      io.to(topic).emit('notification', notification);
-      res.send({code:"success"});
+        redis.sendNotificationToAll(notification,io);
+        res.send({code:"success"});
         return next();
     } else if(!pushId){
       res.send({code:"error",message:'pushId is required'});
       return next();
     } else {
       if(typeof pushId === 'string') {
-          sendNotification(pushId,notification);
+          redis.sendNotification(pushId, notification,io);
           res.send({code:"success"});
           return next();
       } else {
           pushId.forEach(function(pushId){
-            sendNotification(pushId,notification);
+             redis.sendNotification(pushId,notification,io);
           });
           res.send({code:"success"});
           return next();
@@ -82,10 +82,6 @@ function RestApi(io,stats,redis,port){
     }
   };
 
- function sendNotification(pushId,notification){
-     io.to(pushId).emit('notification', notification);
-     redis.sendNotification(pushId, notification);
- }
 
  var handleStats = function (req, res, next) {
     res.send({sessionCount:stats.sessionCount});
