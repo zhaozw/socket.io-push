@@ -1,10 +1,10 @@
 module.exports = RedisStore;
-
+var config = require("./config");
 var debug = require('debug')('RedisStore');
 
 var apn = require('apn');
 
-var options = { production:false };
+var options = config.apn;
 
 var apnConnection = new apn.Connection(options);
 
