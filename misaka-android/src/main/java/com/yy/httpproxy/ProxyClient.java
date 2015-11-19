@@ -30,6 +30,7 @@ public class ProxyClient implements PushCallback {
 
     public void request(String method, String scheme, String host, int port, String path, Map<String, String> headers, Object body, final ReplyHandler replyHandler) {
         final RequestInfo requestInfo = new RequestInfo();
+        requestInfo.setScheme(scheme);
         requestInfo.setBody(config.getRequestSerializer().toBinary(path, body));
         requestInfo.setHeaders(headers);
         requestInfo.setHost(host);
