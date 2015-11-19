@@ -13,6 +13,7 @@ public class RequestInfo {
     private Map<String, String> headers;
     private byte[] body;
     private String method;
+    private String scheme;
 
     public String getHost() {
         return host;
@@ -55,7 +56,7 @@ public class RequestInfo {
     }
 
     public String getUrl(){
-        return  "http://" + getHost() + ":" + getPort() + getPath();
+        return  scheme + "://" + getHost() + ":" + getPort() + getPath();
     }
 
     public String getMethod() {
@@ -64,5 +65,13 @@ public class RequestInfo {
 
     public void setMethod(String method) {
         this.method = method;
+    }
+
+    public void setScheme(String scheme) {
+        this.scheme = scheme;
+    }
+
+    public String getScheme() {
+        return scheme;
     }
 }

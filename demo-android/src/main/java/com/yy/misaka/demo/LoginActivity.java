@@ -115,7 +115,10 @@ public class LoginActivity extends Activity {
 
         SocketIOProxyClient requetClient = new SocketIOProxyClient("http://172.19.207.65:9101");
 
-        proxyClient = new ProxyClient(new Config().setRequestSerializer(new NyySerializer()).setRequester(requetClient).setPushSubscriber(new RemoteClient(this,"http://172.19.207.65:9101")).setPushSerializer(new StringPushSerializer()));
+        String host = "http://172.19.207.65:9101";
+//        String host = "http://183.61.6.33:80";
+
+        proxyClient = new ProxyClient(new Config().setRequestSerializer(new NyySerializer()).setRequester(requetClient).setPushSubscriber(new RemoteClient(this,host,null)).setPushSerializer(new StringPushSerializer()));
 
         proxyClient.subscribe("/topic/test", new PushHandler<String>(String.class) {
 

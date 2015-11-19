@@ -19,7 +19,7 @@ import org.json.JSONObject;
 
 public class RemoteService extends Service implements PushCallback, SocketIOProxyClient.NotificationCallback {
 
-    public static final String INTENT = "com.yy.httpproxy.service.RemoteService.INTENT";
+    private static final String INTENT_TAIL = ".YY_REMOTE_SERVICE";
     public static final int CMD_CREATED = 1;
     public static final int CMD_PUSH = 2;
     public static final int CMD_NOTIFICATION_CLICKED = 3;
@@ -43,6 +43,7 @@ public class RemoteService extends Service implements PushCallback, SocketIOProx
     @Override
     public void onCreate() {
         super.onCreate();
+
     }
 
     private String getFromIntentOrPref(Intent intent, String name) {
@@ -85,7 +86,7 @@ public class RemoteService extends Service implements PushCallback, SocketIOProx
             config.setPushSerializer(new StringPushSerializer());
             client.setPushCallback(this);
             client.setNotificationCallback(this);
-            registerReceiver(broadcastReceiver, new IntentFilter(RemoteClient.INTENT));
+            registerReceiver(broadcastReceiver, new IntentFilter(RemoteClient.getIntentName(this)));
 
         }
         sendCreated();
@@ -93,7 +94,7 @@ public class RemoteService extends Service implements PushCallback, SocketIOProx
     }
 
     private void sendCreated() {
-        Intent intent = new Intent(INTENT);
+        Intent intent = new Intent(getIntentName(this));
         intent.putExtra("cmd", CMD_CREATED);
         sendBroadcast(intent);
     }
@@ -106,11 +107,15 @@ public class RemoteService extends Service implements PushCallback, SocketIOProx
     @Override
     public void onPush(String topic, byte[] data) {
         Log.d(TAG, "push recived " + topic);
-        Intent intent = new Intent(INTENT);
+        Intent intent = new Intent(getIntentName(this));
         intent.putExtra("cmd", CMD_PUSH);
         intent.putExtra("topic", topic);
         intent.putExtra("data", data);
         sendBroadcast(intent);
+    }
+
+    public static String getIntentName(Context context){
+        return context.getPackageName() + INTENT_TAIL;
     }
 
 

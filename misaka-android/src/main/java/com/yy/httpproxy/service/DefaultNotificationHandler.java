@@ -13,11 +13,16 @@ import android.support.v4.app.NotificationCompat;
 
 public class DefaultNotificationHandler implements NotificationHandler {
 
+    public static final String INTENT_TAIL = ".YY_NOTIFICATION";
+
+
     @Override
     public void handlerNotification(Context context, PushedNotification pushedNotification) {
-        Intent pushIntent = new Intent(RemoteService.INTENT);
+        String intentName = context.getApplicationInfo().packageName + INTENT_TAIL;
+        Intent pushIntent = new Intent(intentName);
         pushIntent.putExtra("cmd", RemoteService.CMD_NOTIFICATION_CLICKED);
-        pushIntent.putExtra(pushedNotification.id, pushedNotification.values);
+        pushIntent.putExtra("id", pushedNotification.values);
+        pushIntent.putExtra("notification", pushedNotification.values);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 1, pushIntent, 0);
 
 

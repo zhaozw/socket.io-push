@@ -12,9 +12,9 @@ import java.util.HashMap;
 public abstract class NotificationReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        if (intent.getAction().equals(RemoteService.INTENT) && intent.getIntExtra("cmd", -1) == RemoteService.CMD_NOTIFICATION_CLICKED) {
+        if (intent.getIntExtra("cmd", -1) == RemoteService.CMD_NOTIFICATION_CLICKED) {
             String id = intent.getStringExtra("id");
-            HashMap<String, Object> values = (HashMap<String, Object>) intent.getSerializableExtra("values");
+            HashMap<String, Object> values = (HashMap<String, Object>) intent.getSerializableExtra("notification");
             onNotificationClicked(context, id, values);
         }
     }

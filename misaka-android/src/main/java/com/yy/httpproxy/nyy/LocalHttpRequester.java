@@ -1,6 +1,8 @@
 package com.yy.httpproxy.nyy;
 
 
+import android.util.Log;
+
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.yy.httpproxy.requester.HttpRequester;
@@ -24,6 +26,11 @@ import java.util.Map;
 public class LocalHttpRequester implements HttpRequester {
 
     private AsyncHttpClient client = new AsyncHttpClient();
+
+    public LocalHttpRequester() {
+        client = new AsyncHttpClient();
+        client.setTimeout(15000);
+    }
 
     @Override
     public void request(final RequestInfo requestInfo, final ResponseHandler handler) {
@@ -53,6 +60,7 @@ public class LocalHttpRequester implements HttpRequester {
 
                     @Override
                     public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                        Log.e("LocalHttpRequester", "onFailure, code: %d" + statusCode, error);
                         handler.onError(new RequestException(error, RequestException.Error.CONNECT_ERROR));
                     }
                 });

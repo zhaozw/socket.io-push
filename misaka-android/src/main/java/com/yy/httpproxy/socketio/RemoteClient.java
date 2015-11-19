@@ -18,25 +18,34 @@ public class RemoteClient extends BroadcastReceiver implements PushSubscriber {
 
     private Context context;
     private static final String TAG = "RemoteClient";
-    public static final String INTENT = "com.yy.httpproxy.service.RemoteClient.INTENT";
+    public static final String INTENT_TAIL = ".YY_REMOTE_CLIENT";
+    private String intentName;
     public static final int CMD_SUBSCRIBE_BROADCAST = 1;
     public static final int CMD_SET_PUSH_ID = 2;
     private PushCallback pushCallback;
     private Set<String> topics = new HashSet<>();
 
-    public RemoteClient(Context context, String host) {
+    public RemoteClient(Context context, String host, String notificationHandler) {
         this.context = context;
-        context.registerReceiver(this, new IntentFilter(RemoteService.INTENT));
+        intentName = getIntentName(context);
+        context.registerReceiver(this, new IntentFilter(RemoteService.getIntentName(context)));
         Intent intent = new Intent(context, RemoteService.class);
         intent.putExtra("host", host);
+        if (notificationHandler != null) {
+            intent.putExtra("notificationHandler", notificationHandler);
+        }
         context.startService(intent);
     }
 
-    public void setPushId(String pushId){
-        Intent intent = new Intent(INTENT);
+    public void setPushId(String pushId) {
+        Intent intent = new Intent(intentName);
         intent.putExtra("cmd", CMD_SET_PUSH_ID);
         intent.putExtra("pushId", pushId);
         context.sendBroadcast(intent);
+    }
+
+    public static String getIntentName(Context context){
+        return context.getPackageName() + INTENT_TAIL;
     }
 
 
@@ -46,7 +55,7 @@ public class RemoteClient extends BroadcastReceiver implements PushSubscriber {
     }
 
     private void doSubscribe(String topic) {
-        Intent intent = new Intent(INTENT);
+        Intent intent = new Intent(intentName);
         intent.putExtra("cmd", CMD_SUBSCRIBE_BROADCAST);
         intent.putExtra("topic", topic);
         context.sendBroadcast(intent);
