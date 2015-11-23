@@ -228,8 +228,10 @@ public class SocketIOProxyClient implements HttpRequester, PushSubscriber {
         try {
             sequenceId = sequenceId + 1;
 
-            Request request = new Request(requestInfo, handler);
-            replyCallbacks.put(sequenceId, request);
+            if (handler != null) {
+                Request request = new Request(requestInfo, handler);
+                replyCallbacks.put(sequenceId, request);
+            }
 
             if (!socket.connected()) {
                 return;
@@ -245,7 +247,7 @@ public class SocketIOProxyClient implements HttpRequester, PushSubscriber {
 
             JSONObject object = new JSONObject();
             object.put("headers", headers);
-            object.put("body", Base64.encode(requestInfo.getBody(), Base64.DEFAULT));
+            object.put("body", Base64.encodeToString(requestInfo.getBody(), Base64.DEFAULT));
             object.put("host", requestInfo.getHost());
             object.put("port", requestInfo.getPort());
             object.put("method", requestInfo.getMethod());

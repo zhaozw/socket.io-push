@@ -38,25 +38,31 @@ public class ProxyClient implements PushCallback {
         requestInfo.setPort(port);
         requestInfo.setMethod(method);
 
-        config.getRequester().
-                request(requestInfo, new ResponseHandler() {
-                    @Override
-                    public void onSuccess(Map<String, String> headers, int statusCode, byte[] body) {
-                        try {
-                            Object result = config.getRequestSerializer().toObject(replyHandler.clazz, statusCode, headers, body);
-                            callSuccessOnMainThread(replyHandler, result);
-                        } catch (RequestException e) {
-                            Log.e(TAG, "serialize exception " + e.getMessage(), e);
-                            callErrorOnMainThread(replyHandler, e);
-                        }
-                    }
+        ResponseHandler responseHandler = null;
 
-                    @Override
-                    public void onError(RequestException e) {
+        if (replyHandler != null) {
+            responseHandler = new ResponseHandler() {
+                @Override
+                public void onSuccess(Map<String, String> headers, int statusCode, byte[] body) {
+                    try {
+                        Object result = config.getRequestSerializer().toObject(replyHandler.clazz, statusCode, headers, body);
+                        callSuccessOnMainThread(replyHandler, result);
+                    } catch (RequestException e) {
                         Log.e(TAG, "serialize exception " + e.getMessage(), e);
                         callErrorOnMainThread(replyHandler, e);
                     }
-                });
+                }
+
+                @Override
+                public void onError(RequestException e) {
+                    Log.e(TAG, "serialize exception " + e.getMessage(), e);
+                    callErrorOnMainThread(replyHandler, e);
+                }
+            };
+        }
+
+        config.getRequester().
+                request(requestInfo, responseHandler);
     }
 
     public void subscribe(String topic, ReplyHandler handler) {

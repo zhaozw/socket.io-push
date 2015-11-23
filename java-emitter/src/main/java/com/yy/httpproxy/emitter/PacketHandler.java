@@ -1,43 +1,21 @@
 package com.yy.httpproxy.emitter;
 
-import java.io.IOException;
-
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.JedisPoolConfig;
-import redis.clients.jedis.JedisPubSub;
+import java.util.Map;
 
 /**
- * Created by xuduo on 11/13/15.
+ * Created by xuduo on 11/23/15.
  */
-public class PacketHandler {
+public abstract class PacketHandler {
 
-    private Jedis jedis;
+    private Emitter emitter;
 
-    public PacketHandler() {
-        jedis.subscribe(new JedisPubSub() {
-            @Override
-            public void onMessage(String channel, String message) {
-                System.out.println(channel + " : " + message);
-            }
-        }, "packetProxy");
+    abstract void handle(String sequenceId, String path, Map<String, String> headers, byte[] body);
+
+    public void broadcast(String topic, byte[] data) {
+        emitter.push(topic, data);
     }
 
-    public static void main(String[] args) throws IOException {
-        JedisPool jedisPool = new JedisPool(new JedisPoolConfig(), "127.0.0.1", 6379);
-        Jedis jedis = jedisPool.getResource();
-
-        jedis.subscribe(new JedisPubSub() {
-            @Override
-            public void onMessage(String channel, String message) {
-                System.out.println(channel + " : " + message);
-            }
-        }, "packetProxy");
-
-        try {
-            Thread.sleep(100000L);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+    public void setEmitter(Emitter emitter) {
+        this.emitter = emitter;
     }
 }

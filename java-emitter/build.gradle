@@ -16,4 +16,7 @@ dependencies {
     compile 'org.msgpack:msgpack:0.6.11'
     compile 'org.json:json:20140107'
     compile 'redis.clients:jedis:2.7.2'
+    compile 'commons-codec:commons-codec:1.10'
+    compile 'org.slf4j:slf4j-simple:1.7.13'
+    compile 'org.redisson:redisson:2.1.4'
 }
