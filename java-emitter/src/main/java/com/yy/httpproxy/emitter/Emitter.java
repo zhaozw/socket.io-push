@@ -12,6 +12,8 @@ import org.redisson.core.RTopic;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import io.netty.util.CharsetUtil;
 import io.netty.util.concurrent.Future;
@@ -24,9 +26,11 @@ public class Emitter {
 
     private BASE64Encoder base64Encoder = new BASE64Encoder();
     private Redisson redisson;
+    RTopic<byte[]> rTopic;
 
     public Emitter(Redisson redisson) {
         this.redisson = redisson;
+        rTopic = redisson.getTopic("socket.io#emitter", BytesCodec.INSTANCE);
     }
 
 
@@ -43,7 +47,27 @@ public class Emitter {
         packet.setData(jsonRoot);
         packet.setEvent("push");
 
-        RTopic<byte[]> rTopic = redisson.getTopic("socket.io#emitter", BytesCodec.INSTANCE);
+        rTopic.publishAsync(packet.getBytes());
+
+    }
+
+    public void reply(String sequenceId, String pushId, byte[] data) {
+
+        JSONObject jsonRoot = new JSONObject();
+        jsonRoot.put("sequenceId", sequenceId);
+        jsonRoot.put("code", 1);
+        if (data != null) {
+            jsonRoot.put("data", base64Encoder.encode(data));
+        }
+
+        PacketJson packet = new PacketJson();
+
+        packet.setData(jsonRoot);
+        packet.setEvent("packetProxy");
+        ArrayList<String> rooms = new ArrayList<>(1);
+        rooms.add(pushId);
+        packet.setRooms(rooms);
+
         rTopic.publishAsync(packet.getBytes());
 
     }
@@ -78,14 +102,6 @@ public class Emitter {
         packet.setData(jsonRoot);
         packet.setEvent("push");
 
-//        RedisClient client = new RedisClient("localhost", 6379);
-//        RedisConnection conn = client.connect();
-////or
-//        Future<RedisConnection> connFuture = client.connectAsync();
-//
-//        conn.async(StringCodec.INSTANCE, RedisCommands.PUBLISH, "socket.io#emitter", packet.getBytes());
-//        conn.async(StringCodec.INSTANCE, RedisCommands.GET, "test");
-//
         RTopic<byte[]> rTopic = Redisson.create().getTopic("socket.io#emitter", BytesCodec.INSTANCE);
         try {
             rTopic.publishAsync(packet.getBytes());

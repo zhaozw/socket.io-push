@@ -178,17 +178,17 @@ public class SocketIOProxyClient implements HttpRequester, PushSubscriber {
                         if (error) {
                             request.getResponseHandler().onError(new RequestException(null, RequestException.Error.CONNECT_ERROR.value, errorMessage));
                         } else {
-                            String response = data.optString("response");
+                            String response = data.optString("data");
                             byte[] decodedResponse = Base64.decode(response, Base64.DEFAULT);
                             Log.i(TAG, "response " + new String(decodedResponse));
                             int statusCode = data.optInt("statusCode", 0);
                             Map<String, String> headers = new HashMap<>();
-                            JSONObject headerObject = data.optJSONObject("headers");
-                            Iterator<String> it = headerObject.keys();
-                            while (it.hasNext()) {
-                                String key = it.next();
-                                headers.put(key, headerObject.optString(key));
-                            }
+//                            JSONObject headerObject = data.optJSONObject("headers");
+//                            Iterator<String> it = headerObject.keys();
+//                            while (it.hasNext()) {
+//                                String key = it.next();
+//                                headers.put(key, headerObject.optString(key));
+//                            }
                             request.getResponseHandler().onSuccess(headers, statusCode, decodedResponse);
                         }
                     } catch (Exception e) {
@@ -210,7 +210,7 @@ public class SocketIOProxyClient implements HttpRequester, PushSubscriber {
             IO.Options opts = new IO.Options();
             opts.transports = new String[]{"websocket"};
             socket = IO.socket(host, opts);
-            socket.on("httpProxy", httpProxyListener);
+            socket.on("packetProxy", httpProxyListener);
             socket.on(Socket.EVENT_CONNECT, connectListener);
             socket.on("pushId", pushIdListener);
             socket.on("push", pushListener);
@@ -247,7 +247,7 @@ public class SocketIOProxyClient implements HttpRequester, PushSubscriber {
 
             JSONObject object = new JSONObject();
             object.put("headers", headers);
-            object.put("body", Base64.encodeToString(requestInfo.getBody(), Base64.DEFAULT));
+            object.put("data", Base64.encodeToString(requestInfo.getBody(), Base64.DEFAULT));
             object.put("host", requestInfo.getHost());
             object.put("port", requestInfo.getPort());
             object.put("method", requestInfo.getMethod());

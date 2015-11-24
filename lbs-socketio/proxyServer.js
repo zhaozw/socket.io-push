@@ -1,10 +1,12 @@
 module.exports = ProxyServer;
 
+var clientIdToPushId = {};
 
 function ProxyServer(io,stats,redis){
  if (!(this instanceof ProxyServer)) return new ProxyServer(io,stats,redis);
  var http = require('http');
  var debug = require('debug')('ProxyServer');
+
  io.set('heartbeat interval', 30000);
  io.set('heartbeat timeout', 10000);
 
@@ -14,6 +16,7 @@ function ProxyServer(io,stats,redis){
 
      socket.on('disconnect', function () {
          stats.removeSession();
+         delete clientIdToPushId[socket.id];
      });
 
      socket.on('pushId', function (data) {
@@ -26,9 +29,10 @@ function ProxyServer(io,stats,redis){
                   console.log('join topic ' + topic);
              });
            }
+           clientIdToPushId[socket.id] = data.id;
            socket.join(data.id);
            socket.emit('pushId', { id:data.id });
-           console.log('join room ' + data.id);
+           debug('join room socket.id %s ,pushId %s' ,socket.id, clientIdToPushId[socket.id]);
  	    }
      });
 
@@ -46,15 +50,12 @@ function ProxyServer(io,stats,redis){
       });
 
       socket.on('packetProxy', function (data) {
+               data.pushId = clientIdToPushId[socket.id];
+               data.uid = "0";
                var stringData =  JSON.stringify(data);
-               debug('body %s', stringData);
-               var body = new Buffer(data.body.toString(),"base64").toString('utf-8');
-
-               var post_data = body;
-
+               debug('packetProxy %s body %s', socket.id,stringData);
                redis.publishPacket(stringData);
-
-           });
+      });
 
      socket.on('httpProxy', function (data) {
          console.log('body' + JSON.stringify(data));

@@ -31,20 +31,10 @@ public class JsonSerializer implements RequestSerializer {
     @Override
     public Object toObject(Object clazz, int statusCode, Map<String, String> headers, byte[] body) throws RequestException {
         try {
-            JsonObject root = (JsonObject) parser.parse(new String(body, "UTF-8"));
-            int code = root.get("code").getAsInt();
-            if (code != 1) {
-                throw new RequestException(null, code, root.get("msg").getAsString());
-            }
-            JsonElement data = root.get("data");
-            if (data == null) {
-                return null;
+            if (clazz instanceof Class) {
+                return gson.fromJson(new String(body, "UTF-8"), (Class) clazz);
             } else {
-                if (clazz instanceof Class) {
-                    return gson.fromJson(data, (Class) clazz);
-                } else {
-                    return gson.fromJson(data, (Type) clazz);
-                }
+                return gson.fromJson(new String(body, "UTF-8"), (Type) clazz);
             }
         } catch (Exception e) {
             throw new RequestException(e, RequestException.Error.SERVER_DATA_SERIALIZE_ERROR);

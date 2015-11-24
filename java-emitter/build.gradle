@@ -5,6 +5,11 @@ jar {
     version = '1.0'
 }
 
+task execute(type:JavaExec){
+    main = "com.yy.httpproxy.emitter.DemoServer"
+    classpath = sourceSets.main.runtimeClasspath
+}
+
 repositories {
     // NOTE: You should declare only repositories that you need here
     mavenLocal()

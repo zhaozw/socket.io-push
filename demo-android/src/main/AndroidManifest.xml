@@ -36,6 +36,7 @@
 
         <activity
             android:name=".DrawActivity"
+            android:screenOrientation="portrait"
             android:label="Draw" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

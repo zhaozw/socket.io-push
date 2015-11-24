@@ -16,44 +16,8 @@ import java.util.Map;
 /**
  * Created by xuduo on 11/13/15.
  */
-public class PacketServer {
+public class DemoServer {
 
-    private Emitter emitter;
-    private Map<String, PacketHandler> handlerMap = new HashMap<>();
-    private Redisson redisson = Redisson.create();
-
-    @JsonTypeInfo(
-            use = JsonTypeInfo.Id.NAME,
-            include = JsonTypeInfo.As.PROPERTY,
-            property = "type",
-            defaultImpl = PackProxy.class)
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class PackProxy {
-        public String path;
-        public String data;
-        public String sequenceId;
-        public String uid;
-        public String pushId;
-    }
-
-    public PacketServer() {
-        emitter = new Emitter(redisson);
-        RTopic<PackProxy> topic = redisson.getTopic("packetProxy", new JsonJacksonCodecWithClass(PackProxy.class));
-        topic.addListener(new MessageListener<PackProxy>() {
-
-            public void onMessage(String channel, PackProxy message) {
-                PacketHandler handler = handlerMap.get(message.path);
-                if (handler != null) {
-                    handler.handle(message.uid, message.pushId, message.sequenceId, message.path, null, Base64.decodeBase64(message.data));
-                }
-            }
-        });
-    }
-
-    public void addHandler(String path, PacketHandler handler) {
-        handler.setEmitter(emitter);
-        handlerMap.put(path, handler);
-    }
 
     public static void main(String[] args) throws IOException, InterruptedException {
         PacketServer server = new PacketServer();
