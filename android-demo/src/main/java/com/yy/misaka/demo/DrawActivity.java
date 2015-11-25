@@ -26,6 +26,7 @@ public class DrawActivity extends Activity {
     private DrawView drawView;
     private ProxyClient proxyClient;
     private TextView latency;
+    private TextView count;
     private long totalTime;
     private long totalCount;
 
@@ -40,6 +41,7 @@ public class DrawActivity extends Activity {
         totalCount = 0;
         totalTime = 0;
         latency.setText("0ms");
+        count.setText("0dots");
     }
 
     @Override
@@ -47,11 +49,11 @@ public class DrawActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_draw);
         latency = (TextView) findViewById(R.id.tv_latency);
+        count = (TextView) findViewById(R.id.tv_count);
 
-//        SocketIOProxyClient requetClient = new SocketIOProxyClient("http://183.61.6.33");
-//        SocketIOProxyClient requetClient = new SocketIOProxyClient("http://172.19.207.65:9101");
+        String pushServerHost = "http://183.61.6.33";
 
-        RemoteClient client = new RemoteClient(this.getApplicationContext(), "http://183.61.6.33", "com.yy.misaka.demo.YYNotificationReceiver");
+        RemoteClient client = new RemoteClient(this.getApplicationContext(), pushServerHost, null);
         proxyClient = new ProxyClient(new Config().setRequester(client).setPushSubscriber(client).setPushSerializer(new JsonPushSerializer()).setRequestSerializer(new JsonSerializer()));
 
         findViewById(R.id.btn_clear).setOnClickListener(new View.OnClickListener() {
@@ -99,10 +101,10 @@ public class DrawActivity extends Activity {
 
 
         proxyClient.subscribe("/addDot", new PushHandler<DrawView.Dot>(DrawView.Dot.class) {
-
             @Override
             public void onSuccess(DrawView.Dot result) {
                 drawView.addDot(result);
+                count.setText(totalCount + "dots");
             }
         });
 
@@ -111,6 +113,7 @@ public class DrawActivity extends Activity {
             @Override
             public void onSuccess(Object result) {
                 drawView.clear();
+                resetLatency();
             }
 
         });

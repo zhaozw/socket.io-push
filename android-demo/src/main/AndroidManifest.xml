@@ -19,7 +19,7 @@
         <activity
             android:name=".DrawActivity"
             android:screenOrientation="portrait"
-            android:label="Draw" >
+            android:label="SyncWhiteBoard" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

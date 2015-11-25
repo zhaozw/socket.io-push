@@ -27,4 +27,15 @@
         android:text="0ms"
         android:id="@+id/tv_latency"
         />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_toRightOf="@id/tv_latency"
+        android:layout_margin="10dp"
+        android:text="0dots"
+        android:id="@+id/tv_count"
+        />
+
 </RelativeLayout>

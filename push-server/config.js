@@ -1,5 +1,9 @@
 var config = {};
 
+config.apn = {
+  production : true
+};
+
 config.redis = {
   host : "localhost",
   port : 6379
@@ -13,8 +17,20 @@ config.api_1 = {
   port : 9102
 };
 
-config.apn = {
-  production : true
+config.io_2 = {
+  port : 9201
+};
+
+config.api_2 = {
+  port : 9202
+};
+
+config.io_3 = {
+  port : 9301
+};
+
+config.api_3 = {
+  port : 9302
 };
 
 module.exports = config;
