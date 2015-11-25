@@ -1,15 +1,15 @@
 package com.yy.httpproxy.service;
 
 import android.app.Service;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
 import android.util.Log;
 
-import com.yy.httpproxy.requester.RequestException;
 import com.yy.httpproxy.requester.RequestInfo;
 import com.yy.httpproxy.requester.ResponseHandler;
 import com.yy.httpproxy.serializer.StringPushSerializer;
@@ -20,40 +20,42 @@ import com.yy.httpproxy.subscribe.SharedPreferencePushIdGenerator;
 
 import org.json.JSONObject;
 
-import java.util.Map;
-
 public class RemoteService extends Service implements PushCallback, ResponseHandler, SocketIOProxyClient.NotificationCallback {
 
-    private static final String INTENT_TAIL = ".YY_REMOTE_SERVICE";
-    public static final int CMD_CREATED = 1;
     public static final int CMD_PUSH = 2;
     public static final int CMD_NOTIFICATION_CLICKED = 3;
     public static final int CMD_RESPONSE = 4;
     private final String TAG = "SocketIoService";
     private SocketIOProxyClient client;
     private NotificationHandler notificationHandler;
-    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+    private final Messenger messenger = new Messenger(new IncomingHandler());
+    private Messenger remoteClient;
+
+    private class IncomingHandler extends Handler {
         @Override
-        public void onReceive(Context context, Intent intent) {
-            int cmd = intent.getIntExtra("cmd", 0);
-            Log.v(TAG, "RemoteService onReceive " + cmd);
+        public void handleMessage(Message msg) {
+            int cmd = msg.what;
+            Bundle bundle = msg.getData();
             if (cmd == RemoteClient.CMD_SUBSCRIBE_BROADCAST) {
-                String topic = intent.getStringExtra("topic");
+                String topic = bundle.getString("topic");
                 client.subscribeBroadcast(topic);
             } else if (cmd == RemoteClient.CMD_SET_PUSH_ID) {
-                client.setPushId(intent.getStringExtra("pushId"));
+                client.setPushId(bundle.getString("pushId"));
             } else if (cmd == RemoteClient.CMD_REQUEST) {
-                RequestInfo info = (RequestInfo) intent.getSerializableExtra("requestInfo");
+                RequestInfo info = (RequestInfo) bundle.getSerializable("requestInfo");
                 client.request(info);
+            }else if (cmd == RemoteClient.CMD_REGISTER_CLIENT) {
+                remoteClient = msg.replyTo;
             }
         }
-    };
+    }
+
 
     @Override
     public void onCreate() {
         super.onCreate();
-
     }
+
 
     private String getFromIntentOrPref(Intent intent, String name) {
         String value = null;
@@ -71,6 +73,13 @@ public class RemoteService extends Service implements PushCallback, ResponseHand
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.d(TAG, "onStartCommand");
+        return Service.START_STICKY;
+    }
+
+    @Override
+    public IBinder onBind(Intent intent) {
+        Log.d(TAG, "onBind");
         if (client == null) {
             String host = getFromIntentOrPref(intent, "host");
             String handlerClassName = getFromIntentOrPref(intent, "notificationHandler");
@@ -83,7 +92,7 @@ public class RemoteService extends Service implements PushCallback, ResponseHand
                     handlerClass = Class.forName(handlerClassName);
                     notificationHandler = (NotificationHandler) handlerClass.newInstance();
                 } catch (Exception e) {
-                    Log.e(TAG, "handlerClass error");
+                    Log.e(TAG, "handlerClass error", e);
                     notificationHandler = new DefaultNotificationHandler();
                 }
             }
@@ -96,38 +105,27 @@ public class RemoteService extends Service implements PushCallback, ResponseHand
             config.setPushSerializer(new StringPushSerializer());
             client.setPushCallback(this);
             client.setNotificationCallback(this);
-            registerReceiver(broadcastReceiver, new IntentFilter(RemoteClient.getIntentName(this)));
 
         }
-        sendCreated();
-        return Service.START_STICKY;
-    }
-
-    private void sendCreated() {
-        Intent intent = new Intent(getIntentName(this));
-        intent.putExtra("cmd", CMD_CREATED);
-        sendBroadcast(intent);
-    }
-
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
+        return messenger.getBinder();
     }
 
     @Override
     public void onPush(String topic, byte[] data) {
         Log.d(TAG, "push recived " + topic);
-        Intent intent = new Intent(getIntentName(this));
-        intent.putExtra("cmd", CMD_PUSH);
-        intent.putExtra("topic", topic);
-        intent.putExtra("data", data);
-        sendBroadcast(intent);
-    }
+//        Intent intent = new Intent(getIntentName(this));
+//        intent.putExtra("cmd", CMD_PUSH);
+//        intent.putExtra("topic", topic);
+//        intent.putExtra("data", data);
+//        sendBroadcast(intent);
 
-    public static String getIntentName(Context context) {
-        return context.getPackageName() + INTENT_TAIL;
+        Message msg = Message.obtain(null, CMD_PUSH, 0, 0);
+        Bundle bundle = new Bundle();
+        bundle.putString("topic", topic);
+        bundle.putByteArray("data", data);
+        msg.setData(bundle);
+        sendMsg(msg);
     }
-
 
     @Override
     public void onNotification(String id, JSONObject data) {
@@ -138,13 +136,31 @@ public class RemoteService extends Service implements PushCallback, ResponseHand
     @Override
     public void onResponse(int sequenceId, int code, String message, byte[] data) {
         Log.d(TAG, "onResponse  " + code);
-        Intent intent = new Intent(getIntentName(this));
-        intent.putExtra("cmd", CMD_RESPONSE);
-        intent.putExtra("sequenceId", sequenceId);
-        intent.putExtra("code", code);
-        intent.putExtra("message", message);
-        intent.putExtra("data", data);
-        sendBroadcast(intent);
+//        Intent intent = new Intent(getIntentName(this));
+//        intent.putExtra("cmd", CMD_RESPONSE);
+//        intent.putExtra("sequenceId", sequenceId);
+//        intent.putExtra("code", code);
+//        intent.putExtra("message", message);
+//        intent.putExtra("data", data);
+//        sendBroadcast(intent);
+
+        Message msg = Message.obtain(null, CMD_RESPONSE, 0, 0);
+        Bundle bundle = new Bundle();
+        bundle.putInt("sequenceId", sequenceId);
+        bundle.putInt("code", code);
+        bundle.putString("message", message);
+        bundle.putByteArray("data", data);
+        msg.setData(bundle);
+        sendMsg(msg);
     }
+
+    private void sendMsg(Message msg) {
+        try {
+            remoteClient.send(msg);
+        } catch (Exception e) {
+            Log.e(TAG, "sendMsg error!", e);
+        }
+    }
+
 
 }
