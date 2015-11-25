@@ -15,8 +15,8 @@ public abstract class PacketHandler {
         emitter.push(topic, data);
     }
 
-    public void reply(String sequenceId, String pushId, Map<String, String> headers, byte[] body) {
-        emitter.reply(sequenceId, pushId, body);
+    public void reply(String sequenceId, String pushId, Map<String, String> headers, byte[] data) {
+        emitter.reply(sequenceId, pushId, data);
     }
 
     public void setEmitter(Emitter emitter) {

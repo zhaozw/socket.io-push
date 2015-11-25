@@ -17,7 +17,7 @@ public class YYNotificationReceiver extends NotificationReceiver {
     public void onNotificationClicked(Context context, String id, HashMap<String, Object> values) {
         Log.d("YYNotificationReceiver", "onNotificationClicked " + id + " values " + values);
         Toast.makeText(context, "YYNotificationReceiver clicked", Toast.LENGTH_SHORT).show();
-        Intent intent = new Intent(context, LoginActivity.class);
+        Intent intent = new Intent(context, DrawActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
     }

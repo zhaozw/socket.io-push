@@ -15,7 +15,6 @@ import java.util.Map;
 
 public class JsonSerializer implements RequestSerializer {
 
-    private JsonParser parser = new JsonParser();
     private Gson gson = new Gson();
 
     @Override
@@ -29,7 +28,7 @@ public class JsonSerializer implements RequestSerializer {
     }
 
     @Override
-    public Object toObject(Object clazz, int statusCode, Map<String, String> headers, byte[] body) throws RequestException {
+    public Object toObject(Object clazz, byte[] body) throws RequestException {
         try {
             if (clazz instanceof Class) {
                 return gson.fromJson(new String(body, "UTF-8"), (Class) clazz);

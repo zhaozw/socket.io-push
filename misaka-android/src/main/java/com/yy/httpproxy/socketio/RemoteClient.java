@@ -6,15 +6,24 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.util.Log;
 
+import com.yy.httpproxy.ProxyClient;
+import com.yy.httpproxy.ReplyHandler;
+import com.yy.httpproxy.requester.HttpRequester;
+import com.yy.httpproxy.requester.RequestException;
+import com.yy.httpproxy.requester.RequestInfo;
+import com.yy.httpproxy.requester.ResponseHandler;
+import com.yy.httpproxy.serializer.RequestSerializer;
 import com.yy.httpproxy.service.RemoteService;
 import com.yy.httpproxy.subscribe.PushCallback;
 import com.yy.httpproxy.subscribe.PushSubscriber;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 
-public class RemoteClient extends BroadcastReceiver implements PushSubscriber {
+public class RemoteClient extends BroadcastReceiver implements PushSubscriber, HttpRequester {
 
     private Context context;
     private static final String TAG = "RemoteClient";
@@ -22,8 +31,10 @@ public class RemoteClient extends BroadcastReceiver implements PushSubscriber {
     private String intentName;
     public static final int CMD_SUBSCRIBE_BROADCAST = 1;
     public static final int CMD_SET_PUSH_ID = 2;
+    public static final int CMD_REQUEST = 3;
     private PushCallback pushCallback;
     private Set<String> topics = new HashSet<>();
+    private ProxyClient proxyClient;
 
     public RemoteClient(Context context, String host, String notificationHandler) {
         this.context = context;
@@ -44,10 +55,16 @@ public class RemoteClient extends BroadcastReceiver implements PushSubscriber {
         context.sendBroadcast(intent);
     }
 
-    public static String getIntentName(Context context){
+    public static String getIntentName(Context context) {
         return context.getPackageName() + INTENT_TAIL;
     }
 
+    public void request(RequestInfo requestInfo) {
+        Intent intent = new Intent(intentName);
+        intent.putExtra("cmd", CMD_REQUEST);
+        intent.putExtra("requestInfo", requestInfo);
+        context.sendBroadcast(intent);
+    }
 
     @Override
     public void subscribeBroadcast(String topic) {
@@ -72,12 +89,22 @@ public class RemoteClient extends BroadcastReceiver implements PushSubscriber {
         if (cmd == RemoteService.CMD_PUSH) {
             String topic = intent.getStringExtra("topic");
             byte[] data = intent.getByteArrayExtra("data");
-            Log.d(TAG, " recieve intent push  " + topic);
+            Log.d(TAG, " receive intent push  " + topic);
             pushCallback.onPush(topic, data);
         } else if (cmd == RemoteService.CMD_CREATED) {
             for (String topic : topics) {
                 doSubscribe(topic);
             }
+        } else if (cmd == RemoteService.CMD_RESPONSE) {
+            String message = intent.getStringExtra("message");
+            int code = intent.getIntExtra("code", 1);
+            byte[] data = intent.getByteArrayExtra("data");
+            int sequenceId = intent.getIntExtra("sequenceId", 1);
+            proxyClient.onResponse(sequenceId, code, message, data);
         }
+    }
+
+    public void setProxyClient(ProxyClient proxyClient) {
+        this.proxyClient = proxyClient;
     }
 }

@@ -5,13 +5,10 @@ import android.util.Base64;
 import android.util.Log;
 
 import com.yy.httpproxy.AndroidLoggingHandler;
-import com.yy.httpproxy.requester.HttpRequester;
 import com.yy.httpproxy.requester.RequestException;
 import com.yy.httpproxy.requester.RequestInfo;
 import com.yy.httpproxy.requester.ResponseHandler;
 import com.yy.httpproxy.subscribe.PushCallback;
-import com.yy.httpproxy.subscribe.PushIdCallback;
-import com.yy.httpproxy.subscribe.PushIdGenerator;
 import com.yy.httpproxy.subscribe.PushSubscriber;
 
 import org.json.JSONArray;
@@ -20,7 +17,6 @@ import org.json.JSONObject;
 
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -34,13 +30,19 @@ import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
 
 
-public class SocketIOProxyClient implements HttpRequester, PushSubscriber {
+public class SocketIOProxyClient implements PushSubscriber {
 
     private static String TAG = "SocketIoRequester";
     private PushCallback pushCallback;
     private String pushId;
     private NotificationCallback notificationCallback;
     private Set<String> topics = new HashSet<>();
+    private ResponseHandler responseHandler;
+
+    public void setResponseHandler(ResponseHandler responseHandler) {
+        this.responseHandler = responseHandler;
+    }
+
 
     public interface NotificationCallback {
         void onNotification(String id, JSONObject notification);
@@ -56,11 +58,11 @@ public class SocketIOProxyClient implements HttpRequester, PushSubscriber {
 
     private void reSendFailedRequest() {
         if (!replyCallbacks.isEmpty()) {
-            List<Request> values = new ArrayList<>(replyCallbacks.values());
+            List<RequestInfo> values = new ArrayList<>(replyCallbacks.values());
             replyCallbacks.clear();
-            for (Request request : values) {
-                Log.i(TAG, "StompClient onConnected repost request " + request.getRequestInfo().getUrl());
-                request(request.getRequestInfo(), request.getResponseHandler());
+            for (RequestInfo request : values) {
+                Log.i(TAG, "StompClient onConnected repost request " + request.getUrl());
+                request(request);
             }
         }
     }
@@ -132,20 +134,20 @@ public class SocketIOProxyClient implements HttpRequester, PushSubscriber {
             }
         }
     };
-    private Map<Integer, Request> replyCallbacks = new ConcurrentHashMap<>();
+    private Map<Integer, RequestInfo> replyCallbacks = new ConcurrentHashMap<>();
     private Handler handler = new Handler();
     private long timeout = 20000;
     private Runnable timeoutTask = new Runnable() {
         @Override
         public void run() {
-            Iterator<Map.Entry<Integer, Request>> it = replyCallbacks.entrySet().iterator();
+            Iterator<Map.Entry<Integer, RequestInfo>> it = replyCallbacks.entrySet().iterator();
             while (it.hasNext()) {
-                Map.Entry<Integer, Request> pair = it.next();
-                Request request = pair.getValue();
+                Map.Entry<Integer, RequestInfo> pair = it.next();
+                RequestInfo request = pair.getValue();
                 if (request.timeoutForRequest(timeout)) {
-                    Log.i(TAG, "StompClient timeoutForRequest " + request.getRequestInfo().getUrl());
-                    if (request.getResponseHandler() != null) {
-                        request.getResponseHandler().onError(new RequestException(null, RequestException.Error.TIMEOUT_ERROR));
+                    Log.i(TAG, "StompClient timeoutForRequest " + request.getUrl());
+                    if (responseHandler != null) {
+                        responseHandler.onResponse(request.getSequenceId(), RequestException.Error.TIMEOUT_ERROR.value, RequestException.Error.TIMEOUT_ERROR.name(), null);
                     }
                     it.remove();
                     continue;
@@ -154,7 +156,6 @@ public class SocketIOProxyClient implements HttpRequester, PushSubscriber {
             postTimeout();
         }
     };
-    private int sequenceId;
 
     private void postTimeout() {
         handler.removeCallbacks(timeoutTask);
@@ -170,31 +171,15 @@ public class SocketIOProxyClient implements HttpRequester, PushSubscriber {
             if (args.length > 0 && args[0] instanceof JSONObject) {
                 JSONObject data = (JSONObject) args[0];
                 int responseSeqId = data.optInt("sequenceId", 0);
-                Request request = replyCallbacks.remove(responseSeqId);
-                if (request != null && request.getResponseHandler() != null) {
-                    try {
-                        String errorMessage = data.optString("errorMessage");
-                        boolean error = data.optBoolean("error", false);
-                        if (error) {
-                            request.getResponseHandler().onError(new RequestException(null, RequestException.Error.CONNECT_ERROR.value, errorMessage));
-                        } else {
-                            String response = data.optString("data");
-                            byte[] decodedResponse = Base64.decode(response, Base64.DEFAULT);
-                            Log.i(TAG, "response " + new String(decodedResponse));
-                            int statusCode = data.optInt("statusCode", 0);
-                            Map<String, String> headers = new HashMap<>();
-//                            JSONObject headerObject = data.optJSONObject("headers");
-//                            Iterator<String> it = headerObject.keys();
-//                            while (it.hasNext()) {
-//                                String key = it.next();
-//                                headers.put(key, headerObject.optString(key));
-//                            }
-                            request.getResponseHandler().onSuccess(headers, statusCode, decodedResponse);
-                        }
-                    } catch (Exception e) {
-                        Log.e(TAG, "httpproxy emmit parse error", e);
-                        request.getResponseHandler().onError(new RequestException(e, RequestException.Error.SERVER_DATA_SERIALIZE_ERROR));
-                    }
+                RequestInfo request = replyCallbacks.remove(responseSeqId);
+                if (request != null && responseHandler != null) {
+                    String response = data.optString("data");
+                    byte[] decodedResponse = Base64.decode(response, Base64.DEFAULT);
+                    Log.i(TAG, "response " + new String(decodedResponse));
+                    int code = data.optInt("code", 0);
+                    int sequenceId = data.optInt("sequenceId", 0);
+                    String message = data.optString("message", "");
+                    responseHandler.onResponse(sequenceId, code, message, decodedResponse);
                 }
             }
         }
@@ -222,15 +207,12 @@ public class SocketIOProxyClient implements HttpRequester, PushSubscriber {
 
     }
 
-    @Override
-    public void request(RequestInfo requestInfo, ResponseHandler handler) {
+    public void request(RequestInfo requestInfo) {
 
         try {
-            sequenceId = sequenceId + 1;
 
             if (handler != null) {
-                Request request = new Request(requestInfo, handler);
-                replyCallbacks.put(sequenceId, request);
+                replyCallbacks.put(requestInfo.getSequenceId(), requestInfo);
             }
 
             if (!socket.connected()) {
@@ -252,7 +234,7 @@ public class SocketIOProxyClient implements HttpRequester, PushSubscriber {
             object.put("port", requestInfo.getPort());
             object.put("method", requestInfo.getMethod());
             object.put("path", requestInfo.getPath());
-            object.put("sequenceId", String.valueOf(sequenceId));
+            object.put("sequenceId", String.valueOf(requestInfo.getSequenceId()));
 
 
             socket.emit("packetProxy", object);
@@ -261,7 +243,7 @@ public class SocketIOProxyClient implements HttpRequester, PushSubscriber {
 
 
         } catch (Exception e) {
-            handler.onError(new RequestException(e, RequestException.Error.CLIENT_DATA_SERIALIZE_ERROR));
+            responseHandler.onResponse(requestInfo.getSequenceId(), RequestException.Error.CLIENT_DATA_SERIALIZE_ERROR.value, RequestException.Error.CLIENT_DATA_SERIALIZE_ERROR.name(), null);
         }
     }
 

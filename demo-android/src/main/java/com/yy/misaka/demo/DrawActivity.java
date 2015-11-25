@@ -12,6 +12,7 @@ import com.yy.httpproxy.Config;
 import com.yy.httpproxy.ProxyClient;
 import com.yy.httpproxy.PushHandler;
 import com.yy.httpproxy.ReplyHandler;
+import com.yy.httpproxy.socketio.RemoteClient;
 import com.yy.httpproxy.socketio.SocketIOProxyClient;
 import com.yy.httpproxy.subscribe.SharedPreferencePushIdGenerator;
 
@@ -46,6 +47,12 @@ public class DrawActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_draw);
         latency = (TextView) findViewById(R.id.tv_latency);
+
+//        SocketIOProxyClient requetClient = new SocketIOProxyClient("http://183.61.6.33");
+//        SocketIOProxyClient requetClient = new SocketIOProxyClient("http://172.19.207.65:9101");
+
+        RemoteClient client = new RemoteClient(this.getApplicationContext(), "http://183.61.6.33", "com.yy.misaka.demo.YYNotificationReceiver");
+        proxyClient = new ProxyClient(new Config().setRequester(client).setPushSubscriber(client).setPushSerializer(new JsonPushSerializer()).setRequestSerializer(new JsonSerializer()));
 
         findViewById(R.id.btn_clear).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -90,12 +97,6 @@ public class DrawActivity extends Activity {
             }
         });
 
-        SocketIOProxyClient requetClient = new SocketIOProxyClient("http://172.19.207.65:9101");
-
-        String host = "http://172.19.207.65:9101";
-//        String host = "http://183.61.6.33:80";
-
-        proxyClient = new ProxyClient(new Config().setRequestSerializer(new JsonSerializer()).setRequester(requetClient).setPushSubscriber(requetClient).setPushSerializer(new JsonPushSerializer()));
 
         proxyClient.subscribe("/addDot", new PushHandler<DrawView.Dot>(DrawView.Dot.class) {
 

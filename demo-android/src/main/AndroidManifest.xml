@@ -16,24 +16,6 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
 
-        <!--<activity-->
-                <!--android:name="com.yy.misaka.demo.SplashActivity"-->
-                <!--android:label="@string/app_name" >-->
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.MAIN" />-->
-                <!--<category android:name="android.intent.category.LAUNCHER" />-->
-            <!--</intent-filter>-->
-        <!--</activity>-->
-
-        <!--<activity-->
-                <!--android:name=".LoginActivity"-->
-                <!--android:label="Login" >-->
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.MAIN" />-->
-                <!--<category android:name="android.intent.category.LAUNCHER" />-->
-            <!--</intent-filter>-->
-        <!--</activity>-->
-
         <activity
             android:name=".DrawActivity"
             android:screenOrientation="portrait"
@@ -44,29 +26,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="com.yy.misaka.demo.ProfileActivity" android:label="Profile" ></activity>
-
-        <activity
-                android:name="com.yy.misaka.demo.RegisterActivity"
-                android:label="@string/app_name" >
-        </activity>
-
-        <service
-                android:name="com.yy.androidlib.websocket.service.StompService"
-                android:enabled="true"
-                android:label="StompService"
-                android:process=":service" >
-        </service>
-
-        <activity
-                android:name="com.yy.misaka.demo.ImUserListActivity" android:label="ChatList">
-        </activity>
-        <activity
-                android:name="com.yy.misaka.demo.ChatActivity" android:label="Message" >
-        </activity>
-
         <service android:name="com.yy.httpproxy.service.RemoteService" android:process=":push" android:enabled="true"/>
-
 
         <receiver
             android:name=".YYNotificationReceiver"

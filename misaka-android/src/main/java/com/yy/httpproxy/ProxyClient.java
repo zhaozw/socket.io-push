@@ -20,11 +20,16 @@ public class ProxyClient implements PushCallback {
     private long mainThreadId = Looper.getMainLooper().getThread().getId();
     private Handler handler = new Handler(Looper.getMainLooper());
     private Map<String, ReplyHandler> pushHandlers = new HashMap<>();
+    private Map<Integer, ReplyHandler> replayHandlers = new HashMap<>();
+    private int sequenceId;
 
     public ProxyClient(Config config) {
         this.config = config;
         if (config.getPushSubscriber() != null) {
             config.getPushSubscriber().setPushCallback(this);
+        }
+        if (config.getRequester() != null) {
+            config.getRequester().setProxyClient(this);
         }
     }
 
@@ -37,32 +42,15 @@ public class ProxyClient implements PushCallback {
         requestInfo.setPath(path);
         requestInfo.setPort(port);
         requestInfo.setMethod(method);
-
-        ResponseHandler responseHandler = null;
+        requestInfo.setSequenceId(sequenceId++);
 
         if (replyHandler != null) {
-            responseHandler = new ResponseHandler() {
-                @Override
-                public void onSuccess(Map<String, String> headers, int statusCode, byte[] body) {
-                    try {
-                        Object result = config.getRequestSerializer().toObject(replyHandler.clazz, statusCode, headers, body);
-                        callSuccessOnMainThread(replyHandler, result);
-                    } catch (RequestException e) {
-                        Log.e(TAG, "serialize exception " + e.getMessage(), e);
-                        callErrorOnMainThread(replyHandler, e);
-                    }
-                }
-
-                @Override
-                public void onError(RequestException e) {
-                    Log.e(TAG, "serialize exception " + e.getMessage(), e);
-                    callErrorOnMainThread(replyHandler, e);
-                }
-            };
+            replayHandlers.put(sequenceId, replyHandler);
         }
+        requestInfo.setSequenceId(sequenceId);
 
         config.getRequester().
-                request(requestInfo, responseHandler);
+                request(requestInfo);
     }
 
     public void subscribe(String topic, ReplyHandler handler) {
@@ -121,6 +109,21 @@ public class ProxyClient implements PushCallback {
 
 
     public void setPushId(String pushId) {
-         config.getPushSubscriber().setPushId(pushId);
+        config.getPushSubscriber().setPushId(pushId);
+    }
+
+    public void onResponse(int sequenceId, int code, String message, byte[] data) {
+        ReplyHandler replyHandler = replayHandlers.remove(sequenceId);
+        if (replyHandler != null) {
+            if (code == 1) {
+                try {
+                    replyHandler.onSuccess(config.getRequestSerializer().toObject(replyHandler.clazz, data));
+                } catch (RequestException e) {
+                    replyHandler.onError(RequestException.Error.CLIENT_DATA_SERIALIZE_ERROR.value, RequestException.Error.CLIENT_DATA_SERIALIZE_ERROR.name());
+                }
+            } else {
+                replyHandler.onError(code, message);
+            }
+        }
     }
 }

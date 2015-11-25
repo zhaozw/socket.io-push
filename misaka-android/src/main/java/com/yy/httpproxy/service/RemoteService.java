@@ -9,6 +9,9 @@ import android.content.SharedPreferences;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.yy.httpproxy.requester.RequestException;
+import com.yy.httpproxy.requester.RequestInfo;
+import com.yy.httpproxy.requester.ResponseHandler;
 import com.yy.httpproxy.serializer.StringPushSerializer;
 import com.yy.httpproxy.socketio.RemoteClient;
 import com.yy.httpproxy.socketio.SocketIOProxyClient;
@@ -17,12 +20,15 @@ import com.yy.httpproxy.subscribe.SharedPreferencePushIdGenerator;
 
 import org.json.JSONObject;
 
-public class RemoteService extends Service implements PushCallback, SocketIOProxyClient.NotificationCallback {
+import java.util.Map;
+
+public class RemoteService extends Service implements PushCallback, ResponseHandler, SocketIOProxyClient.NotificationCallback {
 
     private static final String INTENT_TAIL = ".YY_REMOTE_SERVICE";
     public static final int CMD_CREATED = 1;
     public static final int CMD_PUSH = 2;
     public static final int CMD_NOTIFICATION_CLICKED = 3;
+    public static final int CMD_RESPONSE = 4;
     private final String TAG = "SocketIoService";
     private SocketIOProxyClient client;
     private NotificationHandler notificationHandler;
@@ -36,6 +42,9 @@ public class RemoteService extends Service implements PushCallback, SocketIOProx
                 client.subscribeBroadcast(topic);
             } else if (cmd == RemoteClient.CMD_SET_PUSH_ID) {
                 client.setPushId(intent.getStringExtra("pushId"));
+            } else if (cmd == RemoteClient.CMD_REQUEST) {
+                RequestInfo info = (RequestInfo) intent.getSerializableExtra("requestInfo");
+                client.request(info);
             }
         }
     };
@@ -81,6 +90,7 @@ public class RemoteService extends Service implements PushCallback, SocketIOProx
 
             com.yy.httpproxy.Config config = new com.yy.httpproxy.Config();
             client = new SocketIOProxyClient(host);
+            client.setResponseHandler(this);
             client.setPushId(new SharedPreferencePushIdGenerator(this.getApplicationContext()).generatePushId());
             config.setPushSubscriber(client);
             config.setPushSerializer(new StringPushSerializer());
@@ -114,7 +124,7 @@ public class RemoteService extends Service implements PushCallback, SocketIOProx
         sendBroadcast(intent);
     }
 
-    public static String getIntentName(Context context){
+    public static String getIntentName(Context context) {
         return context.getPackageName() + INTENT_TAIL;
     }
 
@@ -124,4 +134,17 @@ public class RemoteService extends Service implements PushCallback, SocketIOProx
         PushedNotification notification = new PushedNotification(id, data);
         notificationHandler.handlerNotification(this, notification);
     }
+
+    @Override
+    public void onResponse(int sequenceId, int code, String message, byte[] data) {
+        Log.d(TAG, "onResponse  " + code);
+        Intent intent = new Intent(getIntentName(this));
+        intent.putExtra("cmd", CMD_RESPONSE);
+        intent.putExtra("sequenceId", sequenceId);
+        intent.putExtra("code", code);
+        intent.putExtra("message", message);
+        intent.putExtra("data", data);
+        sendBroadcast(intent);
+    }
+
 }

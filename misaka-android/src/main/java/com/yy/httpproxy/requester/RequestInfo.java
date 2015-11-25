@@ -1,19 +1,22 @@
 package com.yy.httpproxy.requester;
 
+import java.io.Serializable;
 import java.util.Map;
 
 /**
  * Created by xuduo on 10/16/15.
  */
-public class RequestInfo {
+public class RequestInfo implements Serializable{
 
     private String host;
     private int port;
+    private int sequenceId;
     private String path;
     private Map<String, String> headers;
     private byte[] body;
     private String method;
     private String scheme;
+    private long timestamp = System.currentTimeMillis();
 
     public String getHost() {
         return host;
@@ -73,5 +76,25 @@ public class RequestInfo {
 
     public String getScheme() {
         return scheme;
+    }
+
+    public int getSequenceId() {
+        return sequenceId;
+    }
+
+    public void setSequenceId(int sequenceId) {
+        this.sequenceId = sequenceId;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public boolean timeoutForRequest(long timeout) {
+        return System.currentTimeMillis() - timestamp > timeout;
     }
 }

@@ -49,29 +49,12 @@ public class DrawView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-//        Paint paint = new Paint();
-
-//        paint.setStyle(Paint.Style.FILL);
-//        paint.setColor(Color.RED);
-//        canvas.drawPaint(paint);
-
-//        Path path = new Path();
-//        for (int i = 100; i < 300; i++) {
-//            path.moveTo(i, i);
-//            path.lineTo(i, i);
-//        }
-//        path.close();
-//        paint.setStrokeWidth(3);
-//        paint.setPathEffect(null);
-//        paint.setColor(Color.BLACK);
-//        paint.setStyle(Paint.Style.STROKE);
-//        canvas.drawPath(path, paint);
 
         Paint paint = new Paint();
 
         paint.setColor(Color.RED);
         paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(3);
+        paint.setStrokeWidth(6);
 
         for (List<Dot> line : lines) {
 

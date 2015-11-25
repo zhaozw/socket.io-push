@@ -29,7 +29,7 @@ public class NyySerializer implements RequestSerializer {
     }
 
     @Override
-    public Object toObject(Object clazz, int statusCode, Map<String, String> headers, byte[] body) throws RequestException {
+    public Object toObject(Object clazz, byte[] body) throws RequestException {
         try {
             JsonObject root = (JsonObject) parser.parse(new String(body, "UTF-8"));
             int code = root.get("code").getAsInt();

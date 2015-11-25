@@ -8,6 +8,6 @@ public interface RequestSerializer {
 
     byte[] toBinary(String path, Object body);
 
-    Object toObject(Object clazz, int statusCode, Map<String, String> headers, byte[] body) throws RequestException;
+    Object toObject(Object clazz, byte[] body) throws RequestException;
 
 }
