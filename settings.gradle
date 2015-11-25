@@ -1,1 +1,1 @@
-include ':demo-android',  ':demo-server' ,  ':misaka-android','java-emitter'
+include ':android-demo',  ':server-demo' ,  ':android-push-sdk','java-emitter'
