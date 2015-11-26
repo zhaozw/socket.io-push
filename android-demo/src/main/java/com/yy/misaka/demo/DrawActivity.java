@@ -53,8 +53,10 @@ public class DrawActivity extends Activity {
 
         String pushServerHost = "http://183.61.6.33";
 
-        RemoteClient client = new RemoteClient(this.getApplicationContext(), pushServerHost, null);
-        proxyClient = new ProxyClient(new Config().setRequester(client).setPushSubscriber(client).setPushSerializer(new JsonPushSerializer()).setRequestSerializer(new JsonSerializer()));
+        proxyClient = new ProxyClient(new Config(this.getApplicationContext())
+                .setHost(pushServerHost)
+                .setPushSerializer(new JsonPushSerializer())
+                .setRequestSerializer(new JsonSerializer()));
 
         findViewById(R.id.btn_clear).setOnClickListener(new View.OnClickListener() {
             @Override

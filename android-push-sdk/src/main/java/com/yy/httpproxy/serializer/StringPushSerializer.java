@@ -6,6 +6,7 @@ import java.io.UnsupportedEncodingException;
  * Created by xuduo on 10/20/15.
  */
 public class StringPushSerializer implements PushSerializer {
+
     @Override
     public Object toObject(String topic, Object clazz, byte[] body) {
         try {
@@ -14,4 +15,5 @@ public class StringPushSerializer implements PushSerializer {
             throw new RuntimeException(e);
         }
     }
+
 }

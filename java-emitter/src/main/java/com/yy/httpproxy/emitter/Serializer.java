@@ -1,9 +1,7 @@
 package com.yy.httpproxy.emitter;
 
-public class Serializer {
+public interface Serializer {
 
-    void serialize(){
-
-    }
+    Object toObject(String path, Object clazz, byte[] body);
 
 }

@@ -1,13 +1,9 @@
 package com.yy.httpproxy.serializer;
 
-import com.yy.httpproxy.requester.RequestException;
 
-import java.util.Map;
-
-public interface RequestSerializer {
+public interface RequestSerializer extends PushSerializer {
 
     byte[] toBinary(String path, Object body);
 
-    Object toObject(Object clazz, byte[] body) throws RequestException;
 
 }

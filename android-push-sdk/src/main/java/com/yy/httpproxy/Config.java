@@ -1,8 +1,11 @@
 package com.yy.httpproxy;
 
+import android.content.Context;
+
 import com.yy.httpproxy.requester.HttpRequester;
 import com.yy.httpproxy.serializer.PushSerializer;
 import com.yy.httpproxy.serializer.RequestSerializer;
+import com.yy.httpproxy.socketio.RemoteClient;
 import com.yy.httpproxy.subscribe.PushIdGenerator;
 import com.yy.httpproxy.subscribe.PushSubscriber;
 
@@ -11,19 +14,26 @@ import com.yy.httpproxy.subscribe.PushSubscriber;
  */
 public class Config {
 
-    private HttpRequester requester;
+    private RemoteClient remoteClient;
+    private Context context;
     private RequestSerializer requestSerializer;
-    private PushSubscriber pushSubscriber;
     private PushIdGenerator pushIdGenerator;
     private PushSerializer pushSerializer;
+    private String host;
 
-
-    public HttpRequester getRequester() {
-        return requester;
+    public Config(Context context) {
+        this.context = context;
     }
 
-    public Config setRequester(HttpRequester requester) {
-        this.requester = requester;
+    public RemoteClient getRemoteClient() {
+        if (remoteClient == null) {
+            remoteClient = new RemoteClient(context, host, null);
+        }
+        return remoteClient;
+    }
+
+    public Config setHost(String host) {
+        this.host = host;
         return this;
     }
 
@@ -33,15 +43,6 @@ public class Config {
 
     public Config setRequestSerializer(RequestSerializer requestSerializer) {
         this.requestSerializer = requestSerializer;
-        return this;
-    }
-
-    public PushSubscriber getPushSubscriber() {
-        return pushSubscriber;
-    }
-
-    public Config setPushSubscriber(PushSubscriber pushSubscriber) {
-        this.pushSubscriber = pushSubscriber;
         return this;
     }
 

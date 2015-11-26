@@ -1,70 +1,23 @@
-stomp-app
+Android-Push-SDK
 =========
+Android客户端SDK
 
-stomp client for android, server using spring
+###AndroidManifest.xml
 
-Library used
+```
+        可以单进程,也可以双进程
+        <service android:name="com.yy.httpproxy.service.RemoteService" android:process=":push" android:enabled="true"/>
 
-https://github.com/koush/AndroidAsync 
+        自定义类YYNotificationReceiver,处理通知栏点击事件
+        <receiver
+            android:name=".YYNotificationReceiver"
+            android:exported="true" >
 
-https://code.google.com/p/google-gson/ 
+            <!-- 这里com.xiaomi.mipushdemo.DemoMessageRreceiver改成app中定义的完整类名 -->
+            <intent-filter>
+                <action android:name="com.yy.httpproxy.service.RemoteService.INTENT" />
+            </intent-filter>
+     </receiver>
+```     
 
-https://github.com/SwiftyJSON/SwiftyJSON 
 
-https://github.com/daltoniam/Starscream 
-
-Usage
-
-change http://172.19.99.97:8080/stomp in DemoActivity.java to your running pc ip for the DemoClient to connect to
-
-Client-side  
- 
-requestInfo-response
-
-    stomp.requestInfo("/login", user, new StompJsonClient.ReplyHandler() {
-
-      @Override
-      public void onSuccess(Object result) {
-         Toast.makeText(DemoActivity.this, result.toString(), Toast.LENGTH_LONG).show();
-      }
-
-     @Override
-     public void onError(int code, String message) {
-         Toast.makeText(DemoActivity.this, "requestInfo error!code:" + code + " ,message:" + message, Toast.LENGTH_LONG).show();
-     }
-    });
-                
-subscribe 
-
-    stomp.subscribe("/topic/time", new StompJsonClient.SubscribeHandler<SubscribeMessage>(SubscribeMessage.class) {
-        @Override
-        public void onSuccess(SubscribeMessage result) {
-           Log.i(TAG, "subscribe broadcast " + destination + " " + result.getMessage());
-           ((TextView) findViewById(R.id.tv_subscribe_message)).setText(result.getMessage());
-            }
-    });
-                
-Server-side
-
-reply
-
-    @MessageMapping("/login")
-    public void login(Message<Object> message, Principal principal, User user) throws Exception {
-        logger.info("login username {} password {}", user.getUsername(), user.getPassword());
-        if ("tom".equals(user.getUsername()) && "123456".equals(user.getPassword())) {
-            StompPrincipal sp = (StompPrincipal) principal;
-            sp.setUserId("tom");
-            messagingTemplate.replyToUserSuccess(message);
-        } else {
-            throw new ServiceException(-1, "username  password error!");
-        }
-    }
-    
- broadcast
- 
-    @Scheduled(fixedDelay = 1000)
-    public void broadcastTime() {
-        SubscribeMessage message = new SubscribeMessage();
-        message.setMessage("server time is " + new Date().toString());
-        messagingTemplate.broadcast("/topic/time", message);
-    }

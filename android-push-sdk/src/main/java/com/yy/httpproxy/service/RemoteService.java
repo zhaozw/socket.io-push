@@ -97,12 +97,9 @@ public class RemoteService extends Service implements PushCallback, ResponseHand
                 }
             }
 
-            com.yy.httpproxy.Config config = new com.yy.httpproxy.Config();
             client = new SocketIOProxyClient(host);
             client.setResponseHandler(this);
             client.setPushId(new SharedPreferencePushIdGenerator(this.getApplicationContext()).generatePushId());
-            config.setPushSubscriber(client);
-            config.setPushSerializer(new StringPushSerializer());
             client.setPushCallback(this);
             client.setNotificationCallback(this);
 
@@ -113,11 +110,6 @@ public class RemoteService extends Service implements PushCallback, ResponseHand
     @Override
     public void onPush(String topic, byte[] data) {
         Log.d(TAG, "push recived " + topic);
-//        Intent intent = new Intent(getIntentName(this));
-//        intent.putExtra("cmd", CMD_PUSH);
-//        intent.putExtra("topic", topic);
-//        intent.putExtra("data", data);
-//        sendBroadcast(intent);
 
         Message msg = Message.obtain(null, CMD_PUSH, 0, 0);
         Bundle bundle = new Bundle();
@@ -136,13 +128,6 @@ public class RemoteService extends Service implements PushCallback, ResponseHand
     @Override
     public void onResponse(int sequenceId, int code, String message, byte[] data) {
         Log.d(TAG, "onResponse  " + code);
-//        Intent intent = new Intent(getIntentName(this));
-//        intent.putExtra("cmd", CMD_RESPONSE);
-//        intent.putExtra("sequenceId", sequenceId);
-//        intent.putExtra("code", code);
-//        intent.putExtra("message", message);
-//        intent.putExtra("data", data);
-//        sendBroadcast(intent);
 
         Message msg = Message.obtain(null, CMD_RESPONSE, 0, 0);
         Bundle bundle = new Bundle();

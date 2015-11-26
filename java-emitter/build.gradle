@@ -24,4 +24,5 @@ dependencies {
     compile 'commons-codec:commons-codec:1.10'
     compile 'org.slf4j:slf4j-simple:1.7.13'
     compile 'org.redisson:redisson:2.1.4'
+    compile 'com.google.code.gson:gson:2.3.1'
 }

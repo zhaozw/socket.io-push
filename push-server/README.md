@@ -1,4 +1,55 @@
+Push-Server
+=======================
+对外服务
+
 ##install & run
+
+* 安装 redis 并修改config.js
+
+```
+#config.js
+
+var config = {};
+
+config.apn = {
+  production : true
+};
+
+config.redis = {
+  host : "localhost",
+  port : 6379
+};
+
+#实例1的websocket端口
+config.io_1 = {
+  port : 9101
+};
+
+#实例1的rest_api端口
+config.api_1 = {
+  port : 9102
+};
+
+config.io_2 = {
+  port : 9201
+};
+
+config.api_2 = {
+  port : 9202
+};
+
+config.io_3 = {
+  port : 9301
+};
+
+config.api_3 = {
+  port : 9302
+};
+
+module.exports = config;
+
+```
+
 
 * install nodejs
 
@@ -20,7 +71,55 @@ sudo n stable
 * run
 
 ```
-node .
+#前台运行
+node . 
+
+#前台运行,开启debug日志
+./debug.sh
+
+#后台运行 ,3为运行的实例数
+./restart 3
+
+
+```
+##Nginx reverse proxy
+
+nginx.conf
+```
+upstream ws_backend {
+    ip_hash;
+    server 127.0.0.1:9101;
+    server 127.0.0.1:9201;
+    server 127.0.0.1:9301;
+}
+
+upstream ws_api {
+    ip_hash;
+    server 127.0.0.1:9102;
+    server 127.0.0.1:9202;
+    server 127.0.0.1:9302;
+}
+
+server
+{
+    listen 80;
+
+    location / {
+        proxy_pass http://ws_backend;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $host;
+        proxy_set_header Connection "upgrade";
+    }
+    
+    location /api {
+        proxy_pass ws_api;
+    }
+}
+
+
+
 ```
 
 ##HTTP API

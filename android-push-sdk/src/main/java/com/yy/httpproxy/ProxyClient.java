@@ -25,11 +25,11 @@ public class ProxyClient implements PushCallback {
 
     public ProxyClient(Config config) {
         this.config = config;
-        if (config.getPushSubscriber() != null) {
-            config.getPushSubscriber().setPushCallback(this);
+        if (config.getRemoteClient() != null) {
+            config.getRemoteClient().setPushCallback(this);
         }
-        if (config.getRequester() != null) {
-            config.getRequester().setProxyClient(this);
+        if (config.getRemoteClient() != null) {
+            config.getRemoteClient().setProxyClient(this);
         }
     }
 
@@ -49,7 +49,7 @@ public class ProxyClient implements PushCallback {
         }
         requestInfo.setSequenceId(sequenceId);
 
-        config.getRequester().
+        config.getRemoteClient().
                 request(requestInfo);
     }
 
@@ -59,7 +59,7 @@ public class ProxyClient implements PushCallback {
 
     public void subscribeBroadcast(String topic, ReplyHandler handler) {
         pushHandlers.put(topic, handler);
-        config.getPushSubscriber().subscribeBroadcast(topic);
+        config.getRemoteClient().subscribeBroadcast(topic);
     }
 
     @Override
@@ -109,16 +109,18 @@ public class ProxyClient implements PushCallback {
 
 
     public void setPushId(String pushId) {
-        config.getPushSubscriber().setPushId(pushId);
+        config.getRemoteClient().setPushId(pushId);
     }
 
-    public void onResponse(int sequenceId, int code, String message, byte[] data) {
+    public void onResponse(String path, int sequenceId, int code, String message, byte[] data) {
         ReplyHandler replyHandler = replayHandlers.remove(sequenceId);
         if (replyHandler != null) {
             if (code == 1) {
                 try {
-                    replyHandler.onSuccess(config.getRequestSerializer().toObject(replyHandler.clazz, data));
+                    replyHandler.onSuccess(config.getRequestSerializer().toObject(path, replyHandler.clazz, data));
                 } catch (RequestException e) {
+                    replyHandler.onError(e.getCode(), e.getMessage());
+                } catch (Exception e) {
                     replyHandler.onError(RequestException.Error.CLIENT_DATA_SERIALIZE_ERROR.value, RequestException.Error.CLIENT_DATA_SERIALIZE_ERROR.name());
                 }
             } else {
