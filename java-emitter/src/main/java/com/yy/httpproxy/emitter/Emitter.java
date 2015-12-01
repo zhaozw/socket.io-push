@@ -25,11 +25,9 @@ import sun.misc.BASE64Encoder;
 public class Emitter {
 
     private BASE64Encoder base64Encoder = new BASE64Encoder();
-    private Redisson redisson;
     RTopic<byte[]> rTopic;
 
     public Emitter(Redisson redisson) {
-        this.redisson = redisson;
         rTopic = redisson.getTopic("socket.io#emitter", BytesCodec.INSTANCE);
     }
 

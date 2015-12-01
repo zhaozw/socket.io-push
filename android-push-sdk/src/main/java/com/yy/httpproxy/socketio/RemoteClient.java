@@ -1,51 +1,49 @@
 package com.yy.httpproxy.socketio;
 
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
-import android.os.RemoteException;
 import android.util.Log;
 
 import com.yy.httpproxy.ProxyClient;
-import com.yy.httpproxy.ReplyHandler;
 import com.yy.httpproxy.requester.HttpRequester;
-import com.yy.httpproxy.requester.RequestException;
 import com.yy.httpproxy.requester.RequestInfo;
-import com.yy.httpproxy.requester.ResponseHandler;
-import com.yy.httpproxy.serializer.RequestSerializer;
 import com.yy.httpproxy.service.RemoteService;
-import com.yy.httpproxy.subscribe.PushCallback;
 import com.yy.httpproxy.subscribe.PushSubscriber;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 
 public class RemoteClient implements PushSubscriber, HttpRequester {
 
-    private Context context;
     private static final String TAG = "RemoteClient";
     public static final int CMD_SUBSCRIBE_BROADCAST = 1;
     public static final int CMD_SET_PUSH_ID = 2;
     public static final int CMD_REQUEST = 3;
     public static final int CMD_REGISTER_CLIENT = 4;
-    private PushCallback pushCallback;
+    public static final int CMD_UNSUBSCRIBE_BROADCAST = 5;
     private Set<String> topics = new HashSet<>();
     private ProxyClient proxyClient;
     private Messenger mService;
     private boolean mBound;
+    private String pushId;
 
     private final Messenger messenger = new Messenger(new IncomingHandler());
+
+    public void unsubscribeBroadcast(String topic) {
+        Message msg = Message.obtain(null, CMD_UNSUBSCRIBE_BROADCAST, 0, 0);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("topic", topic);
+        msg.setData(bundle);
+        sendMsg(msg);
+    }
 
     private class IncomingHandler extends Handler {
         @Override
@@ -81,6 +79,8 @@ public class RemoteClient implements PushSubscriber, HttpRequester {
             for (String topic : topics) {
                 doSubscribe(topic);
             }
+
+            setPushId(pushId);
         }
 
         public void onServiceDisconnected(ComponentName className) {
@@ -92,7 +92,6 @@ public class RemoteClient implements PushSubscriber, HttpRequester {
     };
 
     public RemoteClient(Context context, String host, String notificationHandler) {
-        this.context = context;
         Intent intent = new Intent(context, RemoteService.class);
         intent.putExtra("host", host);
         if (notificationHandler != null) {
@@ -105,7 +104,9 @@ public class RemoteClient implements PushSubscriber, HttpRequester {
 
     private void sendMsg(Message msg) {
         try {
-            mService.send(msg);
+            if (mBound) {
+                mService.send(msg);
+            }
         } catch (Exception e) {
             Log.e(TAG, "sendMsg error!", e);
         }
@@ -117,10 +118,7 @@ public class RemoteClient implements PushSubscriber, HttpRequester {
         bundle.putString("pushId", pushId);
         msg.setData(bundle);
         sendMsg(msg);
-//        Intent intent = new Intent(intentName);
-//        intent.putExtra("cmd", CMD_SET_PUSH_ID);
-//        intent.putExtra("pushId", pushId);
-//        context.sendBroadcast(intent);
+        this.pushId = pushId;
     }
 
     public void request(RequestInfo requestInfo) {
@@ -129,10 +127,6 @@ public class RemoteClient implements PushSubscriber, HttpRequester {
         bundle.putSerializable("requestInfo", requestInfo);
         msg.setData(bundle);
         sendMsg(msg);
-//        Intent intent = new Intent(intentName);
-//        intent.putExtra("cmd", CMD_REQUEST);
-//        intent.putExtra("requestInfo", requestInfo);
-//        context.sendBroadcast(intent);
     }
 
     @Override
@@ -146,15 +140,6 @@ public class RemoteClient implements PushSubscriber, HttpRequester {
         bundle.putString("topic", topic);
         msg.setData(bundle);
         sendMsg(msg);
-//        Intent intent = new Intent(intentName);
-//        intent.putExtra("cmd", CMD_SUBSCRIBE_BROADCAST);
-//        intent.putExtra("topic", topic);
-//        context.sendBroadcast(intent);
-    }
-
-    @Override
-    public void setPushCallback(PushCallback proxyClient) {
-        this.pushCallback = proxyClient;
     }
 
     public void setProxyClient(ProxyClient proxyClient) {

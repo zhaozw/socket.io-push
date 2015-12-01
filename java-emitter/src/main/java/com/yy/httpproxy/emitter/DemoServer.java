@@ -14,22 +14,25 @@ public class DemoServer {
 
         PacketServer server = new PacketServer();
 
-        server.addHandler("/addDot", new PacketHandler() {
+        Serializer json = new JsonSerializer();
+        Serializer byteSerializer = new ByteArraySerializer();
+        server.addHandler("/addDot", new PacketHandler<Dot>(Dot.class, json) {
             @Override
-            void handle(String uid, String pushId, String sequenceId, String path, Map<String, String> headers, byte[] body) {
+            void handle(String uid, String pushId, String sequenceId, String path, Map<String, String> headers, Dot body) {
                 broadcast("/addDot", body);
-                reply(sequenceId, pushId, headers, body);
+                reply(sequenceId, pushId, path, headers, body);
             }
+
         });
 
-        server.addHandler("/endLine", new PacketHandler() {
+        server.addHandler("/endLine", new PacketHandler<byte[]>(byte.class, byteSerializer) {
             @Override
             void handle(String uid, String pushId, String sequenceId, String path, Map<String, String> headers, byte[] body) {
                 broadcast("/endLine", body);
             }
         });
 
-        server.addHandler("/clear", new PacketHandler() {
+        server.addHandler("/clear", new PacketHandler<byte[]>(byte.class, byteSerializer)  {
             @Override
             void handle(String uid, String pushId, String sequenceId, String path, Map<String, String> headers, byte[] body) {
                 broadcast("/clear", null);

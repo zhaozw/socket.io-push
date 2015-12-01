@@ -44,8 +44,11 @@ public class RemoteService extends Service implements PushCallback, ResponseHand
             } else if (cmd == RemoteClient.CMD_REQUEST) {
                 RequestInfo info = (RequestInfo) bundle.getSerializable("requestInfo");
                 client.request(info);
-            }else if (cmd == RemoteClient.CMD_REGISTER_CLIENT) {
+            } else if (cmd == RemoteClient.CMD_REGISTER_CLIENT) {
                 remoteClient = msg.replyTo;
+            } else if (cmd == RemoteClient.CMD_UNSUBSCRIBE_BROADCAST) {
+                String topic = bundle.getString("topic");
+                client.unsubscribeBroadcast(topic);
             }
         }
     }

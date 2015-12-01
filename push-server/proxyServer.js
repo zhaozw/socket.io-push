@@ -37,9 +37,16 @@ function ProxyServer(io,stats,redis){
      });
 
       socket.on('subscribeTopic', function (data) {
-          console.log("on subscribeTopic " + JSON.stringify(data));
+          debug("on subscribeTopic %s",JSON.stringify(data));
           var topic = data.topic;
           socket.join(topic);
+      });
+
+
+      socket.on('unsubscribeTopic', function (data) {
+          debug("on unsubscribeTopic %s",JSON.stringify(data));
+          var topic = data.topic;
+          socket.leave(topic);
       });
 
       socket.on('apnToken', function (data) {

@@ -33,4 +33,12 @@ config.api_3 = {
   port : 9302
 };
 
+config.io_4 = {
+  port : 9401
+};
+
+config.api_4 = {
+  port : 9402
+};
+
 module.exports = config;

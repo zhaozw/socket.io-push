@@ -34,7 +34,7 @@ apply plugin: 'maven'
 apply plugin: 'signing'
 
 group = 'com.yy'
-version = '1.0.45'
+version = '1.0.47'
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'

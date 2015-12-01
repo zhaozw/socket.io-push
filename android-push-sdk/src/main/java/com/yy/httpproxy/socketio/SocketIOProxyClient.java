@@ -43,6 +43,19 @@ public class SocketIOProxyClient implements PushSubscriber {
         this.responseHandler = responseHandler;
     }
 
+    public void unsubscribeBroadcast(String topic) {
+        topics.remove(topic);
+        if (socket.connected()) {
+            JSONObject data = new JSONObject();
+            try {
+                data.put("topic", topic);
+                socket.emit("unsubscribeTopic", data);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
 
     public interface NotificationCallback {
         void onNotification(String id, JSONObject notification);
@@ -261,7 +274,6 @@ public class SocketIOProxyClient implements PushSubscriber {
         }
     }
 
-    @Override
     public void setPushCallback(PushCallback pushCallback) {
         this.pushCallback = pushCallback;
     }

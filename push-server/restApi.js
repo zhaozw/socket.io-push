@@ -30,7 +30,7 @@ function RestApi(io,stats,redis,port){
    if(pushAll === 'true') {
      io.to(topic).emit('push', pushData);
      res.send({code:"success"});
-       return next();
+     return next();
    } else if(!pushId){
      res.send({code:"error",message:'pushId is required'});
      return next();

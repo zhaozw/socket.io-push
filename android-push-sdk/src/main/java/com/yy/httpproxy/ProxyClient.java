@@ -26,9 +26,6 @@ public class ProxyClient implements PushCallback {
     public ProxyClient(Config config) {
         this.config = config;
         if (config.getRemoteClient() != null) {
-            config.getRemoteClient().setPushCallback(this);
-        }
-        if (config.getRemoteClient() != null) {
             config.getRemoteClient().setProxyClient(this);
         }
     }
@@ -60,6 +57,11 @@ public class ProxyClient implements PushCallback {
     public void subscribeBroadcast(String topic, ReplyHandler handler) {
         pushHandlers.put(topic, handler);
         config.getRemoteClient().subscribeBroadcast(topic);
+    }
+
+    public void unsubscribeBroadcast(String topic) {
+        pushHandlers.remove(topic);
+        config.getRemoteClient().unsubscribeBroadcast(topic);
     }
 
     @Override

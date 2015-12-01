@@ -71,34 +71,4 @@ public class PacketServer {
         handlerMap.put(path, handler);
     }
 
-    public static void main(String[] args) throws IOException, InterruptedException {
-        PacketServer server = new PacketServer();
-
-        Serializer serializer = new JsonSerializer();
-
-        server.addHandler("/addDot", new PacketHandler<Dot>(Dot.class, serializer) {
-            @Override
-            void handle(String uid, String pushId, String sequenceId, String path, Map<String, String> headers, Dot body) {
-                broadcast("/addDot", body);
-                reply(sequenceId, pushId, headers, body);
-            }
-        });
-
-        server.addHandler("/endLine", new PacketHandler() {
-            @Override
-            void handle(String uid, String pushId, String sequenceId, String path, Map<String, String> headers, byte[] body) {
-                broadcast("/endLine", body);
-            }
-        });
-
-        server.addHandler("/clear", new PacketHandler() {
-            @Override
-            void handle(String uid, String pushId, String sequenceId, String path, Map<String, String> headers, byte[] body) {
-                broadcast("/clear", null);
-            }
-        });
-
-
-        Thread.sleep(100000L);
-    }
 }
