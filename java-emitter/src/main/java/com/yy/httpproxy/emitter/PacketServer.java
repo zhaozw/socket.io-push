@@ -53,7 +53,7 @@ public class PacketServer {
 
     public PacketServer(String host) {
         Config config = new Config();
-        config.useSingleServer().setAddress("host");
+        config.useSingleServer().setAddress(host);
         Redisson redisson = Redisson.create();
         emitter = new Emitter(redisson);
         RTopic<PackProxy> topic = redisson.getTopic("packetProxy", new JsonJacksonCodecWithClass(PackProxy.class));

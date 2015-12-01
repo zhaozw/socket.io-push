@@ -20,7 +20,7 @@ jar {
 }
 
 task execute(type:JavaExec){
-    main = "com.yy.httpproxy.emitter.DemoServer"
+    main = "com.yy.httpproxy.emitter.Benchmark"
     classpath = sourceSets.main.runtimeClasspath
 }
 
