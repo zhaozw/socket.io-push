@@ -19,8 +19,8 @@ import io.socket.emitter.Emitter;
 public class Benchmark {
 
     private static Logger logger = LoggerFactory.getLogger(Benchmark.class);
-    private static int numClients = 100;
-    private static int numOfPushes = 1;
+    private static int numClients = 1000;
+    private static int numOfPushes = 1000;
     private static String host = "http://61.147.186.58:80";
     private static String redisHost = "61.147.186.58:6379";
     private static AtomicInteger connected = new AtomicInteger(0);
