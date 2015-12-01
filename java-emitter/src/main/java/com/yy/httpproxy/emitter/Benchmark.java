@@ -20,8 +20,8 @@ public class Benchmark {
 
     private static Logger logger = LoggerFactory.getLogger(Benchmark.class);
     private static int numClients = 1000;
-    private static int numOfPushes = 1000000;
-    private static String host = "http://ws_bench:80";
+    private static int numOfPushes = 100000;
+    private static String host = "http://61.147.186.58:80";
     private static String redisHost = "61.147.186.58:6379";
     private static AtomicInteger connected = new AtomicInteger(0);
     private static AtomicInteger numRequests = new AtomicInteger(0);
@@ -49,6 +49,7 @@ public class Benchmark {
                         connected.addAndGet(1);
                         JSONObject data = new JSONObject();
                         try {
+                            logger.debug("connected");
                             data.put("topic", "/addDot");
                             socket.emit("subscribeTopic", data);
                         } catch (JSONException e) {
@@ -60,7 +61,7 @@ public class Benchmark {
                     @Override
                     public void call(Object... args) {
                         int count = numRequests.incrementAndGet();
-//                        logger.info("receive push {} {}", count, args[0]);
+                        logger.debug("receive push {}", count);
                         if (count == numClients * numOfPushes) {
                             logger.info("total {} per second  {} time {}ms ", numClients * numOfPushes, 1000L * count / (System.currentTimeMillis() - timestamp), (System.currentTimeMillis() - timestamp) / 1000f);
                         }
