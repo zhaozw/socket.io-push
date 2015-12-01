@@ -19,15 +19,24 @@ import io.socket.emitter.Emitter;
 public class Benchmark {
 
     private static Logger logger = LoggerFactory.getLogger(Benchmark.class);
-    private static int numClients = 200;
-    private static String host = "http://localhost:9101";
+    private static int numClients = 1000;
+    private static int numOfPushes = 1000000;
+    private static String host = "http://ws_bench:80";
+    private static String redisHost = "61.147.186.58:6379";
     private static AtomicInteger connected = new AtomicInteger(0);
     private static AtomicInteger numRequests = new AtomicInteger(0);
     private static AtomicInteger seqId = new AtomicInteger(0);
     private static Socket lastSocket;
+    private static long timestamp = 0;
 
     public static void main(String[] args) throws InterruptedException {
         logger.info("benchmarking {} numClients:{}", host, numClients);
+        if (args.length > 0) {
+            host = args[0];
+            redisHost = args[1];
+            numClients = Integer.parseInt(args[3]);
+
+        }
         for (int i = 0; i < numClients; i++) {
             try {
                 final Socket socket;
@@ -50,7 +59,11 @@ public class Benchmark {
                 socket.on("push", new Emitter.Listener() {
                     @Override
                     public void call(Object... args) {
-                        logger.info("receive push {} {}", numRequests.incrementAndGet(), args[0]);
+                        int count = numRequests.incrementAndGet();
+//                        logger.info("receive push {} {}", count, args[0]);
+                        if (count == numClients * numOfPushes) {
+                            logger.info("total {} per second  {} time {}ms ", numClients * numOfPushes, 1000L * count / (System.currentTimeMillis() - timestamp), (System.currentTimeMillis() - timestamp) / 1000f);
+                        }
                     }
                 });
                 socket.connect();
@@ -63,19 +76,21 @@ public class Benchmark {
         while (connected.get() != numClients) {
             Thread.sleep(100l);
         }
-
+        Thread.sleep(2000l);
+        timestamp = System.currentTimeMillis();
         Serializer json = new ByteArraySerializer();
-        PacketServer server = new PacketServer();
+        PacketServer server = new PacketServer(redisHost);
         server.addHandler("/addDot", new PacketHandler<byte[]>(byte[].class, json) {
             @Override
             void handle(String uid, String pushId, String sequenceId, String path, Map<String, String> headers, byte[] body) {
                 broadcast("/addDot", body);
-                reply(sequenceId, pushId, path, headers, body);
+                //reply(sequenceId, pushId, path, headers, body);
             }
         });
 
-        for (int i = 0; i < 1000; i++) {
-            request(lastSocket, "/addDot", "testdatatttttttttt");
+        for (int i = 0; i < numOfPushes; i++) {
+//            request(lastSocket, "/addDot", "testdatatttttttttt");
+            server.getEmitter().push("/addDot", "testdatatttttttttt".getBytes());
         }
 
         Thread.sleep(100000L);
@@ -86,11 +101,9 @@ public class Benchmark {
 
         try {
 
-
             if (!socket.connected()) {
                 return;
             }
-
 
             JSONObject headers = new JSONObject();
 

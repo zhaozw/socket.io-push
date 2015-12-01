@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import org.apache.commons.codec.binary.Base64;
+import org.redisson.Config;
 import org.redisson.Redisson;
 import org.redisson.core.MessageListener;
 import org.redisson.core.RTopic;
@@ -23,7 +24,6 @@ public class PacketServer {
 
     private Emitter emitter;
     private Map<String, PacketHandler> handlerMap = new HashMap<>();
-    private Redisson redisson = Redisson.create();
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @JsonTypeInfo(
@@ -51,7 +51,10 @@ public class PacketServer {
         }
     }
 
-    public PacketServer() {
+    public PacketServer(String host) {
+        Config config = new Config();
+        config.useSingleServer().setAddress("host");
+        Redisson redisson = Redisson.create();
         emitter = new Emitter(redisson);
         RTopic<PackProxy> topic = redisson.getTopic("packetProxy", new JsonJacksonCodecWithClass(PackProxy.class));
         topic.addListener(new MessageListener<PackProxy>() {
@@ -71,4 +74,7 @@ public class PacketServer {
         handlerMap.put(path, handler);
     }
 
+    public Emitter getEmitter() {
+        return emitter;
+    }
 }

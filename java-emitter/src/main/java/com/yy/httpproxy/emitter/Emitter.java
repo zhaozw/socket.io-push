@@ -44,6 +44,9 @@ public class Emitter {
 
         packet.setData(jsonRoot);
         packet.setEvent("push");
+        ArrayList<String> rooms = new ArrayList<>(1);
+        rooms.add(topic);
+        packet.setRooms(rooms);
 
         rTopic.publishAsync(packet.getBytes());
 

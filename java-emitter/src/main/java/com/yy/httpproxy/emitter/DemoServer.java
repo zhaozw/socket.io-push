@@ -12,7 +12,7 @@ public class DemoServer {
 
     public static void main(String[] args) throws IOException, InterruptedException {
 
-        PacketServer server = new PacketServer();
+        PacketServer server = new PacketServer("localhost:6379");
 
         Serializer json = new JsonSerializer();
         Serializer byteSerializer = new ByteArraySerializer();
