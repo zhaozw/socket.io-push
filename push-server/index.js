@@ -10,8 +10,9 @@ var socketIoRedis = require('socket.io-redis');
 io.adapter(socketIoRedis({ host: config.redis.host , port: config.redis.port }));
 
 var redis = require("redis")
-var redisClient = redis.createClient({ host: config.redis.host, port: config.redis.port });
-var redisStore = require('./redisStore.js')(redisClient);
+var pubClient = redis.createClient({ host: config.redis.host, port: config.redis.port });
+var subClient = redis.createClient({ host: config.redis.host, port: config.redis.port });
+var redisStore = require('./redisStore.js')(pubClient,subClient);
 var stats = require('./stats.js')();
 
 

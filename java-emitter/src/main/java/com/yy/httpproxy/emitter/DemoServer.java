@@ -1,5 +1,8 @@
 package com.yy.httpproxy.emitter;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.util.Map;
 
@@ -9,6 +12,7 @@ import java.util.Map;
  */
 public class DemoServer {
 
+    private static Logger logger = LoggerFactory.getLogger(DemoServer.class);
 
     public static void main(String[] args) throws IOException, InterruptedException {
 
@@ -18,24 +22,31 @@ public class DemoServer {
         Serializer byteSerializer = new ByteArraySerializer();
         server.addHandler("/addDot", new PacketHandler<Dot>(Dot.class, json) {
             @Override
-            void handle(String uid, String pushId, String sequenceId, String path, Map<String, String> headers, Dot body) {
+            void handle(String pushId, String sequenceId, String path, Dot body) {
                 broadcast("/addDot", body);
-                reply(sequenceId, pushId, path, headers, body);
+                reply(sequenceId, pushId, path, body);
             }
 
         });
 
         server.addHandler("/endLine", new PacketHandler<byte[]>(byte.class, byteSerializer) {
             @Override
-            void handle(String uid, String pushId, String sequenceId, String path, Map<String, String> headers, byte[] body) {
+            void handle(String pushId, String sequenceId, String path, byte[] body) {
                 broadcast("/endLine", body);
             }
         });
 
-        server.addHandler("/clear", new PacketHandler<byte[]>(byte.class, byteSerializer)  {
+        server.addHandler("/clear", new PacketHandler<byte[]>(byte.class, byteSerializer) {
             @Override
-            void handle(String uid, String pushId, String sequenceId, String path, Map<String, String> headers, byte[] body) {
+            void handle(String pushId, String sequenceId, String path, byte[] body) {
                 broadcast("/clear", null);
+            }
+        });
+
+        server.addHandler(PacketHandler.DISCONNECT, new PacketHandler() {
+            @Override
+            void handle(String pushId, String sequenceId, String path, Object body) {
+                logger.debug("PacketHandler.DISCONNECT {} {}", pushId, path);
             }
         });
 

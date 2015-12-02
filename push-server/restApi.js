@@ -8,6 +8,7 @@ function RestApi(io,stats,redis,port){
    name: 'myapp',
    version: '1.0.0'
  });
+ var debug = require('debug')('RestApi');
  server.use(restify.acceptParser(server.acceptable));
  server.use(restify.queryParser());
  server.use(restify.bodyParser());
@@ -25,7 +26,7 @@ function RestApi(io,stats,redis,port){
    }
    var pushId = req.params.pushId;
    var pushAll = req.params.pushAll;
-   console.log('push ' + JSON.stringify(req.params));
+   debug('push ' + JSON.stringify(req.params));
    var pushData = {topic: topic, data :data};
    if(pushAll === 'true') {
      io.to(topic).emit('push', pushData);
@@ -58,7 +59,7 @@ function RestApi(io,stats,redis,port){
     notification.id = randomstring.generate(32);
     var pushId = req.params.pushId;
     var pushAll = req.params.pushAll;
-    console.log('notification ' + JSON.stringify(req.params));
+    debug('notification ' + JSON.stringify(req.params));
 
     if(pushAll === 'true') {
         redis.sendNotificationToAll(notification,io);
@@ -81,7 +82,6 @@ function RestApi(io,stats,redis,port){
       }
     }
   };
-
 
  var handleStats = function (req, res, next) {
     res.send({sessionCount:stats.sessionCount});

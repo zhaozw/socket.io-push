@@ -41,6 +41,7 @@ public class Benchmark {
             try {
                 final Socket socket;
                 IO.Options opts = new IO.Options();
+                opts.forceNew = true;
                 opts.transports = new String[]{"websocket"};
                 socket = IO.socket(host, opts);
                 socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
@@ -81,13 +82,13 @@ public class Benchmark {
         timestamp = System.currentTimeMillis();
         Serializer json = new ByteArraySerializer();
         PacketServer server = new PacketServer(redisHost);
-        server.addHandler("/addDot", new PacketHandler<byte[]>(byte[].class, json) {
-            @Override
-            void handle(String uid, String pushId, String sequenceId, String path, Map<String, String> headers, byte[] body) {
-                broadcast("/addDot", body);
-                //reply(sequenceId, pushId, path, headers, body);
-            }
-        });
+//        server.addHandler("/addDot", new PacketHandler() {
+//            @Override
+//            void handle(String pushId, String sequenceId, String path, Object[] body) {
+//                broadcast("/addDot", body);
+//                //reply(sequenceId, pushId, path, headers, body);
+//            }
+//        });
 
         for (int i = 0; i < numOfPushes; i++) {
 //            request(lastSocket, "/addDot", "testdatatttttttttt");

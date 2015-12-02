@@ -43,6 +43,7 @@ public class RemoteClient implements PushSubscriber, HttpRequester {
         bundle.putSerializable("topic", topic);
         msg.setData(bundle);
         sendMsg(msg);
+        topics.remove(topic);
     }
 
     private class IncomingHandler extends Handler {
@@ -140,6 +141,7 @@ public class RemoteClient implements PushSubscriber, HttpRequester {
         bundle.putString("topic", topic);
         msg.setData(bundle);
         sendMsg(msg);
+        topics.add(topic);
     }
 
     public void setProxyClient(ProxyClient proxyClient) {

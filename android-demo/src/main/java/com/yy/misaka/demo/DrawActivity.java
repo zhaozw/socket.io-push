@@ -51,7 +51,8 @@ public class DrawActivity extends Activity {
         latency = (TextView) findViewById(R.id.tv_latency);
         count = (TextView) findViewById(R.id.tv_count);
 
-        String pushServerHost = "http://183.61.6.33";
+//        String pushServerHost = "http://183.61.6.33";
+        String pushServerHost = "http://172.25.133.154:9101";
 
         proxyClient = new ProxyClient(new Config(this.getApplicationContext())
                 .setHost(pushServerHost)
@@ -102,7 +103,7 @@ public class DrawActivity extends Activity {
         });
 
 
-        proxyClient.subscribe("/addDot", new PushHandler<DrawView.Dot>(DrawView.Dot.class) {
+        proxyClient.subscribeBroadcast("/addDot", new PushHandler<DrawView.Dot>(DrawView.Dot.class) {
             @Override
             public void onSuccess(DrawView.Dot result) {
                 drawView.addDot(result);
@@ -110,7 +111,7 @@ public class DrawActivity extends Activity {
             }
         });
 
-        proxyClient.subscribe("/clear", new PushHandler(null) {
+        proxyClient.subscribeBroadcast("/clear", new PushHandler(null) {
 
             @Override
             public void onSuccess(Object result) {
@@ -120,7 +121,7 @@ public class DrawActivity extends Activity {
 
         });
 
-        proxyClient.subscribe("/endLine", new PushHandler<DrawView.Dot>(DrawView.Dot.class) {
+        proxyClient.subscribeBroadcast("/endLine", new PushHandler<DrawView.Dot>(DrawView.Dot.class) {
 
             @Override
             public void onSuccess(DrawView.Dot result) {

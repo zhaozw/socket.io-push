@@ -8,19 +8,89 @@ var options = config.apn;
 
 var apnConnection = new apn.Connection(options);
 
-function RedisStore(redis){
-    if (!(this instanceof RedisStore)) return new RedisStore(redis);
+var pathToServer = {};
+
+
+function RedisStore(redis,subClient){
+    if (!(this instanceof RedisStore)) return new RedisStore(redis,subClient);
     this.redis = redis;
+    subClient.on("message", function (channel, message) {
+        debug("subscribe message " + channel + ": " + message);
+        if(channel === "packetServer" ) {
+            var handlerInfo = JSON.parse(message);
+            updatePathServer(handlerInfo);
+        }
+    });
+    subClient.subscribe("packetServer");
+}
+
+function updatePathServer(handlerInfo){
+    var timestamp = new Date().getTime();
+    var serverId = handlerInfo.serverId;
+    for( path of handlerInfo.paths ){
+        var servers = pathToServer[path];
+        if(!servers){
+            servers = [];
+        }
+        var updatedServers = [];
+        var found = false;
+        for(server of servers){
+            if(server.serverId === serverId){
+                server.timestamp = timestamp;
+                updatedServers.push(server);
+                found = true;
+            } else if(timestamp - server.timestamp > 10000){
+                debug("server is dead %s", server.serverId);
+            } else {
+                updatedServers.push(server);
+            }
+        }
+        if(!found){
+            debug("new server is added %s", serverId);
+            updatedServers.push({serverId:serverId,timestamp:timestamp});
+        }
+        pathToServer[path] = updatedServers;
+    }
+    debug("updatePathServer %s",JSON.stringify(pathToServer));
+}
+
+function hashIndex(pushId,count) {
+    var hash = 0;
+    if (pushId.length == 0) return hash;
+    for (i = 0; i < pushId.length; i++) {
+        char = pushId.charCodeAt(i);
+        hash = ((hash<<5)-hash)+char;
+        hash = hash & hash; // Convert to 32bit integer
+    }
+    return hash % count;
 }
 
 RedisStore.prototype.publishPacket = function(data) {
-    this.redis.publish("packetProxy" , data);
+    var path = data.path;
+    var pushId = data.pushId;
+    if(path && pushId) {
+        var servers = pathToServer[path];
+        if(servers){
+            var serverCount = servers.length;
+            var idx = hashIndex(pushId,serverCount);
+            var serverId = pathToServer[path][idx]["serverId"];
+            var strData = JSON.stringify(data);
+            this.redis.publish("packetProxy#" + serverId , strData);
+            debug("publishPacket %s %s", serverId,strData);
+        }
+    }
+};
+
+RedisStore.prototype.publishDisconnect = function(pushId) {
+    debug("publish pushId %s",pushId);
+    var data = { pushId:pushId, path:"/socketDisconnect"};
+    this.publishPacket(data);
 };
 
 RedisStore.prototype.setApnToken = function(pushId,apnToken) {
     if(pushId && apnToken){
        this.redis.set("apnToken#" + pushId, apnToken);
-       //  this.redis.expire("apnToken#" + pushId, 3600 * 24 * 7);
+       this.redis.expire("apnToken#" + pushId, 3600 * 24 * 7);
        this.redis.hset("apnTokens", apnToken , "");
     }
 };
@@ -42,7 +112,6 @@ RedisStore.prototype.sendNotification = function(pushId, notification,io) {
 
 RedisStore.prototype.sendNotificationToAll = function(notification,io) {
     io.to("android").emit('notification', notification);
-
     this.redis.hkeys("apnTokens", function (err, replies) {
       debug(replies.length + " replies:");
       var note = toApnNotification(notification);

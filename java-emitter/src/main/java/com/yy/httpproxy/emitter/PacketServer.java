@@ -10,9 +10,7 @@ import org.redisson.core.MessageListener;
 import org.redisson.core.RTopic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.impl.SimpleLogger;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,6 +23,8 @@ public class PacketServer {
     private Emitter emitter;
     private Map<String, PacketHandler> handlerMap = new HashMap<>();
     private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private Redisson redisson;
+    private LoadBalancer loadBalancer;
 
     @JsonTypeInfo(
             use = JsonTypeInfo.Id.NAME,
@@ -36,7 +36,6 @@ public class PacketServer {
         public String path;
         public String data;
         public String sequenceId;
-        public String uid;
         public String pushId;
 
         @Override
@@ -45,7 +44,6 @@ public class PacketServer {
                     "path='" + path + '\'' +
                     ", data='" + data + '\'' +
                     ", sequenceId='" + sequenceId + '\'' +
-                    ", uid='" + uid + '\'' +
                     ", pushId='" + pushId + '\'' +
                     '}';
         }
@@ -54,19 +52,23 @@ public class PacketServer {
     public PacketServer(String host) {
         Config config = new Config();
         config.useSingleServer().setAddress(host);
-        Redisson redisson = Redisson.create(config);
+        redisson = Redisson.create(config);
         emitter = new Emitter(redisson);
-        RTopic<PackProxy> topic = redisson.getTopic("packetProxy", new JsonJacksonCodecWithClass(PackProxy.class));
+        loadBalancer = new LoadBalancer(redisson, handlerMap);
+        RTopic<PackProxy> topic = redisson.getTopic("packetProxy#" + loadBalancer.getServerId(), new JsonJacksonCodecWithClass(PackProxy.class));
         topic.addListener(new MessageListener<PackProxy>() {
 
             public void onMessage(String channel, PackProxy message) {
                 logger.debug("onMessage {}", channel, message);
                 PacketHandler handler = handlerMap.get(message.path);
                 if (handler != null) {
-                    handler.handle(message.uid, message.pushId, message.sequenceId, message.path, null, Base64.decodeBase64(message.data));
+                    handler.handleBinary(message.pushId, message.sequenceId, message.path, Base64.decodeBase64(message.data));
                 }
             }
         });
+
+
+
     }
 
     public void addHandler(String path, PacketHandler handler) {

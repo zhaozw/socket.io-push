@@ -16,7 +16,11 @@ function ProxyServer(io,stats,redis){
 
      socket.on('disconnect', function () {
          stats.removeSession();
-         delete clientIdToPushId[socket.id];
+         var pushId = clientIdToPushId[socket.id];
+         if(pushId){
+             redis.publishDisconnect(pushId);
+             delete clientIdToPushId[socket.id];
+         }
      });
 
      socket.on('pushId', function (data) {
@@ -26,7 +30,7 @@ function ProxyServer(io,stats,redis){
            if(topics && topics.length > 0) {
              topics.forEach(function(topic) {
                   socket.join(topic);
-                  console.log('join topic ' + topic);
+                  debug('join topic ' + topic);
              });
            }
            clientIdToPushId[socket.id] = data.id;
@@ -57,18 +61,15 @@ function ProxyServer(io,stats,redis){
       });
 
       socket.on('packetProxy', function (data) {
-               data.pushId = clientIdToPushId[socket.id];
-               data.uid = "0";
-               var stringData =  JSON.stringify(data);
-               debug('packetProxy %s body %s', socket.id,stringData);
-               redis.publishPacket(stringData);
+          data.pushId = clientIdToPushId[socket.id];
+          redis.publishPacket(data);
       });
 
      socket.on('httpProxy', function (data) {
-         console.log('body' + JSON.stringify(data));
+         debug('body' + JSON.stringify(data));
          var body = new Buffer(data.body.toString(),"base64").toString('utf-8');
-         console.log('httpProxy ' + data.sequenceId + ' path ' + data.path + ' body : ' + body);
-         console.log('headers ' + data.headers['X-Authorization']);
+         debug('httpProxy ' + data.sequenceId + ' path ' + data.path + ' body : ' + body);
+         debug('headers ' + data.headers['X-Authorization']);
          var post_data = body;
 
          var options = {
@@ -81,15 +82,11 @@ function ProxyServer(io,stats,redis){
 
          var req = http.request(options, function(res) {
                res.setEncoding('utf8');
-               console.log('request res ' +  res.statusCode);
-               console.log('HEADERS: ' + JSON.stringify(res.headers));
                var body = "";
                res.on('data', function (chunk) {
-                   console.log('Response: ' + chunk);
                    body += chunk;
                });
                res.on('end', function() {
-                   console.log('res on end: ' + body);
                    socket.emit('httpProxy', {
                          sequenceId: data.sequenceId,
                          statusCode: res.statusCode,
@@ -100,7 +97,6 @@ function ProxyServer(io,stats,redis){
          });
 
          req.on('error', function(e) {
-                 console.log('error request: ' + e.message);
                  socket.emit('httpProxy', {
                          sequenceId: data.sequenceId,
                          errorMessage: e.message,
@@ -109,14 +105,9 @@ function ProxyServer(io,stats,redis){
          });
 
          req.setTimeout(5000,function(){
-             console.log('timeout');
          });
          req.write(post_data);
          req.end();
-     });
-
-     socket.on('pushReply', function () {
-         receiveCounter++;
      });
 
  });
