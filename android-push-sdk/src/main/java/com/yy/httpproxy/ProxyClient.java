@@ -42,6 +42,7 @@ public class ProxyClient implements PushCallback {
         requestInfo.setSequenceId(sequenceId++);
 
         if (replyHandler != null) {
+            requestInfo.setExpectReply(true);
             replayHandlers.put(sequenceId, replyHandler);
         }
         requestInfo.setSequenceId(sequenceId);

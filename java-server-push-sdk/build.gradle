@@ -1,0 +1,125 @@
+apply plugin: 'java'
+
+configurations {
+    provided
+}
+
+sourceSets {
+    main {
+        compileClasspath += configurations.provided
+    }
+    test {
+        compileClasspath += configurations.provided
+    }
+}
+
+sourceSets.main.compileClasspath += configurations.provided
+jar {
+    baseName = 'java-server-push-sdk'
+    version = '1.0'
+}
+
+task execute(type:JavaExec){
+    main = "com.yy.httpproxy.emitter.Benchmark"
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+repositories {
+    // NOTE: You should declare only repositories that you need here
+    mavenLocal()
+    mavenCentral()
+    maven { url "http://repo.spring.io/release" }
+}
+
+dependencies {
+    compile 'org.msgpack:msgpack:0.6.11'
+    compile 'org.json:json:20140107'
+    compile 'commons-codec:commons-codec:1.10'
+    compile 'org.slf4j:slf4j-simple:1.7.13'
+    compile 'org.redisson:redisson:2.1.4'
+    compile 'com.google.code.gson:gson:2.3.1'
+}
+
+apply plugin: 'maven'
+apply plugin: 'signing'
+
+group = 'com.yy'
+version = '1.0.0'
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+javadoc {
+    options {
+        encoding "UTF-8"
+        charSet 'UTF-8'
+        author true // 支持author标记
+        version true // 支持version标记
+    }
+}
+
+compileJava {
+    options.encoding = "UTF-8"
+}
+
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+
+artifacts {
+    archives javadocJar, sourcesJar
+}
+
+signing {
+    sign configurations.archives
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: sonatypeUsername, password: sonatypePassword)
+            }
+
+            pom.project {
+                name 'misaka-android'
+                packaging 'jar'
+                description 'misaka-android'
+                description 'misaka-android'
+                url 'https://github.com/xuduo/misaka'
+
+                scm {
+                    url 'https://github.com/xuduo/AndroidNotificationCenter'
+                    connection 'https://github.com/xuduo/AndroidNotificationCenter'
+                    developerConnection 'https://github.com/xuduo/AndroidNotificationCenter'
+                }
+
+                licenses {
+                    license {
+                        name 'The Apache Software License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        distribution 'repo'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id 'xuduo'
+                        name 'xuduo'
+                    }
+                }
+            }
+
+        }
+    }
+}

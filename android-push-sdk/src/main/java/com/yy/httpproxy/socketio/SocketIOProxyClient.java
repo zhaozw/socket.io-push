@@ -224,7 +224,7 @@ public class SocketIOProxyClient implements PushSubscriber {
 
         try {
 
-            if (handler != null) {
+            if (requestInfo.isExpectReply()) {
                 replyCallbacks.put(requestInfo.getSequenceId(), requestInfo);
             }
 

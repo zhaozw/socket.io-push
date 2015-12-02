@@ -16,6 +16,7 @@ public class RequestInfo implements Serializable{
     private byte[] body;
     private String method;
     private String scheme;
+    private boolean expectReply = false;
     private long timestamp = System.currentTimeMillis();
 
     public String getHost() {
@@ -96,5 +97,13 @@ public class RequestInfo implements Serializable{
 
     public boolean timeoutForRequest(long timeout) {
         return System.currentTimeMillis() - timestamp > timeout;
+    }
+
+    public boolean isExpectReply() {
+        return expectReply;
+    }
+
+    public void setExpectReply(boolean expectReply) {
+        this.expectReply = expectReply;
     }
 }

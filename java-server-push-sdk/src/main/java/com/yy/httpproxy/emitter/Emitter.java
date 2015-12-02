@@ -4,22 +4,12 @@ import com.yy.httpproxy.emitter.protocol.PacketJson;
 
 import org.json.JSONObject;
 import org.redisson.Redisson;
-import org.redisson.client.RedisClient;
-import org.redisson.client.RedisConnection;
 import org.redisson.client.codec.StringCodec;
-import org.redisson.client.protocol.RedisCommands;
 import org.redisson.core.RTopic;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Arrays;
 
-import io.netty.util.CharsetUtil;
-import io.netty.util.concurrent.Future;
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.JedisPoolConfig;
 import sun.misc.BASE64Encoder;
 
 public class Emitter {
@@ -73,24 +63,6 @@ public class Emitter {
 
     }
 
-
-    private static void testJedis(byte[] data) {
-        String topic = "test";
-        JedisPool jedisPool = new JedisPool(new JedisPoolConfig(), "127.0.0.1", 6379);
-        Jedis jedis = jedisPool.getResource();
-
-        JSONObject jsonRoot = new JSONObject();
-        jsonRoot.put("topic", topic);
-        jsonRoot.put("data", new BASE64Encoder().encode(data));// base64 {"value":55,"symbol":"yy"}
-
-        PacketJson packet = new PacketJson();
-
-        packet.setData(jsonRoot);
-        packet.setEvent("push");
-
-        jedis.publish("socket.io#emitter".getBytes(), packet.getBytes());
-    }
-
     private static void testRedission(byte[] data) {
         String topic = "test";
 
@@ -116,7 +88,6 @@ public class Emitter {
         RTopic<String> rTopic = Redisson.create().getTopic("test", StringCodec.INSTANCE);
         rTopic.publish("12345");
 
-        testJedis("12345".getBytes());
         testRedission("12345".getBytes());
 
 

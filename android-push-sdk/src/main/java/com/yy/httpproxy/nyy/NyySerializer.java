@@ -10,7 +10,6 @@ import com.yy.httpproxy.serializer.RequestSerializer;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
 import java.net.URLEncoder;
-import java.util.Map;
 
 public class NyySerializer implements RequestSerializer {
 
