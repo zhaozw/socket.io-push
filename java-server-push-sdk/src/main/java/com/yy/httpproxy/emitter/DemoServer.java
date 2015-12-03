@@ -16,7 +16,14 @@ public class DemoServer {
 
     public static void main(String[] args) throws IOException, InterruptedException {
 
-        PacketServer server = new PacketServer("localhost:6379");
+        PacketServer server = new PacketServer("183.61.6.33:6379");
+
+        server.addHandler(PacketHandler.DISCONNECT, new PacketHandler() {
+            @Override
+            void handle(String pushId, String sequenceId, String path, Object body) {
+                logger.debug("PacketHandler.DISCONNECT {} {}", pushId, path);
+            }
+        });
 
         Serializer json = new JsonSerializer();
         Serializer byteSerializer = new ByteArraySerializer();
@@ -43,12 +50,7 @@ public class DemoServer {
             }
         });
 
-        server.addHandler(PacketHandler.DISCONNECT, new PacketHandler() {
-            @Override
-            void handle(String pushId, String sequenceId, String path, Object body) {
-                logger.debug("PacketHandler.DISCONNECT {} {}", pushId, path);
-            }
-        });
+
 
 
         Thread.sleep(100000L);

@@ -1,6 +1,7 @@
 module.exports = RedisStore;
 var config = require("./config");
 var debug = require('debug')('RedisStore');
+var randomstring = require("randomstring");
 
 var apn = require('apn');
 
@@ -70,20 +71,22 @@ RedisStore.prototype.publishPacket = function(data) {
     var pushId = data.pushId;
     if(path && pushId) {
         var servers = pathToServer[path];
+        var strData = JSON.stringify(data);
         if(servers){
             var serverCount = servers.length;
             var idx = hashIndex(pushId,serverCount);
             var serverId = pathToServer[path][idx]["serverId"];
-            var strData = JSON.stringify(data);
             this.redis.publish("packetProxy#" + serverId , strData);
             debug("publishPacket %s %s", serverId,strData);
+        }else {
+            this.redis.publish("packetProxy#default", strData);
         }
     }
 };
 
 RedisStore.prototype.publishDisconnect = function(pushId) {
     debug("publish pushId %s",pushId);
-    var data = { pushId:pushId, path:"/socketDisconnect"};
+    var data = { pushId:pushId, path:"/socketDisconnect",pushId:randomstring.generate(16)};
     this.publishPacket(data);
 };
 

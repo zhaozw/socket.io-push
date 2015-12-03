@@ -51,8 +51,8 @@ public class DrawActivity extends Activity {
         latency = (TextView) findViewById(R.id.tv_latency);
         count = (TextView) findViewById(R.id.tv_count);
 
-//        String pushServerHost = "http://183.61.6.33";
-        String pushServerHost = "http://172.25.133.154:9101";
+        String pushServerHost = "http://183.61.6.33";
+//        String pushServerHost = "http://172.25.133.154:9101";
 
         proxyClient = new ProxyClient(new Config(this.getApplicationContext())
                 .setHost(pushServerHost)
