@@ -86,7 +86,7 @@ RedisStore.prototype.publishPacket = function(data) {
 
 RedisStore.prototype.publishDisconnect = function(pushId) {
     debug("publish pushId %s",pushId);
-    var data = { pushId:pushId, path:"/socketDisconnect",pushId:randomstring.generate(16)};
+    var data = { pushId:pushId, path:"/socketDisconnect",sequenceId:randomstring.generate(16)};
     this.publishPacket(data);
 };
 
