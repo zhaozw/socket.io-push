@@ -27,13 +27,12 @@ public class Benchmark {
     private static long timestamp = 0;
 
     public static void main(String[] args) throws InterruptedException {
-        logger.info("benchmarking {} numClients:{}", host, numClients);
         if (args.length > 0) {
             host = args[0];
             redisHost = args[1];
             numClients = Integer.parseInt(args[3]);
-
         }
+        logger.info("benchmarking {} numClients:{}", host, numClients);
         for (int i = 0; i < numClients; i++) {
             try {
                 final Socket socket;
@@ -59,7 +58,7 @@ public class Benchmark {
                     @Override
                     public void call(Object... args) {
                         int count = numRequests.incrementAndGet();
-                        logger.debug("receive push {}", count);
+                        //logger.debug("receive push {}", count);
                         if (count % 100000 == 0) {
                             logger.info("total per second  {} ",  1000L * count / (System.currentTimeMillis() - timestamp));
                         }
