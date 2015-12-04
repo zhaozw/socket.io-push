@@ -48,7 +48,7 @@ public class Benchmark {
                         JSONObject data = new JSONObject();
                         try {
                             logger.debug("connected");
-                            data.put("topic", "/addDot");
+                            data.put("topic", "/test");
                             socket.emit("subscribeTopic", data);
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -61,7 +61,7 @@ public class Benchmark {
                         int count = numRequests.incrementAndGet();
                         logger.debug("receive push {}", count);
                         if (count % 100000 == 0) {
-                            logger.info("total per second  {} ",  1000L * count / (System.currentTimeMillis() - timestamp), (System.currentTimeMillis() - timestamp) / 1000f);
+                            logger.info("total per second  {} ",  1000L * count / (System.currentTimeMillis() - timestamp));
                         }
                     }
                 });
@@ -76,7 +76,6 @@ public class Benchmark {
         }
         Thread.sleep(2000l);
         timestamp = System.currentTimeMillis();
-        Serializer json = new ByteArraySerializer();
         PacketServer server = new PacketServer(redisHost);
 //        server.addHandler("/addDot", new PacketHandler() {
 //            @Override
@@ -87,9 +86,9 @@ public class Benchmark {
 //        });
 
         while (true) {
-            Thread.sleep(50L);
+            Thread.sleep(100L);
 //            request(lastSocket, "/addDot", "testdatatttttttttt");
-            server.getEmitter().push("/addDot", "testdatatttttttttt".getBytes());
+            server.getEmitter().push("/test", "testdatatttttttttt".getBytes());
         }
 
     }
