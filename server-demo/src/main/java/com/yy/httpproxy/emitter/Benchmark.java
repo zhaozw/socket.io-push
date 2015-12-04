@@ -86,7 +86,7 @@ public class Benchmark {
 //        });
 
         while (true) {
-            Thread.sleep(100L);
+            Thread.sleep(20L);
 //            request(lastSocket, "/addDot", "testdatatttttttttt");
             server.getEmitter().push("/test", "testdatatttttttttt".getBytes());
         }
