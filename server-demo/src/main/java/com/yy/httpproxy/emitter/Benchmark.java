@@ -19,7 +19,7 @@ public class Benchmark {
 
     private static Logger logger = LoggerFactory.getLogger(Benchmark.class);
     private static int numClients = 5000;
-    private static String host = "http://183.61.6.33:80";
+    private static String host = "http://183.61.6.33:8080";
     private static String redisHost = "183.61.6.33:6379";
     private static AtomicInteger connected = new AtomicInteger(0);
     private static AtomicInteger numRequests = new AtomicInteger(0);
