@@ -18,14 +18,12 @@ import io.socket.emitter.Emitter;
 public class Benchmark {
 
     private static Logger logger = LoggerFactory.getLogger(Benchmark.class);
-    private static int numClients = 1000;
-    private static int numOfPushes = 1000;
-    private static String host = "http://61.147.186.58:80";
-    private static String redisHost = "61.147.186.58:6379";
+    private static int numClients = 5000;
+    private static String host = "http://183.61.6.33:80";
+    private static String redisHost = "183.61.6.33:6379";
     private static AtomicInteger connected = new AtomicInteger(0);
     private static AtomicInteger numRequests = new AtomicInteger(0);
     private static AtomicInteger seqId = new AtomicInteger(0);
-    private static Socket lastSocket;
     private static long timestamp = 0;
 
     public static void main(String[] args) throws InterruptedException {
@@ -62,13 +60,12 @@ public class Benchmark {
                     public void call(Object... args) {
                         int count = numRequests.incrementAndGet();
                         logger.debug("receive push {}", count);
-                        if (count == numClients * numOfPushes) {
-                            logger.info("total {} per second  {} time {}ms ", numClients * numOfPushes, 1000L * count / (System.currentTimeMillis() - timestamp), (System.currentTimeMillis() - timestamp) / 1000f);
+                        if (count % 100000 == 0) {
+                            logger.info("total per second  {} ",  1000L * count / (System.currentTimeMillis() - timestamp), (System.currentTimeMillis() - timestamp) / 1000f);
                         }
                     }
                 });
                 socket.connect();
-                lastSocket = socket;
             } catch (URISyntaxException e) {
                 throw new RuntimeException(e);
             }
@@ -89,12 +86,11 @@ public class Benchmark {
 //            }
 //        });
 
-        for (int i = 0; i < numOfPushes; i++) {
+        while (true) {
+            Thread.sleep(50L);
 //            request(lastSocket, "/addDot", "testdatatttttttttt");
             server.getEmitter().push("/addDot", "testdatatttttttttt".getBytes());
         }
-
-        Thread.sleep(100000L);
 
     }
 
