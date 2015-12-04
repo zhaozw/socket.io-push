@@ -59,7 +59,7 @@ public class Emitter {
         rooms.add(pushId);
         packet.setRooms(rooms);
 
-        rTopic.publishAsync(packet.getBytes());
+        rTopic.publish(packet.getBytes());
 
     }
 
