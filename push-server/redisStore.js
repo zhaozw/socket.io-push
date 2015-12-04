@@ -78,12 +78,14 @@ RedisStore.prototype.publishPacket = function(data) {
         if(servers){
             var serverCount = servers.length;
             var idx = hashIndex(pushId,serverCount);
-            var serverId = pathToServer[path][idx]["serverId"];
-            this.redis.publish("packetProxy#" + serverId , strData);
-            debug("publishPacket %s %s", serverId,strData);
-        }else {
-            this.redis.publish("packetProxy#default", strData);
+            if(pathToServer[path][idx]){
+                var serverId = pathToServer[path][idx]["serverId"];
+                this.redis.publish("packetProxy#" + serverId , strData);
+                debug("publishPacket %s %s", serverId,strData);
+                return;
+            }
         }
+        this.redis.publish("packetProxy#default", strData);
     }
 };
 
