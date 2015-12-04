@@ -21,7 +21,7 @@ apply plugin: 'spring-boot'
 task execute(type:JavaExec){
     main = "com.yy.httpproxy.emitter.Benchmark"
     classpath = sourceSets.main.runtimeClasspath
-    jvmArgs "-Xms1000m -Xmx4000m -XX:MaxPermSize=256m"
+    jvmArgs "-Xms1000m -Xmx4000m"
 }
 
 
