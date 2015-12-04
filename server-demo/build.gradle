@@ -24,8 +24,6 @@ task execute(type:JavaExec){
 }
 
 
-
-
 jar {
     baseName = 'demo-server'
     version = '1.0'

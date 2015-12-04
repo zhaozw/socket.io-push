@@ -74,6 +74,7 @@ public class Benchmark {
             Thread.sleep(50l);
         }
         Thread.sleep(2000l);
+        logger.info("all connected");
         timestamp = System.currentTimeMillis();
         PacketServer server = new PacketServer(redisHost);
 //        server.addHandler("/addDot", new PacketHandler() {
