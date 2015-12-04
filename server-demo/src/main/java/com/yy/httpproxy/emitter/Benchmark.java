@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -65,7 +66,7 @@ public class Benchmark {
                     public void call(Object... args) {
                         int count = numRequests.incrementAndGet();
                         //logger.debug("receive push {}", count);
-                        if (count % 100000 == 0) {
+                        if (count % 10000 == 0) {
                             logger.info("total per second  {} ", 1000L * count / (System.currentTimeMillis() - timestamp));
                         }
                     }
@@ -82,7 +83,7 @@ public class Benchmark {
         Thread.sleep(2000l);
         logger.info("all connected");
         timestamp = System.currentTimeMillis();
-        PacketServer server = new PacketServer(redisHost);
+        final PacketServer server = new PacketServer(redisHost);
         server.addHandler("/testRequest", new PacketHandler() {
             @Override
             void handle(String pushId, String sequenceId, String path, Object body) {
@@ -91,12 +92,22 @@ public class Benchmark {
             }
         });
 
-        while (true) {
-//            request(lastSocket, "/addDot", "testdatatttttttttt");
-            for (Integer id : clients) {
-                server.getEmitter().reply("test", id + "", "testdatatttttttttt".getBytes());
-            }
+        for (int i = 0; i < 5; i++) {
+            Thread t = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    while (true) {
+                        List<Integer> ids = new ArrayList(clients);
+                        for (Integer id : ids) {
+                            server.getEmitter().reply("test", id + "", "testdatatttttttttt".getBytes());
+                        }
+                    }
+                }
+            });
+            t.start();
         }
+
+        Thread.sleep(100000000005435L);
 
     }
 
