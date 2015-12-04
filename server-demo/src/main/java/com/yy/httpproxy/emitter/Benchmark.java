@@ -18,7 +18,7 @@ import io.socket.emitter.Emitter;
 public class Benchmark {
 
     private static Logger logger = LoggerFactory.getLogger(Benchmark.class);
-    private static int numClients = 10000;
+    private static int numClients = 5000;
     private static String host = "http://183.61.6.33:8080";
     private static String redisHost = "183.61.6.33:6379";
     private static AtomicInteger connected = new AtomicInteger(0);
@@ -71,7 +71,7 @@ public class Benchmark {
         }
 
         while (connected.get() != numClients) {
-            Thread.sleep(50l);
+            Thread.sleep(25l);
         }
         Thread.sleep(2000l);
         logger.info("all connected");
