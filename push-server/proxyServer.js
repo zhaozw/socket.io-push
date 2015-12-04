@@ -1,6 +1,7 @@
 module.exports = ProxyServer;
 
-var clientIdToPushId = {};
+var socketIdToPushId = {};
+var pushIdToSocketId= {};
 
 function ProxyServer(io,stats,redis){
  if (!(this instanceof ProxyServer)) return new ProxyServer(io,stats,redis);
@@ -16,10 +17,14 @@ function ProxyServer(io,stats,redis){
 
      socket.on('disconnect', function () {
          stats.removeSession();
-         var pushId = clientIdToPushId[socket.id];
+         var pushId = socketIdToPushId[socket.id];
          if(pushId){
-             redis.publishDisconnect(pushId);
-             delete clientIdToPushId[socket.id];
+             delete socketIdToPushId[socket.id];
+             var currentSocketId = pushIdToSocketId[pushId];
+             if(currentSocketId === socket.id){
+                delete pushIdToSocketId[socket.id];
+                redis.publishDisconnect(pushId);
+             }
          }
      });
 
@@ -33,10 +38,11 @@ function ProxyServer(io,stats,redis){
                   debug('join topic ' + topic);
              });
            }
-           clientIdToPushId[socket.id] = data.id;
+           socketIdToPushId[socket.id] = data.id;
+           pushIdToSocketId[data.id] = socket.id;
            socket.join(data.id);
            socket.emit('pushId', { id:data.id });
-           debug('join room socket.id %s ,pushId %s' ,socket.id, clientIdToPushId[socket.id]);
+           debug('join room socket.id %s ,pushId %s' ,socket.id, socketIdToPushId[socket.id]);
  	    }
      });
 
@@ -61,7 +67,7 @@ function ProxyServer(io,stats,redis){
       });
 
       socket.on('packetProxy', function (data) {
-          data.pushId = clientIdToPushId[socket.id];
+          data.pushId = socketIdToPushId[socket.id];
           redis.publishPacket(data);
       });
 

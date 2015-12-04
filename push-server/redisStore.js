@@ -70,6 +70,9 @@ RedisStore.prototype.publishPacket = function(data) {
     var path = data.path;
     var pushId = data.pushId;
     if(path && pushId) {
+        if(!data.sequenceId) {
+            data.sequenceId = randomstring.generate(16);
+        }
         var servers = pathToServer[path];
         var strData = JSON.stringify(data);
         if(servers){
@@ -86,7 +89,7 @@ RedisStore.prototype.publishPacket = function(data) {
 
 RedisStore.prototype.publishDisconnect = function(pushId) {
     debug("publish pushId %s",pushId);
-    var data = { pushId:pushId, path:"/socketDisconnect",sequenceId:randomstring.generate(16)};
+    var data = { pushId:pushId, path:"/socketDisconnect"};
     this.publishPacket(data);
 };
 
