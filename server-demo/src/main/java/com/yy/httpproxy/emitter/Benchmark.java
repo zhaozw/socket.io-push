@@ -22,7 +22,7 @@ import io.socket.emitter.Emitter;
 public class Benchmark {
 
     private static Logger logger = LoggerFactory.getLogger(Benchmark.class);
-    private static int numClients = 10;
+    private static int numClients = 500;
     private static String host = "http://183.61.6.33:8080";
     private static String redisHost = "183.61.6.33:6379";
     private static AtomicInteger connected = new AtomicInteger(0);
