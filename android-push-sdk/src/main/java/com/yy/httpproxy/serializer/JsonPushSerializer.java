@@ -1,4 +1,4 @@
-package com.yy.misaka.demo;
+package com.yy.httpproxy.serializer;
 
 import com.google.gson.Gson;
 import com.yy.httpproxy.serializer.PushSerializer;

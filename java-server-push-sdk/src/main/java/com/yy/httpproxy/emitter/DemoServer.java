@@ -50,9 +50,6 @@ public class DemoServer {
             }
         });
 
-
-
-
         Thread.sleep(100000L);
     }
 }

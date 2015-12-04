@@ -1,5 +1,7 @@
 apply plugin: 'java'
 apply plugin: 'idea'
+apply plugin: 'maven'
+apply plugin: 'signing'
 
 configurations {
     provided
@@ -30,11 +32,8 @@ dependencies {
     compile files('libs/android.jar')
 }
 
-apply plugin: 'maven'
-apply plugin: 'signing'
-
-group = 'com.yy'
-version = '1.0.47'
+group = "com.yy"
+version = "1.0.49"
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'

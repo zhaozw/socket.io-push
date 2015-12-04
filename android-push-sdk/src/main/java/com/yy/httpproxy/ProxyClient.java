@@ -20,8 +20,7 @@ public class ProxyClient implements PushCallback {
     private long mainThreadId = Looper.getMainLooper().getThread().getId();
     private Handler handler = new Handler(Looper.getMainLooper());
     private Map<String, ReplyHandler> pushHandlers = new HashMap<>();
-    private Map<Integer, ReplyHandler> replayHandlers = new HashMap<>();
-    private int sequenceId;
+    private Map<String, ReplyHandler> replayHandlers = new HashMap<>();
 
     public ProxyClient(Config config) {
         this.config = config;
@@ -30,22 +29,15 @@ public class ProxyClient implements PushCallback {
         }
     }
 
-    public void request(String method, String scheme, String host, int port, String path, Map<String, String> headers, Object body, final ReplyHandler replyHandler) {
+    public void request(String path, Object body, final ReplyHandler replyHandler) {
         final RequestInfo requestInfo = new RequestInfo();
-        requestInfo.setScheme(scheme);
         requestInfo.setBody(config.getRequestSerializer().toBinary(path, body));
-        requestInfo.setHeaders(headers);
-        requestInfo.setHost(host);
         requestInfo.setPath(path);
-        requestInfo.setPort(port);
-        requestInfo.setMethod(method);
-        requestInfo.setSequenceId(sequenceId++);
 
         if (replyHandler != null) {
             requestInfo.setExpectReply(true);
-            replayHandlers.put(sequenceId, replyHandler);
+            replayHandlers.put(requestInfo.getSequenceId(), replyHandler);
         }
-        requestInfo.setSequenceId(sequenceId);
 
         config.getRemoteClient().
                 request(requestInfo);
@@ -115,19 +107,19 @@ public class ProxyClient implements PushCallback {
         config.getRemoteClient().setPushId(pushId);
     }
 
-    public void onResponse(String path, int sequenceId, int code, String message, byte[] data) {
+    public void onResponse(String path, String sequenceId, int code, String message, byte[] data) {
         ReplyHandler replyHandler = replayHandlers.remove(sequenceId);
         if (replyHandler != null) {
             if (code == 1) {
                 try {
-                    replyHandler.onSuccess(config.getRequestSerializer().toObject(path, replyHandler.clazz, data));
+                    callSuccessOnMainThread(replyHandler, config.getRequestSerializer().toObject(path, replyHandler.clazz, data));
                 } catch (RequestException e) {
-                    replyHandler.onError(e.getCode(), e.getMessage());
+                    callErrorOnMainThread(replyHandler, new RequestException(e, e.getCode(), e.getMessage()));
                 } catch (Exception e) {
-                    replyHandler.onError(RequestException.Error.CLIENT_DATA_SERIALIZE_ERROR.value, RequestException.Error.CLIENT_DATA_SERIALIZE_ERROR.name());
+                    callErrorOnMainThread(replyHandler, new RequestException(e, RequestException.Error.CLIENT_DATA_SERIALIZE_ERROR.value, RequestException.Error.CLIENT_DATA_SERIALIZE_ERROR.name()));
                 }
             } else {
-                replyHandler.onError(code, message);
+                callErrorOnMainThread(replyHandler, new RequestException(null, code, message));
             }
         }
     }

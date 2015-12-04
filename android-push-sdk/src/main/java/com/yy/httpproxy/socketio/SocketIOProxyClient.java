@@ -74,7 +74,7 @@ public class SocketIOProxyClient implements PushSubscriber {
             List<RequestInfo> values = new ArrayList<>(replyCallbacks.values());
             replyCallbacks.clear();
             for (RequestInfo request : values) {
-                Log.i(TAG, "StompClient onConnected repost request " + request.getUrl());
+                Log.i(TAG, "StompClient onConnected repost request " + request.getPath());
                 request(request);
             }
         }
@@ -147,18 +147,18 @@ public class SocketIOProxyClient implements PushSubscriber {
             }
         }
     };
-    private Map<Integer, RequestInfo> replyCallbacks = new ConcurrentHashMap<>();
+    private Map<String, RequestInfo> replyCallbacks = new ConcurrentHashMap<>();
     private Handler handler = new Handler();
     private long timeout = 20000;
     private Runnable timeoutTask = new Runnable() {
         @Override
         public void run() {
-            Iterator<Map.Entry<Integer, RequestInfo>> it = replyCallbacks.entrySet().iterator();
+            Iterator<Map.Entry<String, RequestInfo>> it = replyCallbacks.entrySet().iterator();
             while (it.hasNext()) {
-                Map.Entry<Integer, RequestInfo> pair = it.next();
+                Map.Entry<String, RequestInfo> pair = it.next();
                 RequestInfo request = pair.getValue();
                 if (request.timeoutForRequest(timeout)) {
-                    Log.i(TAG, "StompClient timeoutForRequest " + request.getUrl());
+                    Log.i(TAG, "StompClient timeoutForRequest " + request.getPath());
                     if (responseHandler != null) {
                         responseHandler.onResponse(request.getSequenceId(), RequestException.Error.TIMEOUT_ERROR.value, RequestException.Error.TIMEOUT_ERROR.name(), null);
                     }
@@ -183,14 +183,14 @@ public class SocketIOProxyClient implements PushSubscriber {
             Log.v(TAG, "httpProxy call " + args + " thread " + Thread.currentThread().getName());
             if (args.length > 0 && args[0] instanceof JSONObject) {
                 JSONObject data = (JSONObject) args[0];
-                int responseSeqId = data.optInt("sequenceId", 0);
+                String responseSeqId = data.optString("sequenceId", "");
                 RequestInfo request = replyCallbacks.remove(responseSeqId);
                 if (request != null && responseHandler != null) {
                     String response = data.optString("data");
                     byte[] decodedResponse = Base64.decode(response, Base64.DEFAULT);
                     Log.i(TAG, "response " + new String(decodedResponse));
-                    int code = data.optInt("code", 0);
-                    int sequenceId = data.optInt("sequenceId", 0);
+                    int code = data.optInt("code", 1);
+                    String sequenceId = data.optString("sequenceId", "");
                     String message = data.optString("message", "");
                     responseHandler.onResponse(sequenceId, code, message, decodedResponse);
                 }
@@ -232,23 +232,10 @@ public class SocketIOProxyClient implements PushSubscriber {
                 return;
             }
 
-
-            JSONObject headers = new JSONObject();
-            if (requestInfo.getHeaders() != null) {
-                for (Map.Entry<String, String> header : requestInfo.getHeaders().entrySet()) {
-                    headers.put(header.getKey(), header.getValue());
-                }
-            }
-
             JSONObject object = new JSONObject();
-            object.put("headers", headers);
             object.put("data", Base64.encodeToString(requestInfo.getBody(), Base64.DEFAULT));
-            object.put("host", requestInfo.getHost());
-            object.put("port", requestInfo.getPort());
-            object.put("method", requestInfo.getMethod());
             object.put("path", requestInfo.getPath());
             object.put("sequenceId", String.valueOf(requestInfo.getSequenceId()));
-
 
             socket.emit("packetProxy", object);
 

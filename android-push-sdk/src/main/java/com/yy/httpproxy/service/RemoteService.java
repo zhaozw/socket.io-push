@@ -129,12 +129,12 @@ public class RemoteService extends Service implements PushCallback, ResponseHand
     }
 
     @Override
-    public void onResponse(int sequenceId, int code, String message, byte[] data) {
+    public void onResponse(String sequenceId, int code, String message, byte[] data) {
         Log.d(TAG, "onResponse  " + code);
 
         Message msg = Message.obtain(null, CMD_RESPONSE, 0, 0);
         Bundle bundle = new Bundle();
-        bundle.putInt("sequenceId", sequenceId);
+        bundle.putString("sequenceId", sequenceId);
         bundle.putInt("code", code);
         bundle.putString("message", message);
         bundle.putByteArray("data", data);

@@ -6,16 +6,14 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.yy.httpproxy.Config;
 import com.yy.httpproxy.ProxyClient;
 import com.yy.httpproxy.PushHandler;
 import com.yy.httpproxy.ReplyHandler;
+import com.yy.httpproxy.serializer.JsonPushSerializer;
+import com.yy.httpproxy.serializer.JsonSerializer;
 import com.yy.httpproxy.subscribe.SharedPreferencePushIdGenerator;
-
-import java.util.HashMap;
-import java.util.Map;
 
 
 public class DrawActivity extends Activity {
@@ -49,8 +47,9 @@ public class DrawActivity extends Activity {
         latency = (TextView) findViewById(R.id.tv_latency);
         count = (TextView) findViewById(R.id.tv_count);
 
-//        String pushServerHost = "http://183.61.6.33";
-        String pushServerHost = "http://172.25.133.154:9101";
+        String pushServerHost = "http://183.61.6.33";
+//        String pushServerHost = "http://61.147.186.58";
+//        String pushServerHost = "http://172.25.133.154:9101";
 
         proxyClient = new ProxyClient(new Config(this.getApplicationContext())
                 .setHost(pushServerHost)
@@ -61,7 +60,7 @@ public class DrawActivity extends Activity {
             @Override
             public void onClick(View view) {
                 resetLatency();
-                proxyClient.request("POST", "http", "google.com", 8080, "/clear", new HashMap<String, String>(), null, null);
+                proxyClient.request("/clear", null, null);
             }
         });
 
@@ -75,9 +74,7 @@ public class DrawActivity extends Activity {
                 dot.yPercent = motionEvent.getY() / view.getHeight();
                 if (motionEvent.getAction() == MotionEvent.ACTION_DOWN || motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
 
-                    Map<String, String> headers = new HashMap<String, String>();
-
-                    proxyClient.request("POST", "http", "google.com", 8080, "/addDot", headers, dot, new ReplyHandler<DrawView.Dot>(DrawView.Dot.class) {
+                    proxyClient.request("/addDot", dot, new ReplyHandler<DrawView.Dot>(DrawView.Dot.class) {
                         @Override
                         public void onSuccess(DrawView.Dot result) {
                             Log.d(TAG, "proxy reply " + result);
@@ -92,7 +89,7 @@ public class DrawActivity extends Activity {
 
                     return true;
                 } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
-                    proxyClient.request("POST", "http", "google.com", 8080, "/endLine", new HashMap<String, String>(), dot, null);
+                    proxyClient.request("/endLine", dot, null);
                     return true;
                 } else {
                     return false;
@@ -120,7 +117,6 @@ public class DrawActivity extends Activity {
         });
 
         proxyClient.subscribeBroadcast("/endLine", new PushHandler<DrawView.Dot>(DrawView.Dot.class) {
-
             @Override
             public void onSuccess(DrawView.Dot result) {
                 drawView.endLine();
@@ -129,17 +125,6 @@ public class DrawActivity extends Activity {
 
         proxyClient.setPushId(new SharedPreferencePushIdGenerator(this).generatePushId());
 
-        proxyClient.subscribeBroadcast("/topic/pushAll", new PushHandler<String>(String.class) {
-
-            @Override
-            public void onSuccess(String result) {
-                Toast toast = Toast.makeText(DrawActivity.this, "pushAll recived " + result, Toast.LENGTH_SHORT);
-                toast.show();
-            }
-        });
-
-
     }
-
 
 }
