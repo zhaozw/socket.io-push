@@ -1,5 +1,6 @@
 package com.yy.httpproxy.emitter;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -21,7 +22,7 @@ import io.socket.emitter.Emitter;
 public class Benchmark {
 
     private static Logger logger = LoggerFactory.getLogger(Benchmark.class);
-    private static int numClients = 2000;
+    private static int numClients = 1000;
     private static String host = "http://183.61.6.33:8080";
     private static String redisHost = "183.61.6.33:6379";
     private static AtomicInteger connected = new AtomicInteger(0);
@@ -54,13 +55,28 @@ public class Benchmark {
                         JSONObject data = new JSONObject();
                         try {
                             logger.debug("connected");
-                            data.put("topic", "" + id);
-                            socket.emit("subscribeTopic", data);
+                            JSONObject object = new JSONObject();
+                            object.put("id", id + "");
+                            socket.emit("pushId", object);
+//                            data.put("topic", "" + id);
+//                            socket.emit("subscribeTopic", data);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
                     }
                 });
+
+                socket.on("pushId", new Emitter.Listener() {
+                    @Override
+                    public void call(Object... args) {
+                        try {
+                            request(socket, "/testRequest", "1231231234");
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+
                 socket.on("packetProxy", new Emitter.Listener() {
                     @Override
                     public void call(Object... args) {
@@ -69,6 +85,7 @@ public class Benchmark {
                         if (count % 10000 == 0) {
                             logger.info("total per second  {} ", 1000L * count / (System.currentTimeMillis() - timestamp));
                         }
+                        request(socket, "/testRequest", "1231231234");
                     }
                 });
                 socket.connect();
@@ -87,7 +104,7 @@ public class Benchmark {
         server.addHandler("/testRequest", new PacketHandler() {
             @Override
             void handle(String pushId, String sequenceId, String path, Object body) {
-                broadcast("/addDot", body);
+                reply(sequenceId, pushId, "/testRequest", body);
                 //reply(sequenceId, pushId, path, headers, body);
             }
         });
@@ -96,12 +113,12 @@ public class Benchmark {
 //            Thread t = new Thread(new Runnable() {
 //                @Override
 //                public void run() {
-                    while (true) {
-                        List<Integer> ids = new ArrayList(clients);
-                        for (Integer id : ids) {
-                            server.getEmitter().reply("test", id + "", "testdatatttttttttt".getBytes());
-                        }
-                    }
+        while (true) {
+            List<Integer> ids = new ArrayList(clients);
+            for (Integer id : ids) {
+                server.getEmitter().reply("test", id + "", "testdatatttttttttt".getBytes());
+            }
+        }
 //                }
 //            });
 //            t.start();
