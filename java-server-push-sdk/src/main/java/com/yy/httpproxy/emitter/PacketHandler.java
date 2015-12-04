@@ -42,9 +42,13 @@ public abstract class PacketHandler<T> {
     }
 
     public void reply(String sequenceId, String pushId, String path, T object) {
-        byte[] data = new byte[0];
+        byte[] data;
         try {
-            data = serializer.toBinary(path, object);
+            if (object == null || object instanceof byte[]) {
+                data = (byte[]) object;
+            } else {
+                data = serializer.toBinary(path, object);
+            }
             replyInternal(sequenceId, pushId, path, data);
         } catch (Exception e) {
             e.printStackTrace();
