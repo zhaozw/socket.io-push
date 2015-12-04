@@ -3,6 +3,8 @@ package com.yy.httpproxy.emitter;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import org.redisson.Redisson;
+import org.redisson.api.RTopicReactive;
+import org.redisson.api.RedissonReactiveClient;
 import org.redisson.core.RTopic;
 
 import java.math.BigInteger;
@@ -30,9 +32,9 @@ public class LoadBalancer {
         public String[] paths;
     }
 
-    public LoadBalancer(Redisson redisson, Map<String, PacketHandler> handlerMap) {
+    public LoadBalancer(RedissonReactiveClient redisson, Map<String, PacketHandler> handlerMap) {
         this.handlerMap = handlerMap;
-        final RTopic<HandlerInfo> packetServer = redisson.getTopic("packetServer" , new JsonJacksonCodecWithClass(HandlerInfo.class));
+        final RTopicReactive<HandlerInfo> packetServer = redisson.getTopic("packetServer" , new JsonJacksonCodecWithClass(HandlerInfo.class));
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -40,7 +42,7 @@ public class LoadBalancer {
                 info.serverId = serverId;
                 Set<String> paths = LoadBalancer.this.handlerMap.keySet();
                 info.paths = paths.toArray(new String[paths.size()]);
-                packetServer.publishAsync(info);
+                packetServer.publish(info);
             }
         }, timerDelay, timerDelay);
     }

@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.apache.commons.codec.binary.Base64;
 import org.redisson.Config;
 import org.redisson.Redisson;
+import org.redisson.api.RTopicReactive;
+import org.redisson.api.RedissonReactiveClient;
 import org.redisson.core.MessageListener;
 import org.redisson.core.RTopic;
 import org.slf4j.Logger;
@@ -23,7 +25,7 @@ public class PacketServer {
     private Emitter emitter;
     private Map<String, PacketHandler> handlerMap = new HashMap<>();
     private Logger logger = LoggerFactory.getLogger(this.getClass());
-    private Redisson redisson;
+    private RedissonReactiveClient redisson;
     private LoadBalancer loadBalancer;
 
     @JsonTypeInfo(
@@ -52,10 +54,10 @@ public class PacketServer {
     public PacketServer(String host) {
         Config config = new Config();
         config.useSingleServer().setAddress(host);
-        redisson = Redisson.create(config);
+        redisson = Redisson.createReactive(config);
         emitter = new Emitter(redisson);
         loadBalancer = new LoadBalancer(redisson, handlerMap);
-        RTopic<PackProxy> topic = redisson.getTopic("packetProxy#" + loadBalancer.getServerId(), new JsonJacksonCodecWithClass(PackProxy.class));
+        RTopicReactive<PackProxy> topic = redisson.getTopic("packetProxy#" + loadBalancer.getServerId(), new JsonJacksonCodecWithClass(PackProxy.class));
         topic.addListener(new MessageListener<PackProxy>() {
 
             public void onMessage(String channel, PackProxy message) {

@@ -4,6 +4,8 @@ import com.yy.httpproxy.emitter.protocol.PacketJson;
 
 import org.json.JSONObject;
 import org.redisson.Redisson;
+import org.redisson.api.RTopicReactive;
+import org.redisson.api.RedissonReactiveClient;
 import org.redisson.client.codec.StringCodec;
 import org.redisson.core.RTopic;
 
@@ -15,9 +17,9 @@ import sun.misc.BASE64Encoder;
 public class Emitter {
 
     private BASE64Encoder base64Encoder = new BASE64Encoder();
-    RTopic<byte[]> rTopic;
+    RTopicReactive<byte[]> rTopic;
 
-    public Emitter(Redisson redisson) {
+    public Emitter(RedissonReactiveClient redisson) {
         rTopic = redisson.getTopic("socket.io#emitter", BytesCodec.INSTANCE);
     }
 
@@ -38,7 +40,7 @@ public class Emitter {
         rooms.add(topic);
         packet.setRooms(rooms);
 
-        rTopic.publishAsync(packet.getBytes());
+        rTopic.publish(packet.getBytes());
 
     }
 
