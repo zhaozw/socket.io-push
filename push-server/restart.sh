@@ -10,6 +10,5 @@ for (( c=1; c<=COUNT; c++ ))
 do
 	export LBS_INSTANCE="$c"
 	echo "starting server no $c"
-    node .
-	#nohup node --max-old-space-size=4096 . > log.txt 2>&1 & echo $! >> pids
+	nohup node --max-old-space-size=2048 . > log.txt 2>&1 & echo $! >> pids
 done
