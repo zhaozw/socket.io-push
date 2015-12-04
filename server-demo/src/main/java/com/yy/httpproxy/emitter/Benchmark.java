@@ -92,10 +92,10 @@ public class Benchmark {
             }
         });
 
-        for (int i = 0; i < 5; i++) {
-            Thread t = new Thread(new Runnable() {
-                @Override
-                public void run() {
+//        for (int i = 0; i < 5; i++) {
+//            Thread t = new Thread(new Runnable() {
+//                @Override
+//                public void run() {
                     while (true) {
                         List<Integer> ids = new ArrayList(clients);
                         for (Integer id : ids) {
@@ -103,11 +103,11 @@ public class Benchmark {
                         }
                     }
                 }
-            });
-            t.start();
-        }
-
-        Thread.sleep(100000000005435L);
+//            });
+//            t.start();
+//        }
+//
+//        Thread.sleep(100000000005435L);
 
     }
 
