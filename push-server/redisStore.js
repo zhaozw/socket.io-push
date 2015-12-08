@@ -71,7 +71,6 @@ function hashIndex(pushId,count) {
 RedisStore.prototype.publishPacket = function(data) {
     var path = data.path;
     var pushId = data.pushId;
-    data.replyTopic = this.directKey;
     if(path && pushId) {
         if(!data.sequenceId) {
             data.sequenceId = randomstring.generate(16);

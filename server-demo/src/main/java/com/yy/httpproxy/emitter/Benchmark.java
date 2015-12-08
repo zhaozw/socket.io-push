@@ -25,10 +25,10 @@ import io.socket.emitter.Emitter;
 public class Benchmark {
 
     private static Logger logger = LoggerFactory.getLogger(Benchmark.class);
-    private static int numClients = 500;
+    private static int numClients = 100;
     private static String host = "http://183.61.6.33:8080";
     private static String redisHost = "183.61.6.33:6379";
-    //    private static String host = "http://172.25.133.154:9101";
+//    private static String host = "http://172.25.133.154:9101";
 //    private static String redisHost = "172.25.133.154:6379";
     private static AtomicInteger connected = new AtomicInteger(0);
     private static AtomicLong numRequests = new AtomicLong(0);
@@ -93,8 +93,8 @@ public class Benchmark {
                         logger.debug("packetProxy");
                         long count = numRequests.incrementAndGet();
                         //logger.debug("receive push {}", count);
-                        if (count > 0 && count % 10000 == 0) {
-                            logger.info("total per second  {} {}", 1000L * count / (System.currentTimeMillis() - timestamp), count);
+                        if (seqId.get() > 0 && seqId.get() % 10000 == 0) {
+                            logger.info("total per second  {} {}", 1000L * seqId.get() / (System.currentTimeMillis() - timestamp), count);
                         }
                         request(socket, "/testRequest", "1231231234");
                     }
