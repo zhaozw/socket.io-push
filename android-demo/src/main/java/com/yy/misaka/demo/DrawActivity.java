@@ -1,6 +1,7 @@
 package com.yy.misaka.demo;
 
 import android.app.Activity;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -15,6 +16,8 @@ import com.yy.httpproxy.serializer.JsonPushSerializer;
 import com.yy.httpproxy.serializer.JsonSerializer;
 import com.yy.httpproxy.subscribe.SharedPreferencePushIdGenerator;
 
+import java.util.Random;
+
 
 public class DrawActivity extends Activity {
 
@@ -25,12 +28,20 @@ public class DrawActivity extends Activity {
     private TextView count;
     private long totalTime;
     private long totalCount;
+    public int myColors[] ={Color.BLACK,Color.DKGRAY,Color.GRAY,Color.LTGRAY,Color.WHITE,Color.RED,Color.GREEN,Color.BLUE ,Color.YELLOW,Color.MAGENTA};
+    public int myColor;
 
 
     private void updateLatency(long timestamp) {
         totalTime += System.currentTimeMillis() - timestamp;
         totalCount++;
         latency.setText((totalTime / totalCount) + "ms");
+    }
+
+    private void update(long timestamp, int num) {
+        totalTime += System.currentTimeMillis() - timestamp;
+        latency.setText((totalTime / num) + "ms");
+        count.setText(""+num);
     }
 
     private void resetLatency() {
@@ -51,6 +62,10 @@ public class DrawActivity extends Activity {
 //        String pushServerHost = "http://61.147.186.58";
         String pushServerHost = "http://172.25.133.154:9101";
 
+        Random random = new Random();
+        int num = random.nextInt(myColors.length);
+        myColor = myColors[num];
+
         proxyClient = new ProxyClient(new Config(this.getApplicationContext())
                 .setHost(pushServerHost)
                 .setPushSerializer(new JsonPushSerializer())
@@ -64,6 +79,15 @@ public class DrawActivity extends Activity {
             }
         });
 
+        findViewById(R.id.btn_clearColor).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DrawView.Dot dot = new DrawView.Dot();
+                dot.myColor = myColor;
+                proxyClient.request("/clearColor", dot, null);
+            }
+        });
+
         drawView = (DrawView) findViewById(R.id.draw_view);
 
         drawView.setOnTouchListener(new View.OnTouchListener() {
@@ -72,11 +96,12 @@ public class DrawActivity extends Activity {
                 DrawView.Dot dot = new DrawView.Dot();
                 dot.xPercent = motionEvent.getX() / view.getWidth();
                 dot.yPercent = motionEvent.getY() / view.getHeight();
+                dot.myColor  = myColor;
                 if (motionEvent.getAction() == MotionEvent.ACTION_DOWN || motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
 
                     proxyClient.request("/addDot", dot, new ReplyHandler<DrawView.Dot>(DrawView.Dot.class) {
                         @Override
-                        public void onSuccess(DrawView.Dot result) {
+                          public void onSuccess(DrawView.Dot result) {
                             Log.d(TAG, "proxy reply " + result);
                             updateLatency(result.timestamp);
                         }
@@ -120,6 +145,18 @@ public class DrawActivity extends Activity {
             @Override
             public void onSuccess(DrawView.Dot result) {
                 drawView.endLine();
+            }
+        });
+
+        proxyClient.subscribeBroadcast("/clearColor", new PushHandler<DrawView.Dot>(DrawView.Dot.class) {
+            @Override
+            public void onSuccess(DrawView.Dot result) {
+                int count = drawView.clearColor(result);
+                if(count == 0){
+                    resetLatency();
+                } else {
+                    update(result.timestamp, count);
+                }
             }
         });
 

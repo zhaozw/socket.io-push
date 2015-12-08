@@ -9,6 +9,7 @@ import android.util.AttributeSet;
 import android.view.View;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -17,16 +18,16 @@ import java.util.List;
 public class DrawView extends View {
 
     public static class Dot {
-
         public float xPercent;
         public float yPercent;
+        public int myColor;
         public long timestamp = System.currentTimeMillis();
 
         @Override
         public String toString() {
             return "Dot{" +
                     "xPercent=" + xPercent +
-                    ", yPercent=" + yPercent +
+                    ", yPercent=" + yPercent + ", myColor = " + myColor +
                     '}';
         }
     }
@@ -52,7 +53,6 @@ public class DrawView extends View {
 
         Paint paint = new Paint();
 
-        paint.setColor(Color.RED);
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(6);
 
@@ -63,6 +63,7 @@ public class DrawView extends View {
             for (Dot dot : line) {
                 float x = dot.xPercent * canvas.getWidth();
                 float y = dot.yPercent * canvas.getHeight();
+                paint.setColor(dot.myColor);
                 if (first) {
                     first = false;
                     path.moveTo(x, y);
@@ -92,5 +93,24 @@ public class DrawView extends View {
     public void clear() {
         lines.clear();
         invalidate();
+    }
+
+    public int  clearColor(Dot dot){
+        int color = dot.myColor;
+        int count = 0;
+        for(Iterator it = lines.iterator(); it.hasNext();){
+            ArrayList<Dot> dots = (ArrayList<Dot>)it.next();
+
+            for (Iterator itDot = dots.iterator(); itDot.hasNext();){
+                Dot temp = (Dot)itDot.next();
+                if (temp.myColor == color) {
+                    itDot.remove();
+                } else {
+                    count++;
+                }
+            }
+        }
+        invalidate();
+        return count;
     }
 }

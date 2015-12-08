@@ -44,6 +44,13 @@ public class DemoServer {
             }
         });
 
+        server.addHandler("/clearColor", new PacketHandler<byte[]>(byte.class, byteSerializer) {
+            @Override
+            void handle(String pushId, String sequenceId, String path, byte[] body) {
+                broadcast("/clearColor", body);
+            }
+        });
+
         server.addHandler("/clear", new PacketHandler<byte[]>(byte.class, byteSerializer) {
             @Override
             void handle(String pushId, String sequenceId, String path, byte[] body) {

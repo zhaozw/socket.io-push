@@ -18,6 +18,7 @@
         android:id="@+id/btn_clear"
         />
 
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -38,4 +39,13 @@
         android:id="@+id/tv_count"
         />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_toLeftOf="@+id/btn_clear"
+        android:layout_marginRight="10dp"
+        android:text="ClearColor"
+        android:id="@+id/btn_clearColor"
+        />
 </RelativeLayout>
