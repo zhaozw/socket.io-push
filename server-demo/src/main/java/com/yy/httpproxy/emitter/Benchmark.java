@@ -37,6 +37,13 @@ public class Benchmark {
             numClients = Integer.parseInt(args[3]);
         }
         Random random = new Random();
+        final PacketServer server = new PacketServer(redisHost);
+        server.addHandler("/testRequest", new PacketHandler() {
+            @Override
+            void handle(String pushId, String sequenceId, String path, Object body) {
+                reply(pushId, sequenceId, "/testRequest", body);
+            }
+        });
         logger.info("benchmarking {} numClients:{}", host, numClients);
         for (int i = 0; i < numClients; i++) {
             try {
@@ -99,31 +106,24 @@ public class Benchmark {
         Thread.sleep(2000l);
         logger.info("all connected");
         timestamp = System.currentTimeMillis();
-        final PacketServer server = new PacketServer(redisHost);
-        server.addHandler("/testRequest", new PacketHandler() {
-            @Override
-            void handle(String pushId, String sequenceId, String path, Object body) {
-                reply(pushId, sequenceId, "/testRequest", body);
-                //reply(sequenceId, pushId, path, headers, body);
-            }
-        });
+
 
 //        for (int i = 0; i < 5; i++) {
 //            Thread t = new Thread(new Runnable() {
 //                @Override
 //                public void run() {
-        while (true) {
-            List<Integer> ids = new ArrayList(clients);
-            for (Integer id : ids) {
-                server.getEmitter().reply("test", id + "", "testdatatttttttttt".getBytes());
-            }
-        }
+//        while (true) {
+//            List<Integer> ids = new ArrayList(clients);
+//            for (Integer id : ids) {
+//                server.getEmitter().reply("test", id + "", "testdatatttttttttt".getBytes());
+//            }
+//        }
 //                }
 //            });
 //            t.start();
 //        }
 //
-//        Thread.sleep(100000000005435L);
+        Thread.sleep(100000000005435L);
 
     }
 
