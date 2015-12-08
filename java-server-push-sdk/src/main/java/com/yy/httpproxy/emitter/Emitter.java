@@ -48,18 +48,17 @@ public class Emitter {
         list.add("emitter");
 
         Map info = new HashMap();
-        info.put("rooms", new String[]{topic});
-        info.put("flags", new String[]{});
         info.put("nsp", "/");
         info.put("type", 2);
-
-
         List dataList = new ArrayList();
         dataList.add(event);
         dataList.add(dataInfo);
         info.put("data", dataList);
         list.add(info);
-        list.add(true);
+
+        Map opts = new HashMap();
+        opts.put("rooms", new String[]{topic});
+        list.add(opts);
 
         //
         // Serialize
