@@ -65,7 +65,7 @@ public class PacketServer {
                 logger.debug("onMessage {} {}", channel, message);
                 PacketHandler handler = handlerMap.get(message.path);
                 if (handler != null) {
-                    handler.handleBinary(message.replyTopic, message.pushId, message.sequenceId, message.path, Base64.decodeBase64(message.data));
+                    handler.handleBinary(message.pushId, message.sequenceId, message.path, Base64.decodeBase64(message.data));
                 }
             }
         });
