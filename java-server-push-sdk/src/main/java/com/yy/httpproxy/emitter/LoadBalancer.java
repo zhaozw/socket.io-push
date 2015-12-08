@@ -44,7 +44,7 @@ public class LoadBalancer {
                 info.paths = paths.toArray(new String[paths.size()]);
                 packetServer.publish(info);
             }
-        }, timerDelay, timerDelay);
+        }, 100L, timerDelay);
     }
 
     public String getServerId() {

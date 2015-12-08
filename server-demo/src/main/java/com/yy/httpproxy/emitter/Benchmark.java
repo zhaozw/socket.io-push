@@ -1,11 +1,14 @@
 package com.yy.httpproxy.emitter;
 
+import org.apache.commons.codec.binary.Base64;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigInteger;
 import java.net.URISyntaxException;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -21,14 +24,16 @@ import io.socket.emitter.Emitter;
 public class Benchmark {
 
     private static Logger logger = LoggerFactory.getLogger(Benchmark.class);
-    private static int numClients = 500;
+    private static int numClients = 1000;
     private static String host = "http://183.61.6.33:8080";
     private static String redisHost = "183.61.6.33:6379";
+    //    private static String host = "http://172.25.133.154:9101";
+//    private static String redisHost = "172.25.133.154:6379";
     private static AtomicInteger connected = new AtomicInteger(0);
     private static AtomicInteger numRequests = new AtomicInteger(0);
     private static AtomicInteger seqId = new AtomicInteger(0);
     private static long timestamp = 0;
-    private static ArrayList<Integer> clients = new ArrayList<>();
+    private static ArrayList<String> clients = new ArrayList<>();
 
     public static void main(String[] args) throws InterruptedException {
         if (args.length > 0) {
@@ -36,11 +41,11 @@ public class Benchmark {
             redisHost = args[1];
             numClients = Integer.parseInt(args[3]);
         }
-        Random random = new Random();
         final PacketServer server = new PacketServer(redisHost);
         server.addHandler("/testRequest", new PacketHandler() {
             @Override
             void handle(String pushId, String sequenceId, String path, Object body) {
+                logger.debug("reply {}", pushId);
                 reply(pushId, sequenceId, "/testRequest", body);
             }
         });
@@ -52,20 +57,17 @@ public class Benchmark {
                 opts.forceNew = true;
                 opts.transports = new String[]{"websocket"};
                 socket = IO.socket(host, opts);
-                final int id = Math.abs(random.nextInt());
+                final String id = new BigInteger(130, new SecureRandom()).toString(32);
                 clients.add(id);
                 socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
                     @Override
                     public void call(Object... args) {
                         connected.addAndGet(1);
-                        JSONObject data = new JSONObject();
                         try {
-                            logger.debug("connected");
                             JSONObject object = new JSONObject();
-                            object.put("id", id + "");
+                            object.put("id", id);
+                            logger.debug("connected {}", id);
                             socket.emit("pushId", object);
-//                            data.put("topic", "" + id);
-//                            socket.emit("subscribeTopic", data);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -75,6 +77,7 @@ public class Benchmark {
                 socket.on("pushId", new Emitter.Listener() {
                     @Override
                     public void call(Object... args) {
+                        logger.debug("pushId {}", args);
                         try {
                             request(socket, "/testRequest", "1231231234");
                         } catch (JSONException e) {
@@ -86,6 +89,7 @@ public class Benchmark {
                 socket.on("packetProxy", new Emitter.Listener() {
                     @Override
                     public void call(Object... args) {
+                        logger.debug("packetProxy");
                         int count = numRequests.incrementAndGet();
                         //logger.debug("receive push {}", count);
                         if (count % 10000 == 0) {
@@ -135,16 +139,14 @@ public class Benchmark {
                 return;
             }
 
-            JSONObject headers = new JSONObject();
 
             JSONObject object = new JSONObject();
-            object.put("headers", headers);
-            object.put("data", data);
+            object.put("data", Base64.encodeBase64String(data.getBytes()));
             object.put("path", path);
             object.put("sequenceId", String.valueOf(seqId.incrementAndGet()));
-
             socket.emit("packetProxy", object);
 
+            logger.debug("request {}", path);
 
         } catch (Exception e) {
         }
