@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import io.socket.client.IO;
 import io.socket.client.Socket;
@@ -24,14 +25,14 @@ import io.socket.emitter.Emitter;
 public class Benchmark {
 
     private static Logger logger = LoggerFactory.getLogger(Benchmark.class);
-    private static int numClients = 1000;
+    private static int numClients = 500;
     private static String host = "http://183.61.6.33:8080";
     private static String redisHost = "183.61.6.33:6379";
     //    private static String host = "http://172.25.133.154:9101";
 //    private static String redisHost = "172.25.133.154:6379";
     private static AtomicInteger connected = new AtomicInteger(0);
-    private static AtomicInteger numRequests = new AtomicInteger(0);
-    private static AtomicInteger seqId = new AtomicInteger(0);
+    private static AtomicLong numRequests = new AtomicLong(0);
+    private static AtomicLong seqId = new AtomicLong(0);
     private static long timestamp = 0;
     private static ArrayList<String> clients = new ArrayList<>();
 
@@ -90,10 +91,10 @@ public class Benchmark {
                     @Override
                     public void call(Object... args) {
                         logger.debug("packetProxy");
-                        int count = numRequests.incrementAndGet();
+                        long count = numRequests.incrementAndGet();
                         //logger.debug("receive push {}", count);
-                        if (count % 10000 == 0) {
-                            logger.info("total per second  {} ", 1000L * count / (System.currentTimeMillis() - timestamp));
+                        if (count > 0 && count % 10000 == 0) {
+                            logger.info("total per second  {} {}", 1000L * count / (System.currentTimeMillis() - timestamp), count);
                         }
                         request(socket, "/testRequest", "1231231234");
                     }
@@ -103,13 +104,14 @@ public class Benchmark {
                 throw new RuntimeException(e);
             }
         }
-
+        Thread.sleep(2000l);
+        timestamp = System.currentTimeMillis();
         while (connected.get() != numClients) {
             Thread.sleep(25l);
         }
         Thread.sleep(2000l);
         logger.info("all connected");
-        timestamp = System.currentTimeMillis();
+
 
 
 //        for (int i = 0; i < 5; i++) {
