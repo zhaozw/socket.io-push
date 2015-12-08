@@ -37,11 +37,11 @@ public abstract class PacketHandler<T> {
         }
     }
 
-    private void replyInternal(String sequenceId, String pushId, String path, byte[] data) {
-        emitter.reply(sequenceId, pushId, data);
+    private void replyInternal( String pushId, String sequenceId, byte[] data) {
+        emitter.reply(pushId, sequenceId, data);
     }
 
-    public void reply(String sequenceId, String pushId, String path, T object) {
+    public void reply(String pushId, String sequenceId, String path, T object) {
         byte[] data;
         try {
             if (object == null || object instanceof byte[]) {
@@ -49,7 +49,7 @@ public abstract class PacketHandler<T> {
             } else {
                 data = serializer.toBinary(path, object);
             }
-            replyInternal(sequenceId, pushId, path, data);
+            replyInternal(pushId, sequenceId, data);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -66,7 +66,7 @@ public abstract class PacketHandler<T> {
         } else {
             try {
                 object = (T) serializer.toObject(path, clazz, body);
-                handle(pushId, sequenceId, path, object);
+                handle( pushId, sequenceId, path, object);
             } catch (Exception e) {
                 e.printStackTrace();
             }

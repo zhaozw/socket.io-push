@@ -34,42 +34,45 @@ public abstract class Packet implements MessagePackable {
 
 	@Override
 	public void writeTo(Packer packer) throws IOException {
-		packer.writeArrayBegin(2);
-		
-		packer.writeMapBegin(3);
-		packer.write("type");
-		packer.write(this.type);
-		packer.write("data");
-		this.packData(packer);
-		
-		packer.write("nsp");
-		packer.write(this.nsp);
-		packer.writeMapEnd(true);
-		
 
-		packer.writeMapBegin(2);
-		
-		packer.write("rooms");
-		packer.writeArrayBegin(rooms.size());
-		for(String room : rooms) {
-			packer.write(room);
-		}
-		packer.writeArrayEnd(true);
-		
-		packer.write("flags");
-		packer.writeMapBegin(flags.size());
-		Iterator<Entry<String, Object>> it = flags.entrySet().iterator();
-	    while (it.hasNext()) {
-	        Entry<String, Object> pairs = (Entry<String, Object>)it.next();
-	        packer.write(pairs.getKey());
-	        packer.write( pairs.getValue());
-	        it.remove(); // avoids a ConcurrentModificationException
-	    }
-		packer.writeMapEnd(true);
-		
-		packer.writeMapEnd(true);
-		
-		packer.writeArrayEnd(true);
+
+
+//		packer.writeArrayBegin(2);
+//
+//		packer.writeMapBegin(3);
+//		packer.write("type");
+//		packer.write(this.type);
+//		packer.write("data");
+//		this.packData(packer);
+//
+//		packer.write("nsp");
+//		packer.write(this.nsp);
+//		packer.writeMapEnd(true);
+//
+//
+//		packer.writeMapBegin(2);
+//
+//		packer.write("rooms");
+//		packer.writeArrayBegin(rooms.size());
+//		for(String room : rooms) {
+//			packer.write(room);
+//		}
+//		packer.writeArrayEnd(true);
+//
+//		packer.write("flags");
+//		packer.writeMapBegin(flags.size());
+//		Iterator<Entry<String, Object>> it = flags.entrySet().iterator();
+//	    while (it.hasNext()) {
+//	        Entry<String, Object> pairs = (Entry<String, Object>)it.next();
+//	        packer.write(pairs.getKey());
+//	        packer.write( pairs.getValue());
+//	        it.remove(); // avoids a ConcurrentModificationException
+//	    }
+//		packer.writeMapEnd(true);
+//
+//		packer.writeMapEnd(true);
+//
+//		packer.writeArrayEnd(true);
 		
 	}
 

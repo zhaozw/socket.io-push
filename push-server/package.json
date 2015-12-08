@@ -1,0 +1,19 @@
+{
+  "name": "push-server",
+  "version": "0.0.1",
+  "description": "[![Build Status](https://travis-ci.org/Automattic/socket.io-redis.svg?branch=master)](https://travis-ci.org/Automattic/socket.io-redis) [![NPM version](https://badge.fury.io/js/socket.io-redis.svg)](http://badge.fury.io/js/socket.io-redis)",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:Automattic/socket.io-redis.git"
+  },
+  "dependencies": {
+    "apn": "1.7.5 ",
+    "restify": "4.0.3",
+    "randomstring": "1.1.3",
+    "debug": "2.2.0",
+    "socket.io": "1.3.7 ",
+    "socket.io-adapter" : "0.4.0",
+    "socket.io-redis" : "0.2.0",
+    "redis": "2.3.0"
+  }
+}

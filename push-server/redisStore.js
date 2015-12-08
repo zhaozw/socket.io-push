@@ -12,11 +12,13 @@ var apnConnection = new apn.Connection(options);
 var pathToServer = {};
 
 
-function RedisStore(redis,subClient){
-    if (!(this instanceof RedisStore)) return new RedisStore(redis,subClient);
+function RedisStore(redis,subClient,directKey){
+    if (!(this instanceof RedisStore)) return new RedisStore(redis,subClient,directKey);
     this.redis = redis;
+    this.directKey = directKey;
+    debug("RedisStore directKey %s",directKey);
     subClient.on("message", function (channel, message) {
-        debug("subscribe message " + channel + ": " + message);
+        //debug("subscribe message " + channel + ": " + message);
         if(channel === "packetServer" ) {
             var handlerInfo = JSON.parse(message);
             updatePathServer(handlerInfo);
@@ -52,7 +54,7 @@ function updatePathServer(handlerInfo){
         }
         pathToServer[path] = updatedServers;
     }
-    debug("updatePathServer %s",JSON.stringify(pathToServer));
+//    debug("updatePathServer %s",JSON.stringify(pathToServer));
 }
 
 function hashIndex(pushId,count) {
@@ -69,6 +71,7 @@ function hashIndex(pushId,count) {
 RedisStore.prototype.publishPacket = function(data) {
     var path = data.path;
     var pushId = data.pushId;
+    data.replyTopic = this.directKey;
     if(path && pushId) {
         if(!data.sequenceId) {
             data.sequenceId = randomstring.generate(16);

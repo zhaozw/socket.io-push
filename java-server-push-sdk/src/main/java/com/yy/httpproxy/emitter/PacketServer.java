@@ -38,6 +38,7 @@ public class PacketServer {
         public String path;
         public String data;
         public String sequenceId;
+        public String replyTopic;
         public String pushId;
 
         @Override
@@ -61,14 +62,13 @@ public class PacketServer {
         topic.addListener(new MessageListener<PackProxy>() {
 
             public void onMessage(String channel, PackProxy message) {
-                logger.debug("onMessage {}", channel, message);
+                logger.debug("onMessage {} {}", channel, message);
                 PacketHandler handler = handlerMap.get(message.path);
                 if (handler != null) {
-                    handler.handleBinary(message.pushId, message.sequenceId, message.path, Base64.decodeBase64(message.data));
+                    handler.handleBinary(message.replyTopic, message.pushId, message.sequenceId, message.path, Base64.decodeBase64(message.data));
                 }
             }
         });
-
 
 
     }

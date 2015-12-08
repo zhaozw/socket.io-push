@@ -6,3 +6,5 @@ npm install --unsafe-perm restify
 npm install --unsafe-perm http
 npm install --unsafe-perm apn
 npm install --unsafe-perm randomstring
+npm install --unsafe-perm uid2
+npm install --unsafe-perm msgpack-js

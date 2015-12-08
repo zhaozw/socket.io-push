@@ -6,13 +6,14 @@ var ioPort = config["io_" + instance].port;
 var apiPort = config["api_" + instance].port;
 console.log("start server on port " + ioPort);
 var io = require('socket.io')(ioPort);
-var socketIoRedis = require('socket.io-redis');
-io.adapter(socketIoRedis({ host: config.redis.host , port: config.redis.port }));
-
+var socketIoRedis = require('socket.io-redis')({ host: config.redis.host , port: config.redis.port });
+io.adapter(socketIoRedis);
+var directKey = socketIoRedis.directKey;
+console.log(socketIoRedis.directKey);
 var redis = require("redis")
 var pubClient = redis.createClient({ host: config.redis.host, port: config.redis.port });
 var subClient = redis.createClient({ host: config.redis.host, port: config.redis.port });
-var redisStore = require('./redisStore.js')(pubClient,subClient);
+var redisStore = require('./redisStore.js')(pubClient,subClient,directKey);
 var stats = require('./stats.js')();
 
 

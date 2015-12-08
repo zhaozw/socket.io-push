@@ -16,7 +16,8 @@ public class DemoServer {
 
     public static void main(String[] args) throws IOException, InterruptedException {
 
-        PacketServer server = new PacketServer("183.61.6.33:6379");
+        PacketServer server = new PacketServer("localhost:6379");
+//        PacketServer server = new PacketServer("183.61.6.33:6379");
 
         server.addHandler(PacketHandler.DISCONNECT, new PacketHandler() {
             @Override
@@ -31,7 +32,7 @@ public class DemoServer {
             @Override
             void handle(String pushId, String sequenceId, String path, Dot body) {
                 broadcast("/addDot", body);
-                reply(sequenceId, pushId, path, body);
+                reply(pushId, sequenceId, path, body);
             }
 
         });
