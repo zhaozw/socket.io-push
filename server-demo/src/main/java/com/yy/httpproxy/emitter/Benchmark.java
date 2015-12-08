@@ -103,7 +103,7 @@ public class Benchmark {
         server.addHandler("/testRequest", new PacketHandler() {
             @Override
             void handle(String pushId, String sequenceId, String path, Object body) {
-                reply(sequenceId, pushId, "/testRequest", body);
+                reply(pushId, sequenceId, "/testRequest", body);
                 //reply(sequenceId, pushId, path, headers, body);
             }
         });
