@@ -21,9 +21,9 @@ public class DefaultNotificationHandler implements NotificationHandler {
         String intentName = context.getApplicationInfo().packageName + INTENT_TAIL;
         Intent pushIntent = new Intent(intentName);
         pushIntent.putExtra("cmd", RemoteService.CMD_NOTIFICATION_CLICKED);
-        pushIntent.putExtra("id", pushedNotification.values);
+        pushIntent.putExtra("id", pushedNotification.id);
         pushIntent.putExtra("notification", pushedNotification.values);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 1, pushIntent, 0);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 1, pushIntent, PendingIntent.FLAG_ONE_SHOT);
 
 
         NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);

@@ -19,7 +19,7 @@ apply plugin: 'idea'
 apply plugin: 'spring-boot'
 
 task execute(type:JavaExec){
-    main = "com.yy.httpproxy.emitter.Benchmark"
+    main = "com.yy.httpproxy.emitter.BenchmarkPush"
     classpath = sourceSets.main.runtimeClasspath
 }
 

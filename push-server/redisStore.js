@@ -11,6 +11,17 @@ var apnConnection = new apn.Connection(options);
 
 var pathToServer = {};
 
+String.prototype.hashCode = function(){
+	var hash = 0;
+	if (this.length == 0) return hash;
+	for (i = 0; i < this.length; i++) {
+		char = this.charCodeAt(i);
+		hash = ((hash<<5)-hash)+char;
+		hash = hash & hash; // Convert to 32bit integer
+	}
+	return hash;
+}
+
 
 function RedisStore(redis,subClient,directKey){
     if (!(this instanceof RedisStore)) return new RedisStore(redis,subClient,directKey);
@@ -58,14 +69,7 @@ function updatePathServer(handlerInfo){
 }
 
 function hashIndex(pushId,count) {
-    var hash = 0;
-    if (pushId.length == 0) return hash;
-    for (i = 0; i < pushId.length; i++) {
-        char = pushId.charCodeAt(i);
-        hash = ((hash<<5)-hash)+char;
-        hash = hash & hash; // Convert to 32bit integer
-    }
-    return hash % count;
+    return pushId.hashCode() % count;
 }
 
 RedisStore.prototype.publishPacket = function(data) {
@@ -80,8 +84,8 @@ RedisStore.prototype.publishPacket = function(data) {
         if(servers){
             var serverCount = servers.length;
             var idx = hashIndex(pushId,serverCount);
-            if(pathToServer[path][idx]){
-                var serverId = pathToServer[path][idx]["serverId"];
+            if(servers[idx]){
+                var serverId = servers[idx]["serverId"];
                 this.redis.publish("packetProxy#" + serverId , strData);
                 debug("publishPacket %s %s", serverId,strData);
                 return;

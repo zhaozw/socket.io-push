@@ -28,7 +28,7 @@ public class DrawActivity extends Activity {
     private TextView count;
     private long totalTime;
     private long totalCount;
-    public int myColors[] ={Color.BLACK,Color.DKGRAY,Color.GRAY,Color.LTGRAY,Color.WHITE,Color.RED,Color.GREEN,Color.BLUE ,Color.YELLOW,Color.MAGENTA};
+    public int myColors[] = {Color.BLACK, Color.DKGRAY, Color.CYAN, Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW, Color.MAGENTA};
     public int myColor;
 
 
@@ -41,7 +41,7 @@ public class DrawActivity extends Activity {
     private void update(long timestamp, int num) {
         totalTime += System.currentTimeMillis() - timestamp;
         latency.setText((totalTime / num) + "ms");
-        count.setText(""+num);
+        count.setText("" + num);
     }
 
     private void resetLatency() {
@@ -96,12 +96,12 @@ public class DrawActivity extends Activity {
                 DrawView.Dot dot = new DrawView.Dot();
                 dot.xPercent = motionEvent.getX() / view.getWidth();
                 dot.yPercent = motionEvent.getY() / view.getHeight();
-                dot.myColor  = myColor;
+                dot.myColor = myColor;
                 if (motionEvent.getAction() == MotionEvent.ACTION_DOWN || motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
 
                     proxyClient.request("/addDot", dot, new ReplyHandler<DrawView.Dot>(DrawView.Dot.class) {
                         @Override
-                          public void onSuccess(DrawView.Dot result) {
+                        public void onSuccess(DrawView.Dot result) {
                             Log.d(TAG, "proxy reply " + result);
                             updateLatency(result.timestamp);
                         }
@@ -152,7 +152,7 @@ public class DrawActivity extends Activity {
             @Override
             public void onSuccess(DrawView.Dot result) {
                 int count = drawView.clearColor(result);
-                if(count == 0){
+                if (count == 0) {
                     resetLatency();
                 } else {
                     update(result.timestamp, count);
