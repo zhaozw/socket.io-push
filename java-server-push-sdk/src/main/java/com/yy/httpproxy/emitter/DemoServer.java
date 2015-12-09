@@ -16,8 +16,8 @@ public class DemoServer {
 
     public static void main(String[] args) throws IOException, InterruptedException {
 
-        PacketServer server = new PacketServer("localhost:6379");
-//        PacketServer server = new PacketServer("183.61.6.33:6379");
+//        PacketServer server = new PacketServer("localhost:6379");
+        PacketServer server = new PacketServer("183.61.6.33:6379");
 
         server.addHandler(PacketHandler.DISCONNECT, new PacketHandler() {
             @Override

@@ -8,12 +8,10 @@ console.log("start server on port " + ioPort);
 var io = require('socket.io')(ioPort);
 var socketIoRedis = require('socket.io-redis')({ host: config.redis.host , port: config.redis.port });
 io.adapter(socketIoRedis);
-var directKey = socketIoRedis.directKey;
-console.log(socketIoRedis.directKey);
 var redis = require("redis")
 var pubClient = redis.createClient({ host: config.redis.host, port: config.redis.port });
 var subClient = redis.createClient({ host: config.redis.host, port: config.redis.port });
-var redisStore = require('./redisStore.js')(pubClient,subClient,directKey);
+var redisStore = require('./redisStore.js')(pubClient,subClient);
 var stats = require('./stats.js')();
 
 

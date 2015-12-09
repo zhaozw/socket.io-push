@@ -23,11 +23,9 @@ String.prototype.hashCode = function(){
 }
 
 
-function RedisStore(redis,subClient,directKey){
-    if (!(this instanceof RedisStore)) return new RedisStore(redis,subClient,directKey);
+function RedisStore(redis,subClient){
+    if (!(this instanceof RedisStore)) return new RedisStore(redis,subClient);
     this.redis = redis;
-    this.directKey = directKey;
-    debug("RedisStore directKey %s",directKey);
     subClient.on("message", function (channel, message) {
         //debug("subscribe message " + channel + ": " + message);
         if(channel === "packetServer" ) {
