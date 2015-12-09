@@ -20,6 +20,7 @@ public class Config {
     private PushIdGenerator pushIdGenerator;
     private PushSerializer pushSerializer;
     private String host;
+    private String notificationHandler;
 
     public Config(Context context) {
         this.context = context;
@@ -27,7 +28,7 @@ public class Config {
 
     public RemoteClient getRemoteClient() {
         if (remoteClient == null) {
-            remoteClient = new RemoteClient(context, host, null);
+            remoteClient = new RemoteClient(context, host, notificationHandler);
         }
         return remoteClient;
     }
@@ -61,6 +62,11 @@ public class Config {
 
     public Config setPushSerializer(PushSerializer pushSerializer) {
         this.pushSerializer = pushSerializer;
+        return this;
+    }
+
+    public Config setNotificationHandler(String notificationHandler) {
+        this.notificationHandler = notificationHandler;
         return this;
     }
 }

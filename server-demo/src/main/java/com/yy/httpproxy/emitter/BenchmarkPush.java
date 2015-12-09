@@ -23,10 +23,10 @@ import io.socket.emitter.Emitter;
 public class BenchmarkPush {
 
     private static Logger logger = LoggerFactory.getLogger(BenchmarkPush.class);
-    private static int numClients = 5000;
+    private static int numClients = 2500;
     private static String host = "http://183.61.6.33:8080";
     private static String redisHost = "183.61.6.33:6379";
-//    private static String host = "http://172.25.133.154:9101";
+    //    private static String host = "http://172.25.133.154:9101";
 //    private static String redisHost = "172.25.133.154:6379";
     private static AtomicInteger connected = new AtomicInteger(0);
     private static AtomicLong numRequests = new AtomicLong(0);
@@ -82,6 +82,7 @@ public class BenchmarkPush {
         }
         Thread.sleep(2000l);
 
+
         while (connected.get() != numClients) {
             Thread.sleep(25l);
         }
@@ -90,7 +91,11 @@ public class BenchmarkPush {
         timestamp = System.currentTimeMillis();
         final PacketServer server = new PacketServer(redisHost);
 
+        int i = 0;
         while (true) {
+            if (++i % 4 == 0) {
+                logger.info(" broadcast {}", i);
+            }
             server.getEmitter().push("/testTopic", "1231234".getBytes());
             Thread.sleep(50L);
         }
