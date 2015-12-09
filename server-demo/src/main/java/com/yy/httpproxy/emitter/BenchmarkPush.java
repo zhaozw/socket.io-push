@@ -91,17 +91,29 @@ public class BenchmarkPush {
         timestamp = System.currentTimeMillis();
         final PacketServer server = new PacketServer(redisHost);
 
-        int i = 0;
-        while (true) {
-            if (++i % 4 == 0) {
-                logger.info(" broadcast {}", i);
+
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
+                    int i = 0;
+                    if (++i % 4 == 0) {
+                        logger.info(" broadcast {}", i);
+                    }
+                    server.getEmitter().push("/testTopic", "1231234".getBytes());
+                    try {
+                        Thread.sleep(25L);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
-            server.getEmitter().push("/testTopic", "1231234".getBytes());
-            Thread.sleep(50L);
-        }
+        });
+        t.start();
 
 
-//        Thread.sleep(100000000005435L);
+
+        Thread.sleep(100000000005435L);
 
     }
 
