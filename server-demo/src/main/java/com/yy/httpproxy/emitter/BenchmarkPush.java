@@ -23,7 +23,7 @@ import io.socket.emitter.Emitter;
 public class BenchmarkPush {
 
     private static Logger logger = LoggerFactory.getLogger(BenchmarkPush.class);
-    private static int numClients = 2500;
+    private static int numClients = 1000;
     private static String host = "http://183.61.6.33:8080";
     private static String redisHost = "183.61.6.33:6379";
     //    private static String host = "http://172.25.133.154:9101";
@@ -95,8 +95,8 @@ public class BenchmarkPush {
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
+                int i = 0;
                 while (true) {
-                    int i = 0;
                     if (++i % 4 == 0) {
                         logger.info(" broadcast {}", i);
                     }
