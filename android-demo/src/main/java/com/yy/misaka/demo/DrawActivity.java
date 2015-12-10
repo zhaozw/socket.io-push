@@ -59,6 +59,7 @@ public class DrawActivity extends Activity {
         count = (TextView) findViewById(R.id.tv_count);
 
         String pushServerHost = "http://183.61.6.33:8080";
+//        String pushServerHost = "http://113.107.236.239";
 //        String pushServerHost = "http://61.147.186.58";
 //        String pushServerHost = "http://172.25.133.154:9101";
 

@@ -23,6 +23,11 @@ public class PushedNotification {
         values = jsonToMap(object);
     }
 
+    public PushedNotification(String id, HashMap<String, Object> map) {
+        this.id = id;
+        values = map;
+    }
+
     public static HashMap<String, Object> jsonToMap(JSONObject json) {
         if (json != JSONObject.NULL) {
             try {

@@ -15,9 +15,17 @@ public abstract class NotificationReceiver extends BroadcastReceiver {
         if (intent.getIntExtra("cmd", -1) == RemoteService.CMD_NOTIFICATION_CLICKED) {
             String id = intent.getStringExtra("id");
             HashMap<String, Object> values = (HashMap<String, Object>) intent.getSerializableExtra("notification");
-            onNotificationClicked(context, id, values);
+            PushedNotification notification = new PushedNotification(id, values);
+            onNotificationClicked(context, notification);
+        } else if (intent.getIntExtra("cmd", -1) == RemoteService.CMD_NOTIFICATION_ARRIVED) {
+            String id = intent.getStringExtra("id");
+            HashMap<String, Object> values = (HashMap<String, Object>) intent.getSerializableExtra("notification");
+            PushedNotification notification = new PushedNotification(id, values);
+            onNotificationArrived(context, notification);
         }
     }
 
-    public abstract void onNotificationClicked(Context context, String id, HashMap<String, Object> values);
+    public abstract void onNotificationClicked(Context context, PushedNotification notification);
+
+    public abstract void onNotificationArrived(Context context, PushedNotification notification);
 }

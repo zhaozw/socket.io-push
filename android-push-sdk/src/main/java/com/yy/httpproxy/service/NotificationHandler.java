@@ -7,6 +7,6 @@ import android.content.Context;
  */
 public interface NotificationHandler {
 
-    void handlerNotification(Context context, PushedNotification notification);
+    void handlerNotification(Context context, boolean binded, PushedNotification notification);
 
 }

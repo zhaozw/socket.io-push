@@ -1,5 +1,6 @@
 package com.yy.httpproxy.emitter;
 
+import org.apache.commons.codec.binary.Base64;
 import org.msgpack.MessagePack;
 import org.msgpack.packer.Packer;
 import org.redisson.api.RTopicReactive;
@@ -19,7 +20,6 @@ import sun.misc.BASE64Encoder;
 public class Emitter {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
-    private BASE64Encoder base64Encoder = new BASE64Encoder();
     private RedissonReactiveClient redisson;
     //    RTopicReactive<byte[]> rTopic;
     private String prefix = "socket.io#/#";
@@ -35,7 +35,7 @@ public class Emitter {
         Map dataInfo = new HashMap();
         dataInfo.put("topic", topic);
         if (data != null) {
-            dataInfo.put("data", base64Encoder.encode(data));
+            dataInfo.put("data", Base64.encodeBase64String(data));
         }
         byte[] packet = msgPack(topic, "push", dataInfo);
         logger.debug("push packet {} {}", topic, new String(packet));
@@ -83,7 +83,7 @@ public class Emitter {
         dataInfo.put("sequenceId", sequenceId);
         dataInfo.put("code", 1);
         if (data != null) {
-            dataInfo.put("data", base64Encoder.encode(data));
+            dataInfo.put("data", Base64.encodeBase64String(data));
         }
         byte[] packet = msgPack(pushId, "packetProxy", dataInfo);
         logger.debug("reply packet {} {}", pushId, new String(packet));

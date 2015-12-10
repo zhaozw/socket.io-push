@@ -24,12 +24,14 @@ public class RemoteService extends Service implements PushCallback, ResponseHand
 
     public static final int CMD_PUSH = 2;
     public static final int CMD_NOTIFICATION_CLICKED = 3;
+    public static final int CMD_NOTIFICATION_ARRIVED = 5;
     public static final int CMD_RESPONSE = 4;
     private final String TAG = "SocketIoService";
     private SocketIOProxyClient client;
     private NotificationHandler notificationHandler;
     private final Messenger messenger = new Messenger(new IncomingHandler());
     private Messenger remoteClient;
+    private boolean binded = false;
 
     private class IncomingHandler extends Handler {
         @Override
@@ -107,7 +109,22 @@ public class RemoteService extends Service implements PushCallback, ResponseHand
             client.setNotificationCallback(this);
 
         }
+        binded = true;
         return messenger.getBinder();
+    }
+
+    @Override
+    public void onRebind(Intent intent) {
+        Log.d(TAG, "onRebind");
+        onBind(intent);
+        binded = true;
+    }
+
+    @Override
+    public boolean onUnbind(Intent intent) {
+        Log.d(TAG, "onUnbind");
+        binded = false;
+        return true;
     }
 
     @Override
@@ -125,7 +142,7 @@ public class RemoteService extends Service implements PushCallback, ResponseHand
     @Override
     public void onNotification(String id, JSONObject data) {
         PushedNotification notification = new PushedNotification(id, data);
-        notificationHandler.handlerNotification(this, notification);
+        notificationHandler.handlerNotification(this, binded, notification);
     }
 
     @Override
@@ -143,11 +160,16 @@ public class RemoteService extends Service implements PushCallback, ResponseHand
     }
 
     private void sendMsg(Message msg) {
-        try {
-            remoteClient.send(msg);
-        } catch (Exception e) {
-            Log.e(TAG, "sendMsg error!", e);
+        if (binded) {
+            try {
+                remoteClient.send(msg);
+            } catch (Exception e) {
+                Log.e(TAG, "sendMsg error!", e);
+            }
+        } else{
+            Log.v(TAG, "sendMsg not binded");
         }
+
     }
 
 

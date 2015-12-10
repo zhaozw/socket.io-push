@@ -133,12 +133,6 @@ public class SocketIOProxyClient implements PushSubscriber {
                     JSONObject data = (JSONObject) args[0];
                     String topic = data.optString("topic");
                     String dataBase64 = data.optString("data");
-                    boolean reply = data.optBoolean("reply", false);
-                    if (reply) {
-                        data.put("pushId", pushId);
-                        data.remove("data");
-                        socket.emit("pushReply", data);
-                    }
                     Log.v(TAG, "on push topic " + topic + " data:" + dataBase64);
                     pushCallback.onPush(topic, Base64.decode(dataBase64, Base64.DEFAULT));
                 } catch (Exception e) {
@@ -233,7 +227,7 @@ public class SocketIOProxyClient implements PushSubscriber {
             }
 
             JSONObject object = new JSONObject();
-            object.put("data", Base64.encodeToString(requestInfo.getBody(), Base64.DEFAULT));
+            object.put("data", Base64.encodeToString(requestInfo.getBody(), Base64.NO_WRAP));
             object.put("path", requestInfo.getPath());
             object.put("sequenceId", String.valueOf(requestInfo.getSequenceId()));
 

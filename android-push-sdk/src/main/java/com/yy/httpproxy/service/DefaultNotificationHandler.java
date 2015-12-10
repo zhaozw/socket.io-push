@@ -15,9 +15,25 @@ public class DefaultNotificationHandler implements NotificationHandler {
 
     public static final String INTENT_TAIL = ".YY_NOTIFICATION";
 
-
     @Override
-    public void handlerNotification(Context context, PushedNotification pushedNotification) {
+    public void handlerNotification(Context context, boolean binded, PushedNotification pushedNotification) {
+
+        showNotification(context, pushedNotification);
+
+        sendArrived(context, pushedNotification);
+
+    }
+
+    protected void sendArrived(Context context, PushedNotification pushedNotification) {
+        String intentName = context.getApplicationInfo().packageName + INTENT_TAIL;
+        Intent arrive = new Intent(intentName);
+        arrive.putExtra("cmd", RemoteService.CMD_NOTIFICATION_ARRIVED);
+        arrive.putExtra("id", pushedNotification.id);
+        arrive.putExtra("notification", pushedNotification.values);
+        context.sendBroadcast(arrive);
+    }
+
+    protected void showNotification(Context context, PushedNotification pushedNotification) {
         String intentName = context.getApplicationInfo().packageName + INTENT_TAIL;
         Intent pushIntent = new Intent(intentName);
         pushIntent.putExtra("cmd", RemoteService.CMD_NOTIFICATION_CLICKED);
@@ -37,4 +53,5 @@ public class DefaultNotificationHandler implements NotificationHandler {
         Notification notification = mBuilder.build();
         nm.notify(pushedNotification.id.hashCode(), notification);
     }
+
 }
