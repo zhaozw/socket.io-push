@@ -22,7 +22,7 @@ function ProxyServer(io,stats,redis){
              delete socketIdToPushId[socket.id];
              var currentSocketId = pushIdToSocketId[pushId];
              if(currentSocketId === socket.id){
-                delete pushIdToSocketId[socket.id];
+                delete pushIdToSocketId[pushId];
                 redis.publishDisconnect(pushId);
              }
          }
