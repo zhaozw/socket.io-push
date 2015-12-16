@@ -93,10 +93,38 @@ RedisStore.prototype.publishPacket = function(data) {
     }
 };
 
-RedisStore.prototype.publishDisconnect = function(pushId) {
-    debug("publish pushId %s",pushId);
-    var data = { pushId:pushId, path:"/socketDisconnect"};
-    this.publishPacket(data);
+RedisStore.prototype.publishDisconnect = function(pushId,socketId) {
+    debug("publishDisconnect pushId %s",pushId);
+    var outerThis = this;
+    this.redis.get("pushIdSocketId#" + pushId,  function(err, lastSocketId) {
+            // reply is null when the key is missing
+            debug("pushIdSocketId redis %s %s", lastSocketId,pushId);
+            if(lastSocketId === socketId) {
+               debug("publishDisconnect current socket disconnect %s",socketId);
+               outerThis.redis.del("pushIdSocketId#" + pushId);
+               var data = { pushId:pushId, path:"/socketDisconnect"};
+               outerThis.publishPacket(data);
+            }
+    });
+
+};
+
+RedisStore.prototype.publishConnect = function(pushId, socketId) {
+    debug("publishConnect pushId %s",pushId);
+    var outerThis = this;
+    this.redis.get("pushIdSocketId#" + pushId,  function(err, lastSocketId) {
+                // reply is null when the key is missing
+          debug("publishConnect query redis %s", lastSocketId);
+          if(lastSocketId) {
+            debug("reconnect do not publish", lastSocketId);
+          } else {
+            debug("first connect publish", lastSocketId);
+            var data = { pushId:pushId, path:"/socketConnect"};
+            outerThis.publishPacket(data);
+          }
+          outerThis.redis.set("pushIdSocketId#" + pushId, socketId);
+          outerThis.redis.expire("pushIdSocketId#" + pushId, 3600 * 24 * 7);
+    });
 };
 
 RedisStore.prototype.setApnToken = function(pushId,apnToken) {

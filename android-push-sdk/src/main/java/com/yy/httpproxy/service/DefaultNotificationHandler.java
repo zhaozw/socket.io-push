@@ -39,7 +39,7 @@ public class DefaultNotificationHandler implements NotificationHandler {
         pushIntent.putExtra("cmd", RemoteService.CMD_NOTIFICATION_CLICKED);
         pushIntent.putExtra("id", pushedNotification.id);
         pushIntent.putExtra("notification", pushedNotification.values);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 1, pushIntent, PendingIntent.FLAG_ONE_SHOT);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, pushedNotification.id.hashCode(), pushIntent, PendingIntent.FLAG_ONE_SHOT);
 
 
         NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);

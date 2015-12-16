@@ -1,7 +1,6 @@
 module.exports = ProxyServer;
 
 var socketIdToPushId = {};
-var pushIdToSocketId= {};
 
 function ProxyServer(io,stats,redis){
  if (!(this instanceof ProxyServer)) return new ProxyServer(io,stats,redis);
@@ -20,11 +19,7 @@ function ProxyServer(io,stats,redis){
          var pushId = socketIdToPushId[socket.id];
          if(pushId){
              delete socketIdToPushId[socket.id];
-             var currentSocketId = pushIdToSocketId[pushId];
-             if(currentSocketId === socket.id){
-                delete pushIdToSocketId[pushId];
-                redis.publishDisconnect(pushId);
-             }
+             redis.publishDisconnect(pushId,socket.id);
          }
      });
 
@@ -39,7 +34,7 @@ function ProxyServer(io,stats,redis){
              });
            }
            socketIdToPushId[socket.id] = data.id;
-           pushIdToSocketId[data.id] = socket.id;
+           redis.publishConnect(data.id,socket.id);
            socket.join(data.id);
            socket.emit('pushId', { id:data.id });
            debug('join room socket.id %s ,pushId %s' ,socket.id, socketIdToPushId[socket.id]);

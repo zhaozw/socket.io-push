@@ -18,7 +18,11 @@ public class JsonPushSerializer implements PushSerializer {
             return null;
         }
         try {
-            return gson.fromJson(new String(body, "UTF-8"), (Class) clazz);
+            String bodyStr = new String(body, "UTF-8");
+            if (bodyStr.isEmpty()) {
+                return null;
+            }
+            return gson.fromJson(bodyStr, (Class) clazz);
         } catch (UnsupportedEncodingException e) {
             return null;
         }
