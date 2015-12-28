@@ -1,4 +1,4 @@
-package com.yy.misaka.demo;
+package com.yy.misaka.demo.appmodel;
 
 import android.content.Context;
 import android.content.Intent;
@@ -8,6 +8,7 @@ import android.widget.Toast;
 import com.yy.httpproxy.service.DefaultNotificationHandler;
 import com.yy.httpproxy.service.NotificationReceiver;
 import com.yy.httpproxy.service.PushedNotification;
+import com.yy.misaka.demo.DrawActivity;
 
 import java.util.HashMap;
 

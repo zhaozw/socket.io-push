@@ -29,7 +29,7 @@
         <service android:name="com.yy.httpproxy.service.RemoteService" android:process=":push" android:enabled="true"/>
 
         <receiver
-            android:name=".YYNotificationReceiver"
+            android:name=".appmodel.YYNotificationReceiver"
             android:exported="true" >
 
             <!-- 这里com.xiaomi.mipushdemo.DemoMessageRreceiver改成app中定义的完整类名 -->

@@ -62,15 +62,15 @@ public class ProxyClient implements PushCallback {
         ReplyHandler handler = pushHandlers.get(topic);
         if (handler != null) {
             Object result;
-            if (config.getPushSerializer() != null) {
+            if(data == null || data.length == 0 || config.getPushSerializer() == null) {
+                result = null;
+            } else {
                 try {
                     result = config.getPushSerializer().toObject(topic, handler.clazz, data);
                 } catch (Exception e) {
                     Log.e(TAG, "onPush serialize exception " + e.getMessage(), e);
                     return;
                 }
-            } else {
-                result = data;
             }
             callSuccessOnMainThread(handler, result);
         }

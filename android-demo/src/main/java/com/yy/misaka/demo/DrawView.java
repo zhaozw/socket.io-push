@@ -46,7 +46,6 @@ public class DrawView extends View {
         super(context, attrs, defStyle);
     }
 
-
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);

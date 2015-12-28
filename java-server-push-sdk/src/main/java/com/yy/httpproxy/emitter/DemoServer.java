@@ -5,16 +5,14 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-
-/**
- * Created by xuduo on 11/13/15.
- */
 public class DemoServer {
 
     private static Logger logger = LoggerFactory.getLogger(DemoServer.class);
 
-    public static void main(String[] args) throws IOException, InterruptedException {
+    public static void main(String[] args) {
 
+        Serializer json = new JsonSerializer();
+        Serializer byteSerializer = new ByteArraySerializer();
         PacketServer server = new PacketServer("localhost:6379");
 //        PacketServer server = new PacketServer("183.61.6.33:6379");
 
@@ -25,28 +23,18 @@ public class DemoServer {
             }
         });
 
-        Serializer json = new JsonSerializer();
-        Serializer byteSerializer = new ByteArraySerializer();
         server.addHandler("/addDot", new PacketHandler<Dot>(Dot.class, json) {
             @Override
             void handle(String pushId, String sequenceId, String path, Dot body) {
                 broadcast("/addDot", body);
                 reply(pushId, sequenceId, path, body);
             }
-
         });
 
         server.addHandler("/endLine", new PacketHandler<byte[]>(byte.class, byteSerializer) {
             @Override
             void handle(String pushId, String sequenceId, String path, byte[] body) {
                 broadcast("/endLine", body);
-            }
-        });
-
-        server.addHandler("/clearColor", new PacketHandler<byte[]>(byte.class, byteSerializer) {
-            @Override
-            void handle(String pushId, String sequenceId, String path, byte[] body) {
-                broadcast("/clearColor", body);
             }
         });
 
@@ -57,6 +45,9 @@ public class DemoServer {
             }
         });
 
-        Thread.sleep(100000L);
+            Thread.sleep(100000L);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }

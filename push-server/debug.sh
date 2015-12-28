@@ -1,2 +1,2 @@
-export DEBUG=socket.io*,ProxyServer,RedisStore
+export DEBUG=socket.io*,ProxyServer,RedisStore,RestApi
 node .

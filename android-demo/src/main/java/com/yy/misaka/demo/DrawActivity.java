@@ -58,15 +58,10 @@ public class DrawActivity extends Activity {
         latency = (TextView) findViewById(R.id.tv_latency);
         count = (TextView) findViewById(R.id.tv_count);
 
-//        String pushServerHost = "http://183.61.6.33:8080";
-//        String pushServerHost = "http://183.61.6.33:9101";
-//        String pushServerHost = "http://113.107.236.239";
-//        String pushServerHost = "http://61.147.186.58";
-        String pushServerHost = "http://172.26.66.8:9101";
+        String pushServerHost = "http://183.61.6.33:8080";
+//        String pushServerHost = "http://172.26.66.8:9101";
 
-        Random random = new Random();
-        int num = random.nextInt(myColors.length);
-        myColor = myColors[num];
+        myColor = myColors[new Random().nextInt(myColors.length)];
 
         proxyClient = new ProxyClient(new Config(this.getApplicationContext())
                 .setHost(pushServerHost)
@@ -78,15 +73,6 @@ public class DrawActivity extends Activity {
             public void onClick(View view) {
                 resetLatency();
                 proxyClient.request("/clear", null, null);
-            }
-        });
-
-        findViewById(R.id.btn_clearColor).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                DrawView.Dot dot = new DrawView.Dot();
-                dot.myColor = myColor;
-                proxyClient.request("/clearColor", dot, null);
             }
         });
 
@@ -147,18 +133,6 @@ public class DrawActivity extends Activity {
             @Override
             public void onSuccess(DrawView.Dot result) {
                 drawView.endLine();
-            }
-        });
-
-        proxyClient.subscribeBroadcast("/clearColor", new PushHandler<DrawView.Dot>(DrawView.Dot.class) {
-            @Override
-            public void onSuccess(DrawView.Dot result) {
-                int count = drawView.clearColor(result);
-                if (count == 0) {
-                    resetLatency();
-                } else {
-                    update(result.timestamp, count);
-                }
             }
         });
 

@@ -1,7 +1,7 @@
 var config = {};
 
 config.apn = {
-  production : true
+  production : false
 };
 
 config.redis = {
