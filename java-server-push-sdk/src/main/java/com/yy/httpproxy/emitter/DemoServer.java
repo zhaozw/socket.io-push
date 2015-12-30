@@ -45,6 +45,7 @@ public class DemoServer {
             }
         });
 
+        try{
             Thread.sleep(100000L);
         } catch (InterruptedException e) {
             e.printStackTrace();

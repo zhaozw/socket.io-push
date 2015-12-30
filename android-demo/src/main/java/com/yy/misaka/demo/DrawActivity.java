@@ -21,7 +21,7 @@ import java.util.Random;
 
 public class DrawActivity extends Activity {
 
-    private static final String TAG = "Demo";
+    private static final String TAG = "DrawActivity";
     private DrawView drawView;
     private ProxyClient proxyClient;
     private TextView latency;
@@ -58,8 +58,8 @@ public class DrawActivity extends Activity {
         latency = (TextView) findViewById(R.id.tv_latency);
         count = (TextView) findViewById(R.id.tv_count);
 
-        String pushServerHost = "http://183.61.6.33:8080";
-//        String pushServerHost = "http://172.26.66.8:9101";
+//        String pushServerHost = "http://183.61.6.33:8080";
+        String pushServerHost = "http://172.26.66.8:9101";
 
         myColor = myColors[new Random().nextInt(myColors.length)];
 

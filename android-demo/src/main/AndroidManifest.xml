@@ -26,7 +26,8 @@
             </intent-filter>
         </activity>
 
-        <service android:name="com.yy.httpproxy.service.RemoteService" android:process=":push" android:enabled="true"/>
+        <service android:name="com.yy.httpproxy.service.BindService" android:process=":push" android:enabled="true"/>
+        <service android:name="com.yy.httpproxy.service.ConnectionService" android:process=":push" android:enabled="true"/>
         <service android:name="com.yy.httpproxy.service.ForegroundService" android:process=":push" android:enabled="true"/>
 
         <receiver

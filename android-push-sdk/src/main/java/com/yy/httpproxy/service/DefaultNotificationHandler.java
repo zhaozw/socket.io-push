@@ -27,7 +27,7 @@ public class DefaultNotificationHandler implements NotificationHandler {
     protected void sendArrived(Context context, PushedNotification pushedNotification) {
         String intentName = context.getApplicationInfo().packageName + INTENT_TAIL;
         Intent arrive = new Intent(intentName);
-        arrive.putExtra("cmd", RemoteService.CMD_NOTIFICATION_ARRIVED);
+        arrive.putExtra("cmd", BindService.CMD_NOTIFICATION_ARRIVED);
         arrive.putExtra("id", pushedNotification.id);
         arrive.putExtra("notification", pushedNotification.values);
         context.sendBroadcast(arrive);
@@ -36,7 +36,7 @@ public class DefaultNotificationHandler implements NotificationHandler {
     protected void showNotification(Context context, PushedNotification pushedNotification) {
         String intentName = context.getApplicationInfo().packageName + INTENT_TAIL;
         Intent pushIntent = new Intent(intentName);
-        pushIntent.putExtra("cmd", RemoteService.CMD_NOTIFICATION_CLICKED);
+        pushIntent.putExtra("cmd", BindService.CMD_NOTIFICATION_CLICKED);
         pushIntent.putExtra("id", pushedNotification.id);
         pushIntent.putExtra("notification", pushedNotification.values);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, pushedNotification.id.hashCode(), pushIntent, PendingIntent.FLAG_ONE_SHOT);

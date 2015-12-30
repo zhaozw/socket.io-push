@@ -21,49 +21,23 @@ import com.yy.httpproxy.subscribe.SharedPreferencePushIdGenerator;
 
 import org.json.JSONObject;
 
-public class RemoteService extends Service implements PushCallback, ResponseHandler, SocketIOProxyClient.NotificationCallback {
+public class ConnectionService extends Service implements PushCallback, ResponseHandler, SocketIOProxyClient.NotificationCallback {
 
-    public static final int CMD_PUSH = 2;
-    public static final int CMD_NOTIFICATION_CLICKED = 3;
-    public static final int CMD_NOTIFICATION_ARRIVED = 5;
-    public static final int CMD_RESPONSE = 4;
-    private final String TAG = "SocketIoService";
-    private SocketIOProxyClient client;
+    private final String TAG = "ConnectionService";
+    public static SocketIOProxyClient client;
     private NotificationHandler notificationHandler;
-    private final Messenger messenger = new Messenger(new IncomingHandler());
-    private Messenger remoteClient;
-    private boolean binded = false;
-
-    private class IncomingHandler extends Handler {
-        @Override
-        public void handleMessage(Message msg) {
-            int cmd = msg.what;
-            Bundle bundle = msg.getData();
-            if (cmd == RemoteClient.CMD_SUBSCRIBE_BROADCAST) {
-                String topic = bundle.getString("topic");
-                client.subscribeBroadcast(topic);
-            } else if (cmd == RemoteClient.CMD_SET_PUSH_ID) {
-                client.setPushId(bundle.getString("pushId"));
-            } else if (cmd == RemoteClient.CMD_REQUEST) {
-                RequestInfo info = (RequestInfo) bundle.getSerializable("requestInfo");
-                client.request(info);
-            } else if (cmd == RemoteClient.CMD_REGISTER_CLIENT) {
-                remoteClient = msg.replyTo;
-            } else if (cmd == RemoteClient.CMD_UNSUBSCRIBE_BROADCAST) {
-                String topic = bundle.getString("topic");
-                client.unsubscribeBroadcast(topic);
-            }
-        }
-    }
-
 
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.i(TAG, "RemoteService onCreate");
+        Log.i(TAG, "ConnectionService onCreate");
+        // startForeground();
+    }
+
+    private void startForeground() {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
         builder.setPriority(Notification.PRIORITY_MIN);
-        startForeground(1024, builder.build());
+        startForeground(12345, builder.build());
         Intent intent = new Intent(this, ForegroundService.class);
         startService(intent);
     }
@@ -85,13 +59,22 @@ public class RemoteService extends Service implements PushCallback, ResponseHand
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d(TAG, "onStartCommand");
+        String host = "null";
+        if (intent != null) {
+            host = intent.getStringExtra("host");
+        }
+        Log.d(TAG, "onStartCommand " + host);
+        initClient(intent);
         return Service.START_STICKY;
     }
 
     @Override
     public IBinder onBind(Intent intent) {
         Log.d(TAG, "onBind");
+        return null;
+    }
+
+    private void initClient(Intent intent) {
         if (client == null) {
             String host = getFromIntentOrPref(intent, "host");
             String handlerClassName = getFromIntentOrPref(intent, "notificationHandler");
@@ -114,31 +97,31 @@ public class RemoteService extends Service implements PushCallback, ResponseHand
             client.setPushId(new SharedPreferencePushIdGenerator(this.getApplicationContext()).generatePushId());
             client.setPushCallback(this);
             client.setNotificationCallback(this);
-
         }
-        binded = true;
-        return messenger.getBinder();
+    }
+
+    @Override
+    public void onDestroy() {
+        Log.d(TAG, "onDestroy");
+        super.onDestroy();
     }
 
     @Override
     public void onRebind(Intent intent) {
         Log.d(TAG, "onRebind");
         onBind(intent);
-        binded = true;
     }
 
     @Override
     public boolean onUnbind(Intent intent) {
         Log.d(TAG, "onUnbind");
-        binded = false;
         return true;
     }
 
     @Override
     public void onPush(String topic, byte[] data) {
         Log.d(TAG, "push recived " + topic);
-
-        Message msg = Message.obtain(null, CMD_PUSH, 0, 0);
+        Message msg = Message.obtain(null, BindService.CMD_PUSH, 0, 0);
         Bundle bundle = new Bundle();
         bundle.putString("topic", topic);
         bundle.putByteArray("data", data);
@@ -149,14 +132,13 @@ public class RemoteService extends Service implements PushCallback, ResponseHand
     @Override
     public void onNotification(String id, JSONObject data) {
         PushedNotification notification = new PushedNotification(id, data);
-        notificationHandler.handlerNotification(this, binded, notification);
+        notificationHandler.handlerNotification(this, BindService.bound, notification);
     }
 
     @Override
     public void onResponse(String sequenceId, int code, String message, byte[] data) {
         Log.d(TAG, "onResponse  " + code);
-
-        Message msg = Message.obtain(null, CMD_RESPONSE, 0, 0);
+        Message msg = Message.obtain(null, BindService.CMD_RESPONSE, 0, 0);
         Bundle bundle = new Bundle();
         bundle.putString("sequenceId", sequenceId);
         bundle.putInt("code", code);
@@ -167,16 +149,15 @@ public class RemoteService extends Service implements PushCallback, ResponseHand
     }
 
     private void sendMsg(Message msg) {
-        if (binded) {
+        if (BindService.bound) {
             try {
-                remoteClient.send(msg);
+                BindService.remoteClient.send(msg);
             } catch (Exception e) {
                 Log.e(TAG, "sendMsg error!", e);
             }
-        } else{
-            Log.v(TAG, "sendMsg not binded");
+        } else {
+            Log.v(TAG, "sendMsg not bound");
         }
-
     }
 
 }

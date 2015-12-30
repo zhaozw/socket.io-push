@@ -14,7 +14,9 @@ import android.util.Log;
 import com.yy.httpproxy.ProxyClient;
 import com.yy.httpproxy.requester.HttpRequester;
 import com.yy.httpproxy.requester.RequestInfo;
-import com.yy.httpproxy.service.RemoteService;
+import com.yy.httpproxy.service.ConnectionService;
+import com.yy.httpproxy.service.DummyService;
+import com.yy.httpproxy.service.BindService;
 import com.yy.httpproxy.subscribe.PushSubscriber;
 
 import java.util.HashSet;
@@ -34,8 +36,8 @@ public class RemoteClient implements PushSubscriber, HttpRequester {
     private Messenger mService;
     private boolean mBound;
     private String pushId;
-
     private final Messenger messenger = new Messenger(new IncomingHandler());
+    private Context context;
 
     public void unsubscribeBroadcast(String topic) {
         Message msg = Message.obtain(null, CMD_UNSUBSCRIBE_BROADCAST, 0, 0);
@@ -51,13 +53,13 @@ public class RemoteClient implements PushSubscriber, HttpRequester {
         public void handleMessage(Message msg) {
             int cmd = msg.what;
             Bundle bundle = msg.getData();
-            if (cmd == RemoteService.CMD_RESPONSE) {
+            if (cmd == BindService.CMD_RESPONSE) {
                 String message = bundle.getString("message");
                 int code = bundle.getInt("code", 1);
                 byte[] data = bundle.getByteArray("data");
                 String sequenceId = bundle.getString("sequenceId", "");
                 proxyClient.onResponse("",sequenceId, code, message, data);
-            } else if (cmd == RemoteService.CMD_PUSH) {
+            } else if (cmd == BindService.CMD_PUSH) {
                 String topic = bundle.getString("topic");
                 byte[] data = bundle.getByteArray("data");
                 proxyClient.onPush(topic, data);
@@ -89,18 +91,31 @@ public class RemoteClient implements PushSubscriber, HttpRequester {
             // unexpectedly disconnected -- that is, its process crashed.
             mService = null;
             mBound = false;
+            Log.i(TAG,"onServiceDisconnected");
+            context.unbindService(this);
         }
     };
 
     public RemoteClient(Context context, String host, String notificationHandler) {
-        Intent intent = new Intent(context, RemoteService.class);
+        this.context = context;
+        startRemoteService(context, host, notificationHandler);
+        startDummyService(context);
+    }
+
+    private void startDummyService(Context context) {
+        Intent intent = new Intent(context, DummyService.class);
+        context.startService(intent);
+    }
+
+    private void startRemoteService(Context context, String host, String notificationHandler) {
+        Intent intent = new Intent(context, ConnectionService.class);
         intent.putExtra("host", host);
         if (notificationHandler != null) {
             intent.putExtra("notificationHandler", notificationHandler);
         }
-//        context.startService(intent);
-        context.bindService(intent, mConnection,
-                Context.BIND_AUTO_CREATE);
+        context.startService(intent);
+        Intent bindIntent = new Intent(context, BindService.class);
+        context.bindService(bindIntent, mConnection, Context.BIND_AUTO_CREATE);
     }
 
     private void sendMsg(Message msg) {
