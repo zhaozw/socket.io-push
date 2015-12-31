@@ -9,6 +9,8 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
     <application
         android:allowBackup="true"
         android:name="com.yy.misaka.demo.appmodel.DemoApp"
@@ -37,6 +39,13 @@
             <!-- 这里com.xiaomi.mipushdemo.DemoMessageRreceiver改成app中定义的完整类名 -->
             <intent-filter>
                 <action android:name="com.yy.httpproxy.service.RemoteService.INTENT" />
+            </intent-filter>
+        </receiver>
+
+        <receiver android:name="com.yy.httpproxy.service.BootBroadcastReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </receiver>
 
