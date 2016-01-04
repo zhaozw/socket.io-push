@@ -31,6 +31,7 @@ public class ForegroundService extends Service {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
         builder.setPriority(Notification.PRIORITY_MIN);
         startForeground(12345, builder.build());
+        ConnectionService.beginForeground();
         stopSelf();
         Log.i(TAG, "FakeService onCreate");
     }

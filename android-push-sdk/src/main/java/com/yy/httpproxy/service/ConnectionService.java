@@ -5,41 +5,43 @@ import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-import android.os.Messenger;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
-import com.yy.httpproxy.requester.RequestInfo;
 import com.yy.httpproxy.requester.ResponseHandler;
-import com.yy.httpproxy.socketio.RemoteClient;
 import com.yy.httpproxy.socketio.SocketIOProxyClient;
+import com.yy.httpproxy.subscribe.ConnectCallback;
 import com.yy.httpproxy.subscribe.PushCallback;
 import com.yy.httpproxy.subscribe.SharedPreferencePushIdGenerator;
 
 import org.json.JSONObject;
 
-public class ConnectionService extends Service implements PushCallback, ResponseHandler, SocketIOProxyClient.NotificationCallback {
+public class ConnectionService extends Service implements ConnectCallback, PushCallback, ResponseHandler, SocketIOProxyClient.NotificationCallback {
 
     private final String TAG = "ConnectionService";
     public static SocketIOProxyClient client;
     private NotificationHandler notificationHandler;
+    private static ConnectionService instance;
 
     @Override
     public void onCreate() {
         super.onCreate();
         Log.i(TAG, "ConnectionService onCreate");
-        // startForeground();
     }
 
-    private void startForeground() {
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
-        builder.setPriority(Notification.PRIORITY_MIN);
-        startForeground(12345, builder.build());
+    private void startForegroundService() {
         Intent intent = new Intent(this, ForegroundService.class);
         startService(intent);
+    }
+
+    public static void beginForeground() {
+        if (instance != null) {
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(instance);
+            builder.setPriority(Notification.PRIORITY_MIN);
+            instance.startForeground(12345, builder.build());
+        }
     }
 
 
@@ -59,6 +61,8 @@ public class ConnectionService extends Service implements PushCallback, Response
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        instance = this;
+        startForegroundService();
         String host = "null";
         if (intent != null) {
             host = intent.getStringExtra("host");
@@ -97,6 +101,7 @@ public class ConnectionService extends Service implements PushCallback, Response
             client.setPushId(new SharedPreferencePushIdGenerator(this.getApplicationContext()).generatePushId());
             client.setPushCallback(this);
             client.setNotificationCallback(this);
+            client.setConnectCallback(this);
         }
     }
 
@@ -126,7 +131,7 @@ public class ConnectionService extends Service implements PushCallback, Response
         bundle.putString("topic", topic);
         bundle.putByteArray("data", data);
         msg.setData(bundle);
-        sendMsg(msg);
+        BindService.sendMsg(msg);
     }
 
     @Override
@@ -145,19 +150,28 @@ public class ConnectionService extends Service implements PushCallback, Response
         bundle.putString("message", message);
         bundle.putByteArray("data", data);
         msg.setData(bundle);
-        sendMsg(msg);
+        BindService.sendMsg(msg);
     }
 
-    private void sendMsg(Message msg) {
-        if (BindService.bound) {
-            try {
-                BindService.remoteClient.send(msg);
-            } catch (Exception e) {
-                Log.e(TAG, "sendMsg error!", e);
-            }
+
+    @Override
+    public void onConnect() {
+        sendConnect();
+    }
+
+    public static void sendConnect(){
+        int id;
+        if (client.isConnected()) {
+            id = BindService.CMD_CONNECTED;
         } else {
-            Log.v(TAG, "sendMsg not bound");
+            id = BindService.CMD_DISCONNECT;
         }
+        Message msg = Message.obtain(null, id, 0, 0);
+        BindService.sendMsg(msg);
     }
 
+    @Override
+    public void onDisconnect() {
+        sendConnect();
+    }
 }

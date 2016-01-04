@@ -14,18 +14,20 @@ import com.yy.httpproxy.PushHandler;
 import com.yy.httpproxy.ReplyHandler;
 import com.yy.httpproxy.serializer.JsonPushSerializer;
 import com.yy.httpproxy.serializer.JsonSerializer;
+import com.yy.httpproxy.subscribe.ConnectCallback;
 import com.yy.httpproxy.subscribe.SharedPreferencePushIdGenerator;
 
 import java.util.Random;
 
 
-public class DrawActivity extends Activity {
+public class DrawActivity extends Activity implements ConnectCallback {
 
     private static final String TAG = "DrawActivity";
     private DrawView drawView;
     private ProxyClient proxyClient;
     private TextView latency;
     private TextView count;
+    private TextView connect;
     private long totalTime;
     private long totalCount;
     public int myColors[] = {Color.BLACK, Color.DKGRAY, Color.CYAN, Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW, Color.MAGENTA};
@@ -57,6 +59,7 @@ public class DrawActivity extends Activity {
         setContentView(R.layout.activity_draw);
         latency = (TextView) findViewById(R.id.tv_latency);
         count = (TextView) findViewById(R.id.tv_count);
+        connect = (TextView) findViewById(R.id.tv_connect);
 
 //        String pushServerHost = "http://183.61.6.33:8080";
         String pushServerHost = "http://172.26.66.8:9101";
@@ -66,7 +69,8 @@ public class DrawActivity extends Activity {
         proxyClient = new ProxyClient(new Config(this.getApplicationContext())
                 .setHost(pushServerHost)
                 .setPushSerializer(new JsonPushSerializer())
-                .setRequestSerializer(new JsonSerializer()));
+                .setRequestSerializer(new JsonSerializer()).setConnectCallback(this))
+        ;
 
         findViewById(R.id.btn_clear).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -138,6 +142,20 @@ public class DrawActivity extends Activity {
 
         proxyClient.setPushId(new SharedPreferencePushIdGenerator(this).generatePushId());
 
+        updateConnect();
     }
 
+    private void updateConnect() {
+        connect.setText(proxyClient.isConnected() ? "connected" : "disconnected");
+    }
+
+    @Override
+    public void onConnect() {
+        updateConnect();
+    }
+
+    @Override
+    public void onDisconnect() {
+        updateConnect();
+    }
 }

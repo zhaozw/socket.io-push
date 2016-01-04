@@ -6,6 +6,7 @@ import com.yy.httpproxy.requester.HttpRequester;
 import com.yy.httpproxy.serializer.PushSerializer;
 import com.yy.httpproxy.serializer.RequestSerializer;
 import com.yy.httpproxy.socketio.RemoteClient;
+import com.yy.httpproxy.subscribe.ConnectCallback;
 import com.yy.httpproxy.subscribe.PushIdGenerator;
 import com.yy.httpproxy.subscribe.PushSubscriber;
 
@@ -19,6 +20,7 @@ public class Config {
     private RequestSerializer requestSerializer;
     private PushIdGenerator pushIdGenerator;
     private PushSerializer pushSerializer;
+    private ConnectCallback connectCallback;
     private String host;
     private String notificationHandler;
 
@@ -67,6 +69,15 @@ public class Config {
 
     public Config setNotificationHandler(String notificationHandler) {
         this.notificationHandler = notificationHandler;
+        return this;
+    }
+
+    public ConnectCallback getConnectCallback() {
+        return connectCallback;
+    }
+
+    public Config setConnectCallback(ConnectCallback connectCallback) {
+        this.connectCallback = connectCallback;
         return this;
     }
 }

@@ -18,7 +18,9 @@ public class BindService extends Service {
     public static final int CMD_NOTIFICATION_CLICKED = 3;
     public static final int CMD_NOTIFICATION_ARRIVED = 5;
     public static final int CMD_RESPONSE = 4;
-    private final String TAG = "RemoteService";
+    public static final int CMD_CONNECTED = 5;
+    public static final int CMD_DISCONNECT = 6;
+    private static final String TAG = "BindService";
     private final Messenger messenger = new Messenger(new IncomingHandler());
     public static Messenger remoteClient;
     public static boolean bound = false;
@@ -38,6 +40,8 @@ public class BindService extends Service {
                 ConnectionService.client.request(info);
             } else if (cmd == RemoteClient.CMD_REGISTER_CLIENT) {
                 remoteClient = msg.replyTo;
+                bound = true;
+                ConnectionService.sendConnect();
             } else if (cmd == RemoteClient.CMD_UNSUBSCRIBE_BROADCAST) {
                 String topic = bundle.getString("topic");
                 ConnectionService.client.unsubscribeBroadcast(topic);
@@ -65,7 +69,6 @@ public class BindService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         Log.d(TAG, "onBind");
-        bound = true;
         return messenger.getBinder();
     }
 
@@ -78,8 +81,6 @@ public class BindService extends Service {
     @Override
     public void onRebind(Intent intent) {
         Log.d(TAG, "onRebind");
-        onBind(intent);
-        bound = true;
     }
 
     @Override
@@ -89,4 +90,15 @@ public class BindService extends Service {
         return true;
     }
 
+    public static void sendMsg(Message msg) {
+        if (bound) {
+            try {
+                BindService.remoteClient.send(msg);
+            } catch (Exception e) {
+                Log.e(TAG, "sendMsg error!", e);
+            }
+        } else {
+            Log.v(TAG, "sendMsg not bound");
+        }
+    }
 }

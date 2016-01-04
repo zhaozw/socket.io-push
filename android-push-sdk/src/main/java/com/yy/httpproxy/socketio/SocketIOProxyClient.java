@@ -8,6 +8,8 @@ import com.yy.httpproxy.AndroidLoggingHandler;
 import com.yy.httpproxy.requester.RequestException;
 import com.yy.httpproxy.requester.RequestInfo;
 import com.yy.httpproxy.requester.ResponseHandler;
+import com.yy.httpproxy.service.ConnectionService;
+import com.yy.httpproxy.subscribe.ConnectCallback;
 import com.yy.httpproxy.subscribe.PushCallback;
 import com.yy.httpproxy.subscribe.PushSubscriber;
 
@@ -40,6 +42,8 @@ public class SocketIOProxyClient implements PushSubscriber {
     private NotificationCallback notificationCallback;
     private Set<String> topics = new HashSet<>();
     private ResponseHandler responseHandler;
+    private ConnectCallback connectCallback;
+    private boolean connected = false;
 
     public void setResponseHandler(ResponseHandler responseHandler) {
         this.responseHandler = responseHandler;
@@ -58,6 +62,10 @@ public class SocketIOProxyClient implements PushSubscriber {
         }
     }
 
+    public void setConnectCallback(ConnectionService connectCallback) {
+        this.connectCallback = connectCallback;
+    }
+
 
     public interface NotificationCallback {
         void onNotification(String id, JSONObject notification);
@@ -68,6 +76,16 @@ public class SocketIOProxyClient implements PushSubscriber {
         public void call(Object... args) {
             sendPushIdAndTopicToServer();
             reSendFailedRequest();
+        }
+    };
+
+    private final Emitter.Listener disconnectListener = new Emitter.Listener() {
+        @Override
+        public void call(Object... args) {
+            connected = false;
+            if (connectCallback != null) {
+                connectCallback.onDisconnect();
+            }
         }
     };
 
@@ -108,6 +126,10 @@ public class SocketIOProxyClient implements PushSubscriber {
             JSONObject data = (JSONObject) args[0];
             String pushId = data.optString("id");
             Log.v(TAG, "on pushId " + pushId);
+            connected = true;
+            if (connectCallback != null) {
+                connectCallback.onConnect();
+            }
         }
     };
 
@@ -209,6 +231,7 @@ public class SocketIOProxyClient implements PushSubscriber {
             socket.on("pushId", pushIdListener);
             socket.on("push", pushListener);
             socket.on("notification", notificationListener);
+            socket.on(Socket.EVENT_DISCONNECT, disconnectListener);
             socket.connect();
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
@@ -268,5 +291,9 @@ public class SocketIOProxyClient implements PushSubscriber {
 
     public void setNotificationCallback(NotificationCallback notificationCallback) {
         this.notificationCallback = notificationCallback;
+    }
+
+    public boolean isConnected() {
+        return connected;
     }
 }

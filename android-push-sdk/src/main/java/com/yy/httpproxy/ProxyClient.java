@@ -29,6 +29,10 @@ public class ProxyClient implements PushCallback {
         }
     }
 
+    public boolean isConnected(){
+        return config.getRemoteClient().isConnected();
+    }
+
     public void request(String path, Object body, final ReplyHandler replyHandler) {
         final RequestInfo requestInfo = new RequestInfo();
         requestInfo.setBody(config.getRequestSerializer().toBinary(path, body));
@@ -122,5 +126,9 @@ public class ProxyClient implements PushCallback {
                 callErrorOnMainThread(replyHandler, new RequestException(null, code, message));
             }
         }
+    }
+
+    public Config getConfig() {
+        return config;
     }
 }

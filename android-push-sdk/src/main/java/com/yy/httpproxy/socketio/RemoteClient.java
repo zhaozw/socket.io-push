@@ -38,6 +38,7 @@ public class RemoteClient implements PushSubscriber, HttpRequester {
     private String pushId;
     private final Messenger messenger = new Messenger(new IncomingHandler());
     private Context context;
+    private boolean connected = false;
 
     public void unsubscribeBroadcast(String topic) {
         Message msg = Message.obtain(null, CMD_UNSUBSCRIBE_BROADCAST, 0, 0);
@@ -46,6 +47,10 @@ public class RemoteClient implements PushSubscriber, HttpRequester {
         msg.setData(bundle);
         sendMsg(msg);
         topics.remove(topic);
+    }
+
+    public boolean isConnected() {
+        return connected;
     }
 
     private class IncomingHandler extends Handler {
@@ -58,11 +63,21 @@ public class RemoteClient implements PushSubscriber, HttpRequester {
                 int code = bundle.getInt("code", 1);
                 byte[] data = bundle.getByteArray("data");
                 String sequenceId = bundle.getString("sequenceId", "");
-                proxyClient.onResponse("",sequenceId, code, message, data);
+                proxyClient.onResponse("", sequenceId, code, message, data);
             } else if (cmd == BindService.CMD_PUSH) {
                 String topic = bundle.getString("topic");
                 byte[] data = bundle.getByteArray("data");
                 proxyClient.onPush(topic, data);
+            } else if (cmd == BindService.CMD_CONNECTED && connected == false) {
+                connected = true;
+                if (proxyClient.getConfig().getConnectCallback() != null) {
+                    proxyClient.getConfig().getConnectCallback().onConnect();
+                }
+            } else if (cmd == BindService.CMD_DISCONNECT && connected == true) {
+                connected = false;
+                if (proxyClient.getConfig().getConnectCallback() != null) {
+                    proxyClient.getConfig().getConnectCallback().onDisconnect();
+                }
             }
         }
     }
@@ -91,7 +106,7 @@ public class RemoteClient implements PushSubscriber, HttpRequester {
             // unexpectedly disconnected -- that is, its process crashed.
             mService = null;
             mBound = false;
-            Log.i(TAG,"onServiceDisconnected");
+            Log.i(TAG, "onServiceDisconnected");
             context.unbindService(this);
         }
     };
