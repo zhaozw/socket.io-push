@@ -18,14 +18,14 @@ public class DemoServer {
 
         server.addHandler(PacketHandler.DISCONNECT, new PacketHandler() {
             @Override
-            void handle(String pushId, String sequenceId, String path, Object body) {
+            public void handle(String pushId, String sequenceId, String path, Object body) {
                 logger.debug("PacketHandler.DISCONNECT {} {}", pushId, path);
             }
         });
 
         server.addHandler("/addDot", new PacketHandler<Dot>(Dot.class, json) {
             @Override
-            void handle(String pushId, String sequenceId, String path, Dot body) {
+            public void handle(String pushId, String sequenceId, String path, Dot body) {
                 broadcast("/addDot", body);
                 reply(pushId, sequenceId, path, body);
             }
@@ -33,14 +33,14 @@ public class DemoServer {
 
         server.addHandler("/endLine", new PacketHandler<byte[]>(byte.class, byteSerializer) {
             @Override
-            void handle(String pushId, String sequenceId, String path, byte[] body) {
+            public void handle(String pushId, String sequenceId, String path, byte[] body) {
                 broadcast("/endLine", body);
             }
         });
 
         server.addHandler("/clear", new PacketHandler<byte[]>(byte.class, byteSerializer) {
             @Override
-            void handle(String pushId, String sequenceId, String path, byte[] body) {
+            public void handle(String pushId, String sequenceId, String path, byte[] body) {
                 broadcast("/clear", null);
             }
         });

@@ -11,12 +11,12 @@ io.adapter(socketIoRedis);
 var redis = require("redis")
 var pubClient = redis.createClient({ host: config.redis.host, port: config.redis.port });
 var subClient = redis.createClient({ host: config.redis.host, port: config.redis.port });
+var statClient = redis.createClient({ host: config.redis.host, port: config.redis.port });
 var redisStore = require('./redisStore.js')(pubClient,subClient);
-var stats = require('./stats.js')();
-
-
+var stats = require('./stats.js')(statClient);
 
 var proxyServer = require('./proxyServer.js')(io,stats, redisStore);
 
 // push
 var restApi = require('./restApi.js')(io, stats,redisStore, apiPort);
+

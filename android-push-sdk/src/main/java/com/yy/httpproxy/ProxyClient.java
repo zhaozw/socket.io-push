@@ -5,9 +5,8 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
-import com.yy.httpproxy.requester.RequestInfo;
-import com.yy.httpproxy.requester.ResponseHandler;
 import com.yy.httpproxy.requester.RequestException;
+import com.yy.httpproxy.requester.RequestInfo;
 import com.yy.httpproxy.subscribe.PushCallback;
 
 import java.util.HashMap;
@@ -107,8 +106,8 @@ public class ProxyClient implements PushCallback {
     }
 
 
-    public void setPushId(String pushId) {
-        config.getRemoteClient().setPushId(pushId);
+    public void getPushId() {
+        getConfig().getPushId();
     }
 
     public void onResponse(String path, String sequenceId, int code, String message, byte[] data) {

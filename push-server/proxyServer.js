@@ -12,7 +12,7 @@ function ProxyServer(io,stats,redis){
 
  io.on('connection', function (socket) {
 
-     stats.addSession();
+     stats.addSession(socket);
 
      socket.on('disconnect', function () {
          stats.removeSession();
@@ -66,7 +66,11 @@ function ProxyServer(io,stats,redis){
           redis.publishPacket(data);
       });
 
-     socket.on('httpProxy', function (data) {
+      socket.on('notificationReply', function (data) {
+          stats.onNotificationReply(data.timestamp);
+      });
+
+      socket.on('httpProxy', function (data) {
          debug('body' + JSON.stringify(data));
 //         var body = new Buffer(data.body.toString(),"base64").toString('utf-8');
 //         debug('httpProxy ' + data.sequenceId + ' path ' + data.path + ' body : ' + body);

@@ -21,7 +21,7 @@ public abstract class PacketHandler<T> {
 
     }
 
-    abstract void handle(String pushId, String sequenceId, String path, T body);
+    public abstract void handle(String pushId, String sequenceId, String path, T body);
 
     private void broadcastInternal(String topic, byte[] data) {
         emitter.push(topic, data);
@@ -41,7 +41,7 @@ public abstract class PacketHandler<T> {
         emitter.reply(pushId, sequenceId, data);
     }
 
-    public void reply(String pushId, String sequenceId, String path, T object) {
+    public void reply(String pushId, String sequenceId, String path, Object object) {
         byte[] data;
         try {
             if (object == null || object instanceof byte[]) {

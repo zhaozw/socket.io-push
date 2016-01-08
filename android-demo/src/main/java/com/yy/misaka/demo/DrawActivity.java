@@ -140,8 +140,6 @@ public class DrawActivity extends Activity implements ConnectCallback {
             }
         });
 
-        proxyClient.setPushId(new SharedPreferencePushIdGenerator(this).generatePushId());
-
         updateConnect();
     }
 

@@ -81,6 +81,7 @@ public class ConnectionService extends Service implements ConnectCallback, PushC
     private void initClient(Intent intent) {
         if (client == null) {
             String host = getFromIntentOrPref(intent, "host");
+            String pushId = getFromIntentOrPref(intent, "pushId");
             String handlerClassName = getFromIntentOrPref(intent, "notificationHandler");
             Class handlerClass;
 
@@ -98,7 +99,7 @@ public class ConnectionService extends Service implements ConnectCallback, PushC
 
             client = new SocketIOProxyClient(host);
             client.setResponseHandler(this);
-            client.setPushId(new SharedPreferencePushIdGenerator(this.getApplicationContext()).generatePushId());
+            client.setPushId(pushId);
             client.setPushCallback(this);
             client.setNotificationCallback(this);
             client.setConnectCallback(this);

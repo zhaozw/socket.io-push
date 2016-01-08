@@ -51,7 +51,7 @@ function RestApi(io,stats,redis,port){
  };
 
  var handleNotification = function (req, res, next) {
-     var notification = JSON.parse(req.params.notification);
+    var notification = JSON.parse(req.params.notification);
     if(!notification){
       res.send({code:"error",message:'notification is required'});
       return next();
@@ -88,7 +88,17 @@ function RestApi(io,stats,redis,port){
     return next();
  };
 
+ var handleChartStats = function (req, res, next) {
+     var key = req.params.key;
+     stats.find(key,function(result){
+        res.send(result);
+     });
+     return next();
+  };
+
+
  server.get('/api/stats', handleStats);
+ server.get('/api/stats/chart', handleChartStats);
  server.get('/api/push', handlePush);
  server.post('/api/push', handlePush);
  server.get('/api/notification', handleNotification);
@@ -102,5 +112,6 @@ function RestApi(io,stats,redis,port){
  server.listen(port, function () {
    console.log('%s listening at %s', server.name, server.url);
  });
+
 }
 

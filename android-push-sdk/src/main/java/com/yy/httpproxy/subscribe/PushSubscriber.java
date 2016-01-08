@@ -7,5 +7,4 @@ public interface PushSubscriber {
 
     void subscribeBroadcast(String topic);
 
-    void setPushId(String pushId);
 }

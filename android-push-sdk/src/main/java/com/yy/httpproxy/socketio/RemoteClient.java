@@ -98,7 +98,6 @@ public class RemoteClient implements PushSubscriber, HttpRequester {
                 doSubscribe(topic);
             }
 
-            setPushId(pushId);
         }
 
         public void onServiceDisconnected(ComponentName className) {
@@ -111,9 +110,9 @@ public class RemoteClient implements PushSubscriber, HttpRequester {
         }
     };
 
-    public RemoteClient(Context context, String host, String notificationHandler) {
+    public RemoteClient(Context context, String host, String pushId, String notificationHandler) {
         this.context = context;
-        startRemoteService(context, host, notificationHandler);
+        startRemoteService(context, host, pushId, notificationHandler);
         startDummyService(context);
     }
 
@@ -122,9 +121,10 @@ public class RemoteClient implements PushSubscriber, HttpRequester {
         context.startService(intent);
     }
 
-    private void startRemoteService(Context context, String host, String notificationHandler) {
+    private void startRemoteService(Context context, String host, String pushId, String notificationHandler) {
         Intent intent = new Intent(context, ConnectionService.class);
         intent.putExtra("host", host);
+        intent.putExtra("pushId", pushId);
         if (notificationHandler != null) {
             intent.putExtra("notificationHandler", notificationHandler);
         }
@@ -141,15 +141,6 @@ public class RemoteClient implements PushSubscriber, HttpRequester {
         } catch (Exception e) {
             Log.e(TAG, "sendMsg error!", e);
         }
-    }
-
-    public void setPushId(String pushId) {
-        Message msg = Message.obtain(null, CMD_SET_PUSH_ID, 0, 0);
-        Bundle bundle = new Bundle();
-        bundle.putString("pushId", pushId);
-        msg.setData(bundle);
-        sendMsg(msg);
-        this.pushId = pushId;
     }
 
     public void request(RequestInfo requestInfo) {

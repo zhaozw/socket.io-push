@@ -14,10 +14,6 @@ sourceSets {
 }
 
 sourceSets.main.compileClasspath += configurations.provided
-jar {
-    baseName = 'java-server-push-sdk'
-    version = '1.0'
-}
 
 task execute(type:JavaExec){
     main = "com.yy.httpproxy.emitter.DemoServer"
@@ -44,7 +40,7 @@ apply plugin: 'maven'
 apply plugin: 'signing'
 
 group = 'com.yy'
-version = '1.0.0'
+version = '1.0.1'
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'

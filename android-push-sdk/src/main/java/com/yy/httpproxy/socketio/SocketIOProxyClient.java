@@ -9,6 +9,7 @@ import com.yy.httpproxy.requester.RequestException;
 import com.yy.httpproxy.requester.RequestInfo;
 import com.yy.httpproxy.requester.ResponseHandler;
 import com.yy.httpproxy.service.ConnectionService;
+import com.yy.httpproxy.stats.Stats;
 import com.yy.httpproxy.subscribe.ConnectCallback;
 import com.yy.httpproxy.subscribe.PushCallback;
 import com.yy.httpproxy.subscribe.PushSubscriber;
@@ -44,6 +45,7 @@ public class SocketIOProxyClient implements PushSubscriber {
     private ResponseHandler responseHandler;
     private ConnectCallback connectCallback;
     private boolean connected = false;
+    private Stats stats = new Stats();
 
     public void setResponseHandler(ResponseHandler responseHandler) {
         this.responseHandler = responseHandler;
@@ -74,6 +76,7 @@ public class SocketIOProxyClient implements PushSubscriber {
     private final Emitter.Listener connectListener = new Emitter.Listener() {
         @Override
         public void call(Object... args) {
+            sendStats();
             sendPushIdAndTopicToServer();
             reSendFailedRequest();
         }
@@ -141,7 +144,15 @@ public class SocketIOProxyClient implements PushSubscriber {
                     JSONObject data = (JSONObject) args[0];
                     JSONObject android = data.optJSONObject("android");
                     Log.v(TAG, "on notification topic " + android);
-                    notificationCallback.onNotification(data.optString("id"), android);
+                    String id = data.optString("id", null);
+                    notificationCallback.onNotification(id, android);
+                    long timestamp = data.optLong("timestamp", 0);
+                    if (timestamp > 0 && id != null) {
+                        JSONObject object = new JSONObject();
+                        object.put("id", id);
+                        object.put("timestamp", timestamp);
+                        socket.emit("notificationReply", object);
+                    }
                 } catch (Exception e) {
                     Log.e(TAG, "handle notification error ", e);
                 }
@@ -178,6 +189,9 @@ public class SocketIOProxyClient implements PushSubscriber {
                 if (request.timeoutForRequest(timeout)) {
                     Log.i(TAG, "StompClient timeoutForRequest " + request.getPath());
                     if (responseHandler != null) {
+                        if (request.getTimestamp() > 0) {
+                            stats.reportError(request.getPath());
+                        }
                         responseHandler.onResponse(request.getSequenceId(), RequestException.Error.TIMEOUT_ERROR.value, RequestException.Error.TIMEOUT_ERROR.name(), null);
                     }
                     it.remove();
@@ -188,11 +202,37 @@ public class SocketIOProxyClient implements PushSubscriber {
         }
     };
 
+    private Runnable statsTask = new Runnable() {
+        @Override
+        public void run() {
+            sendStats();
+        }
+    };
+
     private void postTimeout() {
         handler.removeCallbacks(timeoutTask);
         if (replyCallbacks.size() > 0) {
             handler.postDelayed(timeoutTask, 1000);
         }
+    }
+
+    private void sendStats() {
+        if (socket.connected()) {
+            try {
+                JSONArray requestStats = stats.getRequestJsonArray();
+                if (requestStats.length() > 0) {
+                    JSONObject object = new JSONObject();
+                    object.put("requestStats", requestStats);
+                    socket.emit("stats", object);
+                    Log.v(TAG, "send stats " + requestStats.length());
+                }
+            } catch (JSONException e) {
+                Log.e(TAG, "sendStats error", e);
+            }
+        }
+        handler.removeCallbacks(statsTask);
+        handler.postDelayed(statsTask, 10 * 60 * 1000L);
+//        handler.postDelayed(statsTask, 10 * 1000L);
     }
 
     private final Emitter.Listener httpProxyListener = new Emitter.Listener() {
@@ -211,6 +251,7 @@ public class SocketIOProxyClient implements PushSubscriber {
                     String sequenceId = data.optString("sequenceId", "");
                     String message = data.optString("message", "");
                     responseHandler.onResponse(sequenceId, code, message, decodedResponse);
+                    stats.reportSuccess(request.getPath(), request.getTimestamp());
                 }
             }
         }
@@ -250,6 +291,8 @@ public class SocketIOProxyClient implements PushSubscriber {
             if (!socket.connected()) {
                 return;
             }
+
+            requestInfo.setTimestamp();
 
             JSONObject object = new JSONObject();
             object.put("data", Base64.encodeToString(requestInfo.getBody(), Base64.NO_WRAP));

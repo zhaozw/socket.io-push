@@ -14,7 +14,7 @@ public class RequestInfo implements Serializable{
     private byte[] body;
     private String path;
     private boolean expectReply = false;
-    private long timestamp = System.currentTimeMillis();
+    private long timestamp;
 
     public String getPath() {
         return path;
@@ -32,8 +32,8 @@ public class RequestInfo implements Serializable{
         return timestamp;
     }
 
-    public void setTimestamp(long timestamp) {
-        this.timestamp = timestamp;
+    public void setTimestamp() {
+        this.timestamp = System.currentTimeMillis();
     }
 
     public boolean timeoutForRequest(long timeout) {
