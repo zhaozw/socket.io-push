@@ -97,7 +97,7 @@ Stats.prototype.find = function(key,callback){
     var totalCount = 0;
     var totalLatency = 0;
     var totalSuccess = 0;
-    for (i = 0; i < 25; i++) {
+    for (i = 0; i < 24; i++) {
        keys.push("stats#" + key + "#totalCount#" + timestamp);
        keys.push("stats#" + key + "#successCount#" + timestamp);
        keys.push("stats#" + key + "#totalLatency#" + timestamp);
@@ -116,6 +116,9 @@ Stats.prototype.find = function(key,callback){
 
         }
         var avgLatency =  Math.round(totalLatency/totalSuccess) || 0;
-        callback({"totalCount":totalCount,"totalSuccess":totalSuccess,"avgLatency": avgLatency});
+        var successRate = totalSuccess / totalCount;
+        var countPerSecond = totalCount / 24 / mSecPerHour * 1000;
+
+        callback({"totalCount":totalCount,"totalSuccess":totalSuccess,"avgLatency": avgLatency, "successRate" : successRate ,"countPerSecond":countPerSecond});
     });
 }

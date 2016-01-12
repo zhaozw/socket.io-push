@@ -65,7 +65,7 @@ sudo n stable
 * install node modules
 
 ```
-./npmInstall.sh
+npm install
 ```
 
 * run
