@@ -6,12 +6,33 @@ function RestApi(io,stats,redis,port){
  var randomstring = require("randomstring");
  var server = restify.createServer({
    name: 'myapp',
-   version: '1.0.0'
+   version: '1.0.0',
  });
+
  var debug = require('debug')('RestApi');
  server.use(restify.acceptParser(server.acceptable));
  server.use(restify.queryParser());
  server.use(restify.bodyParser());
+
+ server.get(/\/push\/?.*/, restify.serveStatic({
+   directory: './static',
+   default: 'index.html'
+ }));
+
+ server.get(/^\/stats\/?.*/, restify.serveStatic({
+    directory: './static',
+    default: 'index.html'
+  }));
+
+  server.get(/\/js\/?.*/, restify.serveStatic({
+      directory: './static',
+      default: 'index.html'
+  }));
+
+  server.get("/", restify.serveStatic({
+      directory: './static',
+      default: 'index.html'
+  }));
 
  var handlePush = function (req, res, next) {
    var topic = req.params.topic;
@@ -38,11 +59,11 @@ function RestApi(io,stats,redis,port){
    } else {
      if(typeof pushId === 'string') {
          io.to(pushId).emit('push', pushData);
-                res.send({code:"success"});
-                return next();
+         res.send({code:"success"});
+         return next();
      } else {
          pushId.forEach(function(id){
-                 io.to(id).emit('push', pushData);
+            io.to(id).emit('push', pushData);
          });
          res.send({code:"success"});
          return next();
