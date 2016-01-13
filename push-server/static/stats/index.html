@@ -6,51 +6,59 @@
 <body>
 <div style="width:30%">
     <div>
-        Total: <span id="totalCount">0</span><br/>
-        Success Rate: <span id="successRate">0</span><br/>
-        Average Latency: <span id="avgLatency">0</span><br/>
-        Request Per Second: <span id="requestPerSecond">0</span><br/>
+        数据展示为最近7天,图表精度1个小时<br/>
+        total = 服务端对连接的客户端发送通知栏消息总数<br/>
+        success = 客户端收到通知栏消息后,发包给服务器,10秒内记成功<br/>
+        latency = 服务器发通知的时候,加上服务器时间戳,客户端回包加上这个时间戳,计算延迟,10秒外计算为失败<br/>
+        average latency = sum(latency) / success<br/>
+        success rate = success/total<br/>
+    </div>
+    <div>
+        Total Count: <span id="totalCount">0</span><br/>
+        Success Rate(percent): <span id="successRate">0</span><br/>
+        Average Latency(ms): <span id="avgLatency">0</span><br/>
+        Per Second: <span id="requestPerSecond">0</span><br/>
     </div>
     <br/>
     <br/>
     <div>
         <label for="totalChartHour">
-            Total(Hour)<br /><br />
+            Total Count(Hour)<br /><br />
             <canvas id="totalChartHour" height="300" width="800"></canvas>
         </label>
     </div>
 
     <div>
         <label for="totalChartDay">
-            Total(Day)<br /><br />
+            Total Count(Day)<br /><br />
             <canvas id="totalChartDay" height="300" width="800"></canvas>
         </label>
     </div>
 
     <div>
         <label for="latencyChartHour">
-            Latency(Hour)<br /><br />
+            Latency(ms)(Hour)<br /><br />
             <canvas id="latencyChartHour" height="400" width="800"></canvas>
         </label>
     </div>
 
     <div>
         <label for="latencyChartDay">
-            Latency(Day)<br /><br />
+            Latency(ms)(Day)<br /><br />
             <canvas id="latencyChartDay" height="400" width="800"></canvas>
         </label>
     </div>
 
     <div>
         <label for="successRateChartHour">
-            Success Rate(Hour)<br /><br />
+            Success Rate(%)(Hour)<br /><br />
             <canvas id="successRateChartHour" height="400" width="800"></canvas>
         </label>
     </div>
 
     <div>
         <label for="successRateChartDay">
-            Success Rate(Day)<br /><br />
+            Success Rate(%)(Day)<br /><br />
             <canvas id="successRateChartDay" height="400" width="800"></canvas>
         </label>
     </div>

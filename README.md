@@ -12,4 +12,15 @@ SocketIO-Push
 * [Android SDK](android-push-sdk)
 * [IOS SDK](https://github.com/xuduo/socket.io-push-iossdk) 另一个git repo
 
-##Demo
+##更新日志
+
+####2013-1-13 
+    添加统计数据(安卓)
+    统计方法:
+    数据展示为最近7天,图表精度1个小时
+    total = 服务端对连接的客户端发送通知栏消息总数
+    success = 客户端收到通知栏消息后,发包给服务器,10秒内记成功
+    latency = 服务器发通知的时候,加上服务器时间戳,客户端回包加上这个时间戳,计算延迟,10秒外计算为失败
+    average latency = sum(latency) / success
+    success rate = success/total
+    
