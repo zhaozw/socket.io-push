@@ -262,7 +262,7 @@ public class SocketIOProxyClient implements PushSubscriber {
     public SocketIOProxyClient(String host) {
         AndroidLoggingHandler.reset(new AndroidLoggingHandler());
         java.util.logging.Logger.getLogger("").setLevel(Level.FINEST);
-        topics.add("android");
+        topics.add("noti");
         try {
             IO.Options opts = new IO.Options();
             opts.transports = new String[]{"websocket"};
@@ -271,7 +271,7 @@ public class SocketIOProxyClient implements PushSubscriber {
             socket.on(Socket.EVENT_CONNECT, connectListener);
             socket.on("pushId", pushIdListener);
             socket.on("push", pushListener);
-            socket.on("notification", notificationListener);
+            socket.on("noti", notificationListener);
             socket.on(Socket.EVENT_DISCONNECT, disconnectListener);
             socket.connect();
         } catch (URISyntaxException e) {

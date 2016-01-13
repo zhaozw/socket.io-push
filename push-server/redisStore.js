@@ -136,7 +136,7 @@ RedisStore.prototype.setApnToken = function(pushId,apnToken) {
 };
 
 RedisStore.prototype.sendNotification = function(pushId, notification,io) {
-    io.to(pushId).emit('notification', notification);
+    io.to(pushId).emit('noti', notification);
     this.redis.get("apnToken#" + pushId,  function(err, token) {
         // reply is null when the key is missing
         debug("apnToken redis %s", token);
@@ -149,7 +149,7 @@ RedisStore.prototype.sendNotification = function(pushId, notification,io) {
 
 
 RedisStore.prototype.sendNotificationToAll = function(notification,io) {
-    io.to("android").emit('notification', notification);
+    io.to("noti").emit('noti', notification);
     this.redis.hkeys("apnTokens", function (err, replies) {
       debug(replies.length + " replies:");
       var note = toApnNotification(notification);

@@ -25,7 +25,7 @@ Stats.prototype.addSession = function(socket,count) {
                    if(packetBody.length > 0 ) {
                         var json  = packetBody.substring(1,packetBody.length);
                         var parsed = JSON.parse(json);
-                        if(parsed[0] === "notification"){
+                        if(parsed[0] === "noti"){
                             var timestamp = Date.now();
                             parsed[1]['timestamp'] = timestamp
                             packet[0] = "2" + JSON.stringify(parsed);
