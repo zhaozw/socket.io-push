@@ -62,16 +62,15 @@ public class DrawActivity extends Activity implements ConnectCallback {
         connect = (TextView) findViewById(R.id.tv_connect);
 
 //        String pushServerHost = "http://183.61.6.33:8080";
-//        String pushServerHost = "http://172.26.66.8:9101";
-        String pushServerHost = "http://183.60.221.91:9101";
+        String pushServerHost = "http://172.26.66.8:9101";
+//        String pushServerHost = "http://183.60.221.91:9101";
 
         myColor = myColors[new Random().nextInt(myColors.length)];
 
         proxyClient = new ProxyClient(new Config(this.getApplicationContext())
                 .setHost(pushServerHost)
                 .setPushSerializer(new JsonPushSerializer())
-                .setRequestSerializer(new JsonSerializer()).setConnectCallback(this))
-        ;
+                .setRequestSerializer(new JsonSerializer()).setConnectCallback(this));
 
         findViewById(R.id.btn_clear).setOnClickListener(new View.OnClickListener() {
             @Override

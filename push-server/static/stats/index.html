@@ -15,6 +15,9 @@
         success rate = success/total<br/>
     </div>
     <br/>
+    <div>
+        key : <input id="key" value=""> <button onclick="javascript:loadData()">Query Data</button>
+    </div>
     <br/>
     <div>
         Total Count: <span id="totalCount">0</span><br/>
@@ -74,6 +77,21 @@
 
 <script>
 
+    function getUrlParameter(sParam) {
+        var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+            sURLVariables = sPageURL.split('&'),
+            sParameterName,
+            i;
+
+        for (i = 0; i < sURLVariables.length; i++) {
+            sParameterName = sURLVariables[i].split('=');
+
+            if (sParameterName[0] === sParam) {
+                return sParameterName[1] === undefined ? true : sParameterName[1];
+            }
+        }
+    };
+
     var options =  {
                     animation: false,
                     bezierCurve: true,
@@ -102,11 +120,11 @@
                     scaleDateTimeFormat: "mm-dd"
 	};
 
-	window.onload = function(){
+	function loadData(){
 		$.ajax({
             type: 'GET',
-            url: '/api/stats/chart?key=notification',
-            data: { get_param: 'value' },
+            url: '/api/stats/chart',
+            data: { key: $("#key").val() },
             dataType: 'json',
             success: function (data) {
 
@@ -124,6 +142,14 @@
                 makeDayChart("successRateChartDay","percent",data.chartData.successRateDay,data.chartData.timestamps);
             }
         });
+	}
+
+	window.onload = function(){
+	    if(!$("#key").val()){
+            var key = getUrlParameter('key');
+            $("#key").val(key);
+	    }
+	    loadData();
 	}
 
 	function makeDayChart(canvas,name,serverData,timestamps){
