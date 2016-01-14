@@ -1,5 +1,8 @@
 var config = {};
 
+config.pingTimeOut = 70000;
+config.pingInterval = 25000;
+
 config.apn = {
   production : false
 };

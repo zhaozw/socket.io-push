@@ -7,8 +7,6 @@ function ProxyServer(io,stats,redis){
  var http = require('http');
  var debug = require('debug')('ProxyServer');
 
- io.set('heartbeat interval', 30000);
- io.set('heartbeat timeout', 10000);
 
  io.on('connection', function (socket) {
 

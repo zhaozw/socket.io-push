@@ -93,7 +93,7 @@ Stats.prototype.onNotificationReply = function(timestamp) {
 
 Stats.prototype.find = function(key,callback){
     var totalHour = 7 * 24;
-    var timestamp = hourStrip(Date.now() - totalHour * mSecPerHour);
+    var timestamp = hourStrip(Date.now() - (totalHour - 1) * mSecPerHour);
     var keys = [];
     var totalCount = 0;
     var totalLatency = 0;

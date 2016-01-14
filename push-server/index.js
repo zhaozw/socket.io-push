@@ -5,7 +5,7 @@ console.log("starting instance #" + instance);
 var ioPort = config["io_" + instance].port;
 var apiPort = config["api_" + instance].port;
 console.log("start server on port " + ioPort);
-var io = require('socket.io')(ioPort);
+var io = require('socket.io')(ioPort,{pingTimeout:config.pingTimeout,pingInterval:config.pingInterval});
 var socketIoRedis = require('socket.io-redis')({ host: config.redis.host , port: config.redis.port });
 io.adapter(socketIoRedis);
 var redis = require("redis")
@@ -19,4 +19,5 @@ var proxyServer = require('./proxyServer.js')(io,stats, redisStore);
 
 // push
 var restApi = require('./restApi.js')(io, stats,redisStore, apiPort);
+
 
