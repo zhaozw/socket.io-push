@@ -6,6 +6,7 @@ function Stats(redis){
  if (!(this instanceof Stats)) return new Stats(redis);
  this.redis = redis;
  this.sessionCount = 0;
+ this.redisIncrBuffer = require('./redisIncrBuffer.js')(redis);
 }
 
 Stats.prototype.addSession = function(socket,count) {
@@ -71,14 +72,14 @@ function hourStrip(timestamp){
 Stats.prototype.incr = function(key,timestamp) {
     var hourKey = hourStrip(timestamp);
     key = key + "#" + hourKey;
-    this.redis.incr(key);
+    this.redisIncrBuffer.incrby(key,1);
     debug("incr %s %s",key,hourKey);
 };
 
 Stats.prototype.incrby = function(key,timestamp,by) {
     var hourKey = hourStrip(timestamp);
     key = key + "#" + hourKey;
-    this.redis.incrby(key, by);
+    this.redisIncrBuffer.incrby(key, by);
     debug("incrby %s %s by %d ",key,hourKey,by);
 };
 

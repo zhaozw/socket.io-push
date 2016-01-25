@@ -13,7 +13,7 @@ var pubClient = redis.createClient({ host: config.redis.host, port: config.redis
 var subClient = redis.createClient({ host: config.redis.host, port: config.redis.port });
 var statClient = redis.createClient({ host: config.redis.host, port: config.redis.port });
 var redisStore = require('./redisStore.js')(pubClient,subClient);
-var stats = require('./stats.js')(statClient);
+var stats = require('./stats/stats.js')(statClient);
 
 var proxyServer = require('./proxyServer.js')(io,stats, redisStore);
 
