@@ -8,9 +8,13 @@ SocketIO-Push
 * 基于长连接的,request/response负载均衡代理(开发中)
 
 ##文档
-* [服务器](push-server)
+* [服务器 push-server](push-server)
 * [Android SDK](android-push-sdk)
 * [IOS SDK](https://github.com/xuduo/socket.io-push-iossdk) 另一个git repo
+
+##Demo
+* [Android](demo-android)
+* [IOS](demo-ios)
 
 ##更新日志
 

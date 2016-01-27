@@ -14,7 +14,7 @@ function RestApi(io,stats,redis,port){
  server.use(restify.queryParser());
  server.use(restify.bodyParser());
 
- server.get(/\/push\/?.*/, restify.serveStatic({
+ server.get(/^\/push\/?.*/, restify.serveStatic({
    directory: './static',
    default: 'index.html'
  }));
@@ -24,7 +24,7 @@ function RestApi(io,stats,redis,port){
     default: 'index.html'
   }));
 
-  server.get(/\/js\/?.*/, restify.serveStatic({
+  server.get(/^\/js\/?.*/, restify.serveStatic({
       directory: './static',
       default: 'index.html'
   }));
