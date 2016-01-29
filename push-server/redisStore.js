@@ -34,6 +34,18 @@ function RedisStore(redis,subClient){
         }
     });
     subClient.subscribe("packetServer");
+
+    options.batchFeedback = true;
+    options.interval = 60 * 5;
+
+    var feedback = new apn.Feedback(options);
+        feedback.on("feedback", function(devices) {
+              devices.forEach(function(item) {
+              var id = item.device.toString('hex');
+              debug("feedback %s",id);
+              redis.hdel("apnTokens",id);
+          });
+    });
 }
 
 function updatePathServer(handlerInfo){
