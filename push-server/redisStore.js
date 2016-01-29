@@ -180,6 +180,7 @@ function toApnNotification(notification){
                note.sound = "default";
             }
             note.alert = notification.apn.alert;
+            note.expiry = Math.floor(Date.now() / 1000) + 600;
             if(notification.apn.payload) {
                 note.payload = notification.apn.payload;
             } else {
