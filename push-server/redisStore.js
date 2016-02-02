@@ -5,9 +5,7 @@ var randomstring = require("randomstring");
 
 var apn = require('apn');
 
-var options = config.apn;
-
-var apnConnection = new apn.Connection(options);
+var apnConnection;
 
 var pathToServer = {};
 
@@ -35,17 +33,15 @@ function RedisStore(redis,subClient){
     });
     subClient.subscribe("packetServer");
 
-    options.batchFeedback = true;
-    options.interval = 60 * 5;
+    config.apn.errorCallback = function(errorCode,notification, device){
+         var id = device.token.toString('hex');
+         debug("apn errorCallback %d %s",errorCode, id);
+         if(errorCode == 8){
+            redis.hdel("apnTokens",id);
+         }
+    }
+    apnConnection = new apn.Connection(config.apn);
 
-    var feedback = new apn.Feedback(options);
-        feedback.on("feedback", function(devices) {
-              devices.forEach(function(item) {
-              var id = item.device.toString('hex');
-              debug("feedback %s",id);
-              redis.hdel("apnTokens",id);
-          });
-    });
 }
 
 function updatePathServer(handlerInfo){
@@ -125,7 +121,7 @@ RedisStore.prototype.publishConnect = function(pushId, socketId) {
     debug("publishConnect pushId %s",pushId);
     var outerThis = this;
     this.redis.get("pushIdSocketId#" + pushId,  function(err, lastSocketId) {
-                // reply is null when the key is missing
+          // reply is null when the key is missing
           debug("publishConnect query redis %s", lastSocketId);
           if(lastSocketId) {
             debug("reconnect do not publish", lastSocketId);
