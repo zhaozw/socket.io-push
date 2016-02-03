@@ -137,17 +137,25 @@ RedisStore.prototype.publishConnect = function(pushId, socketId) {
 
 RedisStore.prototype.setApnToken = function(pushId,apnToken) {
     if(pushId && apnToken){
-       this.redis.set("apnToken#" + pushId, apnToken);
-       this.redis.expire("apnToken#" + pushId, 3600 * 24 * 7);
-       this.redis.hset("apnTokens", apnToken , "");
+       var outerThis = this;
+       this.redis.get("apnTokenToPushId#" + apnToken,  function(err, pushId) {
+            if(pushId) {
+               debug("removing duplicate pushIdToApnToken %s",pushId);
+               outerThis.redis.del("pushIdToApnToken#" + pushId);
+            }
+            outerThis.redis.set("pushIdToApnToken#" + pushId, apnToken);
+            outerThis.redis.expire("pushIdToApnToken#" + pushId, 3600 * 24 * 7);
+            outerThis.redis.hset("apnTokens", apnToken , 1);
+            debug("set pushIdToApnToken %s %s",pushId,apnToken);
+       });
     }
 };
 
 RedisStore.prototype.sendNotification = function(pushId, notification,io) {
     io.to(pushId).emit('noti', notification);
-    this.redis.get("apnToken#" + pushId,  function(err, token) {
+    this.redis.get("pushIdToApnToken#" + pushId,  function(err, token) {
         if(token) {
-            debug("apnToken %s redis %s %s",notification.id, pushId, token);
+            debug("apnToken redis %s %s %s",notification.id, pushId, token);
             var note = toApnNotification(notification);
             apnConnection.pushNotification(note, token);
         }
