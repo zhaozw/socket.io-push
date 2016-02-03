@@ -138,15 +138,17 @@ RedisStore.prototype.publishConnect = function(pushId, socketId) {
 RedisStore.prototype.setApnToken = function(pushId,apnToken) {
     if(pushId && apnToken){
        var outerThis = this;
-       this.redis.get("apnTokenToPushId#" + apnToken,  function(err, pushId) {
-            if(pushId) {
-               debug("removing duplicate pushIdToApnToken %s",pushId);
-               outerThis.redis.del("pushIdToApnToken#" + pushId);
+       this.redis.get("apnTokenToPushId#" + apnToken,  function(err, oldPushId) {
+            if(oldPushId) {
+               debug("removing duplicate pushIdToApnToken %s",oldPushId);
+               outerThis.redis.del("pushIdToApnToken#" + oldPushId);
             }
             outerThis.redis.set("pushIdToApnToken#" + pushId, apnToken);
             outerThis.redis.expire("pushIdToApnToken#" + pushId, 3600 * 24 * 7);
+            outerThis.redis.set("apnTokenToPushId#" + apnToken, pushId);
+            outerThis.redis.expire("apnTokenToPushId#" + pushId, 3600 * 24 * 7);
             outerThis.redis.hset("apnTokens", apnToken , 1);
-            debug("set pushIdToApnToken %s %s",pushId,apnToken);
+            debug("set pushIdToApnToken %s %s", pushId, apnToken);
        });
     }
 };
