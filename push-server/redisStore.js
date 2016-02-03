@@ -32,7 +32,7 @@ function RedisStore(redis,subClient){
         }
     });
     subClient.subscribe("packetServer");
-
+    config.apn.maxConnections = 10;
     config.apn.errorCallback = function(errorCode,notification, device){
          var id = device.token.toString('hex');
          debug("apn errorCallback %d %s",errorCode, id);
@@ -146,9 +146,8 @@ RedisStore.prototype.setApnToken = function(pushId,apnToken) {
 RedisStore.prototype.sendNotification = function(pushId, notification,io) {
     io.to(pushId).emit('noti', notification);
     this.redis.get("apnToken#" + pushId,  function(err, token) {
-        // reply is null when the key is missing
-        debug("apnToken redis %s", token);
         if(token) {
+            debug("apnToken %s redis %s %s",notification.id, pushId, token);
             var note = toApnNotification(notification);
             apnConnection.pushNotification(note, token);
         }
