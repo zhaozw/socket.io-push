@@ -113,7 +113,6 @@ RedisStore.prototype.publishDisconnect = function(pushId,socketId) {
                outerThis.publishPacket(data);
             }
     });
-
 };
 
 RedisStore.prototype.publishConnect = function(pushId, socketId) {

@@ -14,7 +14,7 @@ var subClient = redis.createClient({ host: config.redis.host, port: config.redis
 var statClient = redis.createClient({ host: config.redis.host, port: config.redis.port });
 var redisStore = require('./lib/redis/redisStore.js')(config,pubClient,subClient);
 var stats = require('./lib/stats/stats.js')(statClient);
-var uidStore = require('./lib/uid/uidStore.js')(statClient);
+var uidStore = require('./lib/redis/uidStore.js')(statClient);
 
 var proxyServer = require('./lib/server/proxyServer.js')(io,stats, redisStore);
 

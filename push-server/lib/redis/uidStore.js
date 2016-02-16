@@ -1,6 +1,6 @@
 module.exports = UidStore;
 var debug = require('debug')('UidStore');
-
+var redisUtil = require('./util.js');
 var apn = require('apn');
 
 var socketIdToUid = {};
