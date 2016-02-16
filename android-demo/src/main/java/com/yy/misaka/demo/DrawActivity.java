@@ -61,8 +61,11 @@ public class DrawActivity extends Activity implements ConnectCallback {
         count = (TextView) findViewById(R.id.tv_count);
         connect = (TextView) findViewById(R.id.tv_connect);
 
-//        String pushServerHost = "http://183.61.6.33:8080";
+//        String pushServerHost = "http://183.61.6.33";
         String pushServerHost = "http://172.26.86.35:9101";
+//        String pushServerHost = "http://ws.tt.yy.com";
+//        String pushServerHost = "http://61.160.36.69:9101";
+//        String pushServerHost = "http://patch.3g.yy.com:9101";
 //        String pushServerHost = "http://183.60.221.91:9101";
 
         myColor = myColors[new Random().nextInt(myColors.length)];

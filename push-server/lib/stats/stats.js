@@ -15,30 +15,17 @@ Stats.prototype.addSession = function(socket,count) {
     }
     this.sessionCount += count;
 
-    var oldPacket = socket.packet;
-
     var stats = this;
 
-    socket.packet = function(packet, preEncoded){
-        try{
-            if(preEncoded && preEncoded.preEncoded){
-                   var packetBody = packet[0];
-                   if(packetBody.length > 0 ) {
-                        var json  = packetBody.substring(1,packetBody.length);
-                        var parsed = JSON.parse(json);
-                        if(parsed[0] === "noti"){
-                            var timestamp = Date.now();
-                            parsed[1]['timestamp'] = timestamp
-                            packet[0] = "2" + JSON.stringify(parsed);
-                            stats.incr("stats#notification#totalCount",timestamp);
-                            debug("adding notification timestamp %s" , packet[0]);
-                        }
-
-                   }
-           }
-        } catch(err){}
-        oldPacket.call(socket, packet, preEncoded);
-    };
+    socket.packetListeners.push(function(parsed,packet){
+        if(parsed[0] === "noti"){
+           var timestamp = Date.now();
+           parsed[1]['timestamp'] = timestamp
+           packet[0] = "2" + JSON.stringify(parsed);
+           stats.incr("stats#notification#totalCount",timestamp);
+           debug("adding notification timestamp %s" , packet[0]);
+        }
+    });
 
     socket.on('stats', function (data) {
         debug("on stats %s",JSON.stringify(data.requestStats));

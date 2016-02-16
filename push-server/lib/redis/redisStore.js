@@ -1,5 +1,4 @@
 module.exports = RedisStore;
-var config = require("./config");
 var debug = require('debug')('RedisStore');
 var randomstring = require("randomstring");
 
@@ -21,8 +20,8 @@ String.prototype.hashCode = function(){
 }
 
 
-function RedisStore(redis,subClient){
-    if (!(this instanceof RedisStore)) return new RedisStore(redis,subClient);
+function RedisStore(config,redis,subClient){
+    if (!(this instanceof RedisStore)) return new RedisStore(config,redis,subClient);
     this.redis = redis;
     subClient.on("message", function (channel, message) {
         //debug("subscribe message " + channel + ": " + message);

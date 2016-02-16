@@ -10,8 +10,6 @@ function ProxyServer(io,stats,redis){
 
  io.on('connection', function (socket) {
 
-     stats.addSession(socket);
-
      socket.on('disconnect', function () {
          stats.removeSession();
          var pushId = socketIdToPushId[socket.id];
@@ -20,6 +18,24 @@ function ProxyServer(io,stats,redis){
              redis.publishDisconnect(pushId,socket.id);
          }
      });
+
+     var oldPacket = socket.packet;
+     socket.packetListeners = [];
+     socket.packet = function(packet, preEncoded) {
+             try{
+                 if(preEncoded && preEncoded.preEncoded){
+                    var packetBody = packet[0];
+                    if(packetBody.length > 0 ) {
+                         var json  = packetBody.substring(1,packetBody.length);
+                         var parsed = JSON.parse(json);
+                         for (i = 0;i < socket.packetListeners.length; i++) {
+                             socket.packetListeners[i](parsed,packet);
+                         }
+                    }
+                }
+             } catch(err){}
+             oldPacket.call(socket, packet, preEncoded);
+     };
 
      socket.on('pushId', function (data) {
          if(data.id && data.id.length >= 10){
@@ -68,50 +84,7 @@ function ProxyServer(io,stats,redis){
           stats.onNotificationReply(data.timestamp);
       });
 
-      socket.on('httpProxy', function (data) {
-         debug('body' + JSON.stringify(data));
-//         var body = new Buffer(data.body.toString(),"base64").toString('utf-8');
-//         debug('httpProxy ' + data.sequenceId + ' path ' + data.path + ' body : ' + body);
-//         debug('headers ' + data.headers['X-Authorization']);
-//         var post_data = body;
-//
-//         var options = {
-//           host: data.host,
-//           port: data.port,
-//           path: data.path,
-//           method: data.method,
-//           headers: data.headers
-//         };
-//
-//         var req = http.request(options, function(res) {
-//               res.setEncoding('utf8');
-//               var body = "";
-//               res.on('data', function (chunk) {
-//                   body += chunk;
-//               });
-//               res.on('end', function() {
-//                   socket.emit('httpProxy', {
-//                         sequenceId: data.sequenceId,
-//                         statusCode: res.statusCode,
-//                         response: new Buffer(body).toString('base64'),
-//                         headers: res.headers
-//                     });
-//               });
-//         });
-//
-//         req.on('error', function(e) {
-//                 socket.emit('httpProxy', {
-//                         sequenceId: data.sequenceId,
-//                         errorMessage: e.message,
-//                 error: true
-//                     });
-//         });
-//
-//         req.setTimeout(5000,function(){
-//         });
-//         req.write(post_data);
-//         req.end();
-     });
+      stats.addSession(socket);
 
  });
 }

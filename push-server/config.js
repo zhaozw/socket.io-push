@@ -4,11 +4,13 @@ config.pingTimeOut = 70000;
 config.pingInterval = 25000;
 
 config.apn = {
-  production : false
+  production : false,
+  cert : "cert/cert.pem",
+  key : "cert/key.pem"
 };
 
 config.redis = {
-  host : "localhost",
+  host : "127.0.0.1",
   port : 6379
 };
 

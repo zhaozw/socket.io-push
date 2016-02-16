@@ -288,21 +288,18 @@ public class SocketIOProxyClient implements PushSubscriber {
                 replyCallbacks.put(requestInfo.getSequenceId(), requestInfo);
             }
 
-            if (!socket.connected()) {
-                return;
-            }
-
             requestInfo.setTimestamp();
-
-            JSONObject object = new JSONObject();
-            object.put("data", Base64.encodeToString(requestInfo.getBody(), Base64.NO_WRAP));
-            object.put("path", requestInfo.getPath());
-            object.put("sequenceId", String.valueOf(requestInfo.getSequenceId()));
-
-            socket.emit("packetProxy", object);
 
             postTimeout();
 
+            if (socket.connected()) {
+                JSONObject object = new JSONObject();
+                object.put("data", Base64.encodeToString(requestInfo.getBody(), Base64.NO_WRAP));
+                object.put("path", requestInfo.getPath());
+                object.put("sequenceId", String.valueOf(requestInfo.getSequenceId()));
+
+                socket.emit("packetProxy", object);
+            }
 
         } catch (Exception e) {
             responseHandler.onResponse(requestInfo.getSequenceId(), RequestException.Error.CLIENT_DATA_SERIALIZE_ERROR.value, RequestException.Error.CLIENT_DATA_SERIALIZE_ERROR.name(), null);

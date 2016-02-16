@@ -88,7 +88,6 @@ public class Emitter {
         byte[] packet = msgPack(pushId, "packetProxy", dataInfo);
         logger.debug("reply packet {} {}", pushId, new String(packet));
         getTopic(pushId).publish(packet);
-
     }
 
 }
