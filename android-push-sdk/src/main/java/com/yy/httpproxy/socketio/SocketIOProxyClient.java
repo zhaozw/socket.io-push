@@ -19,6 +19,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.URISyntaxException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -33,6 +36,12 @@ import java.util.logging.Level;
 import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 
 public class SocketIOProxyClient implements PushSubscriber {
@@ -266,6 +275,32 @@ public class SocketIOProxyClient implements PushSubscriber {
         try {
             IO.Options opts = new IO.Options();
             opts.transports = new String[]{"websocket"};
+            if (host.startsWith("https")) {
+                try {
+                    opts.sslContext = SSLContext.getInstance("TLS");
+                    TrustManager tm = new X509TrustManager() {
+                        public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+                        }
+
+                        public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+                        }
+
+                        public X509Certificate[] getAcceptedIssuers() {
+                            return null;
+                        }
+                    };
+                    opts.sslContext.init(null, new TrustManager[]{tm}, null);
+                    opts.hostnameVerifier = new HostnameVerifier() {
+
+                        @Override
+                        public boolean verify(String s, SSLSession sslSession) {
+                            return true;
+                        }
+                    };
+                } catch (Exception e) {
+                    Log.e(TAG, "ssl init error ", e);
+                }
+            }
             socket = IO.socket(host, opts);
             socket.on("packetProxy", httpProxyListener);
             socket.on(Socket.EVENT_CONNECT, connectListener);
