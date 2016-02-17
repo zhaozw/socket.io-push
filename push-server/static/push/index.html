@@ -19,10 +19,6 @@
         text-align: center;
         }
 
-        form{
-        text-align: center;
-        }
-
         #myDiv{
         margin-top:50px;
         width:100%;
@@ -36,7 +32,8 @@
         }
 
     </style>
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+   <!-- <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>-->
+    <script src="/js/jquery-1.8.0.min.js"></script>
 </head>
 <body>
 <script type="text/javascript">
@@ -105,8 +102,6 @@
             </td>
         </tr>
 
-        <form action="/api/notification" method="post" onsubmit="return validate_form()"
-              id="myForm">
             <tr align=left id="pushIdDiv">
                 <div id="pushIdText">
                     <td width="100" align=right>pushId: &nbsp&nbsp&nbsp</td>
@@ -129,15 +124,19 @@
             </tr>
 
             <tr align=right>
-                <td  colspan="3" align="center"><input type="submit" value="发送"/></td>
+                <td  colspan="3" align="center"><input type="button" onclick="ajaxTest()" value="推送"/></td>
             </tr>
-        </form>
+
+            <tr></tr>
+
+            <tr>
+                <td colspan="3" align="center"><font size="5" color="green" id="result"></font></td>
+            </tr>
+
     </table>
 </div>
 <script>
-
-        function validate_form()
-        {
+         function ajaxTest(){
             var radio =  document.getElementsByName("type");
             for(var i = 0;i < radio.length; i++)
             {
@@ -167,15 +166,21 @@
                 return false
             }
 
-
             var data = { "android":{"title":$("#title").val() ,"message":$("#content").val()},"apn":{"alert":$("#content").val() , "badge":5, "sound":"default", "payload":1234}}
             var str = JSON.stringify(data);
-            //var notification='{ "android":{"title":"title" ,"message":"message"},"apn":{"alert":"message" , "badge":5, "sound":"default", "payload":1234}}';
-            //var bToObj=JSON.parse(notification); string to json
-
-            document.getElementById("notification").value = str;
-
-            document.getElementById("pushAll").value = pushAll;
+            $.ajax({
+                type: 'POST',
+                url: '/api/notification',
+                data:"notification="+ str +"&pushAll="+pushAll+"&pushId="+$("#pushId").val()+"&uid="+$("#uid").val(),
+                success: function (data) {
+                    var message = data.message;
+                    var code = data.code;
+                    document.getElementById("result").innerHTML = message;
+                },
+                error: function(){
+                    alert("连接失败！");
+                }
+           });
         }
 
 </script>

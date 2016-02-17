@@ -73,11 +73,11 @@ function RestApi(io,stats,redis,port, uidStore){
 
  var handleNotification = function (req, res, next) {
     var notification = JSON.parse(req.params.notification);
-    console.log(req.params);
     if(!notification){
       res.send({code:"error",message:'notification is required'});
       return next();
     }
+
     notification.id = randomstring.generate(32);
     var pushId = req.params.pushId;
     var uid = req.params.uid;
@@ -86,19 +86,19 @@ function RestApi(io,stats,redis,port, uidStore){
 
     if(pushAll === 'true') {
         redis.sendNotificationToAll(notification,io);
-        res.send({code:"success"});
+        res.send({code:"success",message:'推送成功!'});
         return next();
     }else{
         if(pushId){
             if(typeof pushId === 'string') {
                 redis.sendNotification(pushId, notification,io);
-                res.send({code:"success"});
+                res.send({code:"success",message:'推送成功!'});
                 return next();
             }else {
                 pushId.forEach(function(pushId){
                     redis.sendNotification(pushId,notification,io);
                 });
-                res.send({code:"success"});
+                res.send({code:"success",message:'推送成功!'});
                 return next();
             }
        }else {
@@ -109,7 +109,7 @@ function RestApi(io,stats,redis,port, uidStore){
                               redis.sendNotification(result, notification,io);
                          });
                     });
-                    res.send({code:"success"});
+                    res.send({code:"success",message:'推送成功!'});
                     return next();
                 }else {
                     uid.forEach(function(uid){
@@ -119,7 +119,7 @@ function RestApi(io,stats,redis,port, uidStore){
                               });
                          });
                     });
-                    res.send({code:"success"});
+                    res.send({code:"success",message:'推送成功!'});
                     return next();
                 }
            }
