@@ -137,7 +137,8 @@ public class SocketIOProxyClient implements PushSubscriber {
         public void call(Object... args) {
             JSONObject data = (JSONObject) args[0];
             String pushId = data.optString("id");
-            Log.v(TAG, "on pushId " + pushId);
+            String uid = data.optString("uid");
+            Log.v(TAG, "on pushId " + pushId + " ,uid " + uid);
             connected = true;
             if (connectCallback != null) {
                 connectCallback.onConnect();

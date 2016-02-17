@@ -2,11 +2,10 @@ module.exports = ProxyServer;
 
 var socketIdToPushId = {};
 
-function ProxyServer(io,stats,redis){
- if (!(this instanceof ProxyServer)) return new ProxyServer(io,stats,redis);
+function ProxyServer(io,stats,redis,uidStore){
+ if (!(this instanceof ProxyServer)) return new ProxyServer(io,stats,redis,uidStore);
  var http = require('http');
  var debug = require('debug')('ProxyServer');
-
 
  io.on('connection', function (socket) {
 
@@ -47,11 +46,18 @@ function ProxyServer(io,stats,redis){
                   debug('join topic ' + topic);
              });
            }
-           socketIdToPushId[socket.id] = data.id;
-           redis.publishConnect(data.id,socket.id);
-           socket.join(data.id);
-           socket.emit('pushId', { id:data.id });
-           debug('join room socket.id %s ,pushId %s' ,socket.id, socketIdToPushId[socket.id]);
+           uidStore.getUidByPushId(data.id ,function(uid){
+                var reply = { id:data.id };
+                if (uid){
+                    reply.uid = uid;
+                }
+                socketIdToPushId[socket.id] = data.id;
+                redis.publishConnect(data.id,socket.id);
+                socket.join(data.id);
+                socket.emit('pushId', reply);
+                debug('join room socket.id %s ,pushId %s' ,socket.id, socketIdToPushId[socket.id]);
+           })
+
  	    }
      });
 

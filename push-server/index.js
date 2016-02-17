@@ -16,7 +16,7 @@ var redisStore = require('./lib/redis/redisStore.js')(config,pubClient,subClient
 var stats = require('./lib/stats/stats.js')(statClient);
 var uidStore = require('./lib/redis/uidStore.js')(statClient);
 
-var proxyServer = require('./lib/server/proxyServer.js')(io,stats, redisStore);
+var proxyServer = require('./lib/server/proxyServer.js')(io,stats, redisStore,uidStore);
 
 // push
 var restApi = require('./lib/api/restApi.js')(io, stats,redisStore, apiPort);
