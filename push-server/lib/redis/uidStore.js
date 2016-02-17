@@ -32,3 +32,9 @@ UidStore.prototype.getUidByPushId = function(pushId, callback) {
         callback(uid);
     });
 };
+
+UidStore.prototype.getPushIdByUid = function(uid, callback) {
+    this.redis.hkeys("uidToPushId#" + uid, function (err, replies) {
+         callback(replies);
+    });
+};

@@ -1,6 +1,6 @@
 module.exports = RestApi;
 
-function RestApi(io,stats,redis,port){
+function RestApi(io,stats,redis,port, uidStore){
 
  var restify = require('restify');
  var randomstring = require("randomstring");
@@ -73,12 +73,14 @@ function RestApi(io,stats,redis,port){
 
  var handleNotification = function (req, res, next) {
     var notification = JSON.parse(req.params.notification);
+    console.log(req.params);
     if(!notification){
       res.send({code:"error",message:'notification is required'});
       return next();
     }
     notification.id = randomstring.generate(32);
     var pushId = req.params.pushId;
+    var uid = req.params.uid;
     var pushAll = req.params.pushAll;
     debug('notification ' + JSON.stringify(req.params));
 
@@ -86,21 +88,42 @@ function RestApi(io,stats,redis,port){
         redis.sendNotificationToAll(notification,io);
         res.send({code:"success"});
         return next();
-    } else if(!pushId){
-      res.send({code:"error",message:'pushId is required'});
-      return next();
-    } else {
-      if(typeof pushId === 'string') {
-          redis.sendNotification(pushId, notification,io);
-          res.send({code:"success"});
-          return next();
-      } else {
-          pushId.forEach(function(pushId){
-             redis.sendNotification(pushId,notification,io);
-          });
-          res.send({code:"success"});
-          return next();
-      }
+    }else{
+        if(pushId){
+            if(typeof pushId === 'string') {
+                redis.sendNotification(pushId, notification,io);
+                res.send({code:"success"});
+                return next();
+            }else {
+                pushId.forEach(function(pushId){
+                    redis.sendNotification(pushId,notification,io);
+                });
+                res.send({code:"success"});
+                return next();
+            }
+       }else {
+           if(uid){
+               if(typeof uid === 'string'){
+                    uidStore.getPushIdByUid(uid, function(results){
+                         results.forEach(function (result, i) {
+                              redis.sendNotification(result, notification,io);
+                         });
+                    });
+                    res.send({code:"success"});
+                    return next();
+                }else {
+                    uid.forEach(function(uid){
+                         uidStore.getPushIdByUid(uid, function(results){
+                              results.forEach(function (result, i) {
+                                 redis.sendNotification(result, notification,io);
+                              });
+                         });
+                    });
+                    res.send({code:"success"});
+                    return next();
+                }
+           }
+       }
     }
   };
 
@@ -117,6 +140,13 @@ function RestApi(io,stats,redis,port){
      return next();
   };
 
+  var handleAddPushIdToUid = function (req, res, next) {
+     var uid = req.params.uid;
+     var pushId = req.params.pushId;
+     uidStore.addUid(pushId, uid, 3600 * 1000)
+     res.send({code:"success"});
+     return next();
+  };
 
  server.get('/api/stats', handleStats);
  server.get('/api/stats/chart', handleChartStats);
@@ -124,6 +154,8 @@ function RestApi(io,stats,redis,port){
  server.post('/api/push', handlePush);
  server.get('/api/notification', handleNotification);
  server.post('/api/notification', handleNotification);
+ server.get('/api/addPushIdToUid', handleAddPushIdToUid);
+ server.post('/api/addPushIdToUid', handleAddPushIdToUid);
 
  server.get('/api/stats', function(req,res,nex) {
        res.send({connectCounter:connectCounter,sentCounter :sentCounter , receiveCounter:receiveCounter, percent:receiveCounter/sentCounter });
