@@ -19,14 +19,20 @@
         text-align: center;
         }
 
-		form{
-
-			text-align: center;
-		}
+        form{
+        text-align: center;
+        }
 
         #myDiv{
-           margin-top:50px;
-           text-align: center;
+        margin-top:50px;
+        width:100%;
+        text-align: center;
+        }
+
+        table
+        {
+            margin-left: auto;
+            margin-right: auto;
         }
 
     </style>
@@ -37,7 +43,6 @@
     var pushAll = false;
     function change()
     {
-
         var radio =  document.getElementsByName("type");
         var radioLength = radio.length;
         for(var i = 0;i < radioLength; i++)
@@ -49,13 +54,20 @@
                  if(radioValue == "pushId")
                  {
                     pushAll = false;
-                   $("#pushIdDiv").show();
-
+                    $("#pushIdDiv").show();
+                    $("#pushUidDiv").hide();
+                 }
+                 else if(radioValue == "uid")
+                 {
+                    pushAll = false;
+                    $("#pushIdDiv").hide();
+                    $("#pushUidDiv").show();
                  }
                  else
                  {
                     pushAll = true;
                     $("#pushIdDiv").hide();
+                    $("#pushUidDiv").hide();
                  }
             }
         }
@@ -64,53 +76,65 @@
          change();
     }
 
+
 </script>
 
 <h1>Push Test</h1>
 
 <div id="myDiv">
-
-    <table cellspacing="10" cellpadding="0" width="400">
+    <table cellspacing="10" cellpadding="0" width="400" >
         <tr align=left>
-            <td width="100"  align=right>标&nbsp&nbsp&nbsp题 :</td>
-            <td width="300"><input id="title"  name="id" type="text"></td>
+            <td width="100" align=right>标&nbsp&nbsp&nbsp题 :</td>
+            <td width="300" colspan="3"><input id="title" name="id" type="text"></td>
         </tr>
 
         <tr align=left>
             <td width="100" align=right>消息编辑框:&nbsp&nbsp&nbsp</td>
-            <td width="300"><textarea id="content" name="content" cols="40" rows="4" placeholder="内容输入框" value=""></textarea></td>
+            <td width="300" colspan="3"><textarea id="content" name="content" cols="40" rows="4"
+                                      placeholder="内容输入框" value=""></textarea></td>
         </tr>
 
         <tr align=left>
-            <td width="100" align=right> <input name="type" type="radio" value="pushId" onchange = "change();" checked=true />pushId</td>
-            <td width="100"><input name="type" type="radio" value="pushAll" onchange = "change();"/>pushAll</td>
+            <td width="100" align=right><input name="type" type="radio" value="pushId" onchange="change();" checked=true/>pushId
+            </td>
+
+            <td width="100" align="right" ><input name="type" type="radio" value="pushAll" onchange="change();"/>pushAll
+            </td>
+
+            <td width="100" align="right"><input name="type" type="radio" value="uid" onchange="change();"/>pushUid
+            </td>
         </tr>
 
-        <form action ="/api/notification" method="post" onsubmit="return validate_form()" id="myForm">
+        <form action="/api/notification" method="post" onsubmit="return validate_form()"
+              id="myForm">
             <tr align=left id="pushIdDiv">
-                <div id = "pushIdText">
+                <div id="pushIdText">
                     <td width="100" align=right>pushId: &nbsp&nbsp&nbsp</td>
-                    <td width="300"><input id="pushId"  name="pushId" type="text"></td>
+                    <td width="300" colspan="3"><input id="pushId" name="pushId" type="text"></td>
                 </div>
             </tr>
-            <tr align=left  style="display:none;">
-                <td width="400"> <input id="notification"  name="notification" type="hidden"></td>
+            <tr align=left id="pushUidDiv">
+                <div id="pushUidText">
+                    <td width="100" align=right>uid: &nbsp&nbsp&nbsp</td>
+                    <td width="300" colspan="3"><input id="uid" name="uid" type="text"></td>
+                </div>
             </tr>
 
-            <tr align=left  style="display:none;">
-                <td width="400"> <input id="pushAll"  name="pushAll" type="hidden"></td>
-            </tr>
-            <tr align=right >
-                <td> <input type="submit"  value="发送"/></td>
+            <tr align=left style="display:none;">
+                <td width="400"><input id="notification" name="notification" type="hidden"></td>
             </tr>
 
-            <tr align=right >
-                <td> <input type="button" onclick="ajaxTest()" value="发送"/></td>
+            <tr align=left style="display:none;">
+                <td width="400"><input id="pushAll" name="pushAll" type="hidden"></td>
+            </tr>
+
+            <tr align=right>
+                <td  colspan="3" align="center"><input type="submit" value="发送"/></td>
             </tr>
         </form>
     </table>
 </div>
-    <script>
+<script>
 
         function validate_form()
         {
@@ -120,9 +144,12 @@
                  if(radio[i].checked)
                  {
                     var radioValue = radio[i].value;
-                    if(radioValue == "pushId" && $("#pushId").val() == "")
-                    {
+                    if(radioValue == "pushId" && $("#pushId").val() == ""){
                         alert("pushId 不能为空");
+                        return false;
+                    }
+                    if(radioValue == "uid" && $("#uid").val() == ""){
+                        alert("pushUid 不能为空");
                         return false;
                     }
                  }
@@ -147,60 +174,11 @@
             //var bToObj=JSON.parse(notification); string to json
 
             document.getElementById("notification").value = str;
-            if(pushAll)
-            {
-                document.getElementById("pushAll").value = true;
-            }else
-            {
-                document.getElementById("pushAll").value = false
-            }
+
+            document.getElementById("pushAll").value = pushAll;
         }
 
-        function ajaxTest(){
-            var radio =  document.getElementsByName("type");
-            for(var i = 0;i < radio.length; i++)
-            {
-                 if(radio[i].checked)
-                 {
-                    var radioValue = radio[i].value;
-                    if(radioValue == "pushId" && $("#pushId").val() == "")
-                    {
-                        alert("pushId 不能为空");
-                        return false;
-                    }
-                 }
-            }
-            var title =$("#title").val();
-            if(title == "")
-            {
-                alert("title 不能为空");
-                return false;
-            }
-            var content = $("#content").val();
-            if(content == "")
-            {
-                alert("content 不能为空");
-                return false
-            }
-
-
-            var data = { "android":{"title":$("#title").val() ,"message":$("#content").val()},"apn":{"alert":$("#content").val() , "badge":5, "sound":"default", "payload":1234}}
-            var str = JSON.stringify(data);
-
-            $.ajax({
-                type: "POST",
-                dataType: "jsonp",
-                url: "/api/notification",
-                data: $("#myForm").serialize(),
-                success: function(msg){
-                    alert(msg);
-                },
-                error: function(){
-                    alert("连接失败！");
-                }
-            });
-        }
-    </script>
+</script>
 
 </body>
 </html>
