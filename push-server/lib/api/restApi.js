@@ -10,6 +10,19 @@ function RestApi(io, stats, redis, port, uidStore) {
     });
 
     var debug = require('debug')('RestApi');
+
+    //server.on('uncaughtException', function (req, res, route, e) {
+    //    debug("uncaughtException %s", e);
+    //
+    //    if (this.listeners('uncaughtException').length > 1 ||
+    //        res.headersSent) {
+    //        return (false);
+    //    }
+    //
+    //    res.send(new InternalError(e, e.message || 'unexpected error'));
+    //    return (true);
+    //});
+
     server.use(restify.acceptParser(server.acceptable));
     server.use(restify.queryParser());
     server.use(restify.bodyParser());
@@ -90,17 +103,15 @@ function RestApi(io, stats, redis, port, uidStore) {
             return next();
         } else {
             if (pushId) {
+                var pushIds;
                 if (typeof pushId === 'string') {
-                    redis.sendNotification(pushId, notification, io);
-                    res.send({code: "success", message: '推送成功!'});
-                    return next();
+                    pushIds = [pushId];
                 } else {
-                    pushId.forEach(function (pushId) {
-                        redis.sendNotification(pushId, notification, io);
-                    });
-                    res.send({code: "success", message: '推送成功!'});
-                    return next();
+                    pushIds = pushId;
                 }
+                redis.sendNotification(pushIds, notification, io);
+                res.send({code: "success", message: '推送成功!'});
+                return next();
             } else {
                 if (uid) {
                     if (typeof uid === 'string') {

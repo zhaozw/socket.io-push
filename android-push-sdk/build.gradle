@@ -33,7 +33,7 @@ dependencies {
 }
 
 group = "com.yy"
-version = "1.0.62"
+version = "1.0.63"
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'

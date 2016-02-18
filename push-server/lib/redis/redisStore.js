@@ -1,6 +1,7 @@
 module.exports = RedisStore;
 var debug = require('debug')('RedisStore');
 var randomstring = require("randomstring");
+var util = require('./util.js');
 
 var apn = require('apn');
 
@@ -151,17 +152,29 @@ RedisStore.prototype.setApnToken = function (pushId, apnToken) {
     }
 };
 
-RedisStore.prototype.sendNotification = function (pushId, notification, io) {
-    io.to(pushId).emit('noti', notification);
-    this.redis.get("pushIdToApnToken#" + pushId, function (err, token) {
-        if (token) {
-            debug("apnToken redis %s %s %s", notification.id, pushId, token);
-            var note = toApnNotification(notification);
-            apnConnection.pushNotification(note, token);
+RedisStore.prototype.sendNotification = function (pushIds, notification, io) {
+    pushIds.forEach(function (pushId) {
+        io.to(pushId).emit('noti', notification);
+    });
+
+    util.batch(this.redis, "get", "pushIdToApnToken#", pushIds, function (replies) {
+        debug("util.batchGet %s", replies);
+        replies.clean();
+        if (replies.length > 0) {
+            apnConnection.pushNotification(note, replies);
         }
     });
 };
 
+Array.prototype.clean = function () {
+    for (var i = 0; i < this.length; i++) {
+        if (!this[i]) {
+            this.splice(i, 1);
+            i--;
+        }
+    }
+    return this;
+};
 
 RedisStore.prototype.sendNotificationToAll = function (notification, io) {
     io.to("noti").emit('noti', notification);
