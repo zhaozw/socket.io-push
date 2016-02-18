@@ -1,6 +1,6 @@
 module.exports = RestApi;
 
-function RestApi(io, stats, redis, port, uidStore) {
+function RestApi(io, stats, redis, port, uidStore, pubClient) {
 
     var restify = require('restify');
     var randomstring = require("randomstring");
@@ -10,6 +10,7 @@ function RestApi(io, stats, redis, port, uidStore) {
     });
 
     var debug = require('debug')('RestApi');
+    var util = require('../redis/util.js');
 
     //server.on('uncaughtException', function (req, res, route, e) {
     //    debug("uncaughtException %s", e);
@@ -95,44 +96,40 @@ function RestApi(io, stats, redis, port, uidStore) {
         var pushId = req.params.pushId;
         var uid = req.params.uid;
         var pushAll = req.params.pushAll;
+
         debug('notification ' + JSON.stringify(req.params));
 
         if (pushAll === 'true') {
             redis.sendNotificationToAll(notification, io);
-            res.send({code: "success", message: '推送成功!'});
+            res.send({code: "success"});
             return next();
         } else {
             if (pushId) {
                 var pushIds;
                 if (typeof pushId === 'string') {
-                    pushIds = [pushId];
+                    pushIds = pushId.split("\n").clean('');
                 } else {
                     pushIds = pushId;
                 }
                 redis.sendNotification(pushIds, notification, io);
-                res.send({code: "success", message: '推送成功!'});
+                res.send({code: "success"});
                 return next();
             } else {
                 if (uid) {
+                    var uids;
                     if (typeof uid === 'string') {
-                        uidStore.getPushIdByUid(uid, function (results) {
-                            results.forEach(function (result, i) {
-                                redis.sendNotification(result, notification, io);
-                            });
-                        });
-                        res.send({code: "success", message: '推送成功!'});
-                        return next();
+                        uids = uid.split("\n").clean('');
                     } else {
-                        uid.forEach(function (uid) {
-                            uidStore.getPushIdByUid(uid, function (results) {
-                                results.forEach(function (result, i) {
-                                    redis.sendNotification(result, notification, io);
-                                });
-                            });
-                        });
-                        res.send({code: "success", message: '推送成功!'});
-                        return next();
+                        uids = uid;
                     }
+                    var pushIds=[];
+                    util.batch(pubClient, "hkeys", "uidToPushId#", uids, function (replies) {
+                        replies.forEach(function (result, i) {
+                             pushIds = pushIds.concat(result);
+                        });
+                        redis.sendNotification(pushIds, notification, io);
+                        res.send({code: "success"});
+                    });
                 }
             }
         }
