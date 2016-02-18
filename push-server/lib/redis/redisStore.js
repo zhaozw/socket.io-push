@@ -161,6 +161,7 @@ RedisStore.prototype.sendNotification = function (pushIds, notification, io) {
         debug("util.batchGet %s", replies);
         replies.clean();
         if (replies.length > 0) {
+            var note = toApnNotification(notification);
             apnConnection.pushNotification(note, replies);
         }
     });
