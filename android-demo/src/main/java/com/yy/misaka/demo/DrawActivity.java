@@ -151,7 +151,7 @@ public class DrawActivity extends Activity implements ConnectCallback {
     }
 
     @Override
-    public void onConnect() {
+    public void onConnect(String uid) {
         updateConnect();
     }
 

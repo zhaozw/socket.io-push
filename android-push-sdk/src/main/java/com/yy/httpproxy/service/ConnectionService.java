@@ -156,7 +156,7 @@ public class ConnectionService extends Service implements ConnectCallback, PushC
 
 
     @Override
-    public void onConnect() {
+    public void onConnect(String uid) {
         sendConnect();
     }
 
@@ -168,6 +168,11 @@ public class ConnectionService extends Service implements ConnectCallback, PushC
             id = BindService.CMD_DISCONNECT;
         }
         Message msg = Message.obtain(null, id, 0, 0);
+        String uid = client.getUid();
+        if (uid != null) {
+            Bundle bundle = new Bundle();
+            bundle.putString("uid", uid);
+        }
         BindService.sendMsg(msg);
     }
 

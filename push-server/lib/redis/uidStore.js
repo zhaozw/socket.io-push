@@ -5,36 +5,36 @@ var apn = require('apn');
 
 var socketIdToUid = {};
 
-function UidStore(redis,subClient){
-    if (!(this instanceof UidStore)) return new UidStore(redis,subClient);
+function UidStore(redis, subClient) {
+    if (!(this instanceof UidStore)) return new UidStore(redis, subClient);
     this.redis = redis;
 }
 
 
-UidStore.prototype.addUid = function(pushId, uid, timeToLive) {
-    debug("addUid pushId %s %s",uid,pushId);
+UidStore.prototype.addUid = function (pushId, uid, timeToLive) {
+    debug("addUid pushId %s %s", uid, pushId);
     var key = "pushIdToUid#" + pushId;
     this.redis.set(key, uid);
-    if(timeToLive){
+    if (timeToLive) {
         this.redis.expire(key, timeToLive);
     }
-    this.redis.hset("uidToPushId#" + uid, pushId , Date.now());
+    this.redis.hset("uidToPushId#" + uid, pushId, Date.now());
 };
 
-UidStore.prototype.batchGetPushId = function(uids, callback) {
+UidStore.prototype.batchGetPushId = function (uids, callback) {
     util.batchGet(this.redis, uids, callback);
 };
 
-UidStore.prototype.getUidByPushId = function(pushId, callback) {
-    this.redis.get("pushIdToUid#" + pushId,  function(err, uid) {
+UidStore.prototype.getUidByPushId = function (pushId, callback) {
+    this.redis.get("pushIdToUid#" + pushId, function (err, uid) {
         // reply is null when the key is missing
         debug("getUidByPushId %s %s", pushId, uid);
         callback(uid);
     });
 };
 
-UidStore.prototype.getPushIdByUid = function(uid, callback) {
-      this.redis.hkeys("uidToPushId#" + uid, function (err, replies) {
-           callback(replies);
-      });
-  };
+UidStore.prototype.getPushIdByUid = function (uid, callback) {
+    this.redis.hkeys("uidToPushId#" + uid, function (err, replies) {
+        callback(replies);
+    });
+};

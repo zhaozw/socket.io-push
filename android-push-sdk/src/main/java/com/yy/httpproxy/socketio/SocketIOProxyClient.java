@@ -54,6 +54,7 @@ public class SocketIOProxyClient implements PushSubscriber {
     private ResponseHandler responseHandler;
     private ConnectCallback connectCallback;
     private boolean connected = false;
+    private String uid;
     private Stats stats = new Stats();
 
     public void setResponseHandler(ResponseHandler responseHandler) {
@@ -68,7 +69,6 @@ public class SocketIOProxyClient implements PushSubscriber {
                 data.put("topic", topic);
                 socket.emit("unsubscribeTopic", data);
             } catch (JSONException e) {
-                e.printStackTrace();
             }
         }
     }
@@ -95,6 +95,7 @@ public class SocketIOProxyClient implements PushSubscriber {
         @Override
         public void call(Object... args) {
             connected = false;
+            uid = null;
             if (connectCallback != null) {
                 connectCallback.onDisconnect();
             }
@@ -137,11 +138,11 @@ public class SocketIOProxyClient implements PushSubscriber {
         public void call(Object... args) {
             JSONObject data = (JSONObject) args[0];
             String pushId = data.optString("id");
-            String uid = data.optString("uid");
+            uid = data.optString("uid");
             Log.v(TAG, "on pushId " + pushId + " ,uid " + uid);
             connected = true;
             if (connectCallback != null) {
-                connectCallback.onConnect();
+                connectCallback.onConnect(uid);
             }
         }
     };
@@ -367,6 +368,10 @@ public class SocketIOProxyClient implements PushSubscriber {
 
     public void setNotificationCallback(NotificationCallback notificationCallback) {
         this.notificationCallback = notificationCallback;
+    }
+
+    public String getUid(){
+        return uid;
     }
 
     public boolean isConnected() {

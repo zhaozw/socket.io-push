@@ -71,7 +71,11 @@ public class RemoteClient implements PushSubscriber, HttpRequester {
             } else if (cmd == BindService.CMD_CONNECTED && connected == false) {
                 connected = true;
                 if (proxyClient.getConfig().getConnectCallback() != null) {
-                    proxyClient.getConfig().getConnectCallback().onConnect();
+                    String uid = null;
+                    if (bundle != null) {
+                        uid = bundle.getString("uid");
+                    }
+                    proxyClient.getConfig().getConnectCallback().onConnect(uid);
                 }
             } else if (cmd == BindService.CMD_DISCONNECT && connected == true) {
                 connected = false;

@@ -5,7 +5,7 @@ package com.yy.httpproxy.subscribe;
  */
 public interface ConnectCallback {
 
-    void onConnect();
+    void onConnect(String uid);
 
     void onDisconnect();
 
