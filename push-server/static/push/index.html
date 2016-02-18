@@ -48,23 +48,17 @@
             {
                  var radioValue = radio[i].value;
 
-                 if(radioValue == "pushId")
-                 {
-                    pushAll = false;
-                    $("#pushIdDiv").show();
-                    $("#pushUidDiv").hide();
-                 }
-                 else if(radioValue == "uid")
-                 {
-                    pushAll = false;
-                    $("#pushIdDiv").hide();
-                    $("#pushUidDiv").show();
-                 }
-                 else
+                 if(radioValue == "yes")
                  {
                     pushAll = true;
                     $("#pushIdDiv").hide();
                     $("#pushUidDiv").hide();
+                 }
+                 else if(radioValue == "no")
+                 {
+                    pushAll = false;
+                    $("#pushIdDiv").show();
+                    $("#pushUidDiv").show();
                  }
             }
         }
@@ -72,8 +66,6 @@
     window.onload = function() {
          change();
     }
-
-
 </script>
 
 <h1>Push Test</h1>
@@ -92,26 +84,29 @@
         </tr>
 
         <tr align=left>
-            <td width="100" align=right><input name="type" type="radio" value="pushId" onchange="change();" checked=true/>pushId
+            <td width="100" align=right><font size="2" >pushAll</font>
             </td>
 
-            <td width="100" align="right" ><input name="type" type="radio" value="pushAll" onchange="change();"/>pushAll
+            <td width="100" align="right" ><input name="type" type="radio" value="yes" onchange="change();"/>是
             </td>
 
-            <td width="100" align="right"><input name="type" type="radio" value="uid" onchange="change();"/>pushUid
+            <td width="100" align="right"><input name="type" type="radio" value="no" checked=true onchange="change();"/>否
             </td>
+
         </tr>
 
             <tr align=left id="pushIdDiv">
                 <div id="pushIdText">
                     <td width="100" align=right>pushId: &nbsp&nbsp&nbsp</td>
-                    <td width="300" colspan="3"><input id="pushId" name="pushId" type="text"></td>
+                    <td width="300" colspan="3"><textarea id="pushId" name="pushId" cols="40" rows="4"
+                                                          placeholder="多个Id换行分开" value=""></textarea></td>
                 </div>
             </tr>
             <tr align=left id="pushUidDiv">
                 <div id="pushUidText">
                     <td width="100" align=right>uid: &nbsp&nbsp&nbsp</td>
-                    <td width="300" colspan="3"><input id="uid" name="uid" type="text"></td>
+                    <td width="300" colspan="3"><textarea id="uid" name="uid" cols="40" rows="4"
+                                                          placeholder="多个Id换行分开" value=""></textarea></td>
                 </div>
             </tr>
 
@@ -143,12 +138,8 @@
                  if(radio[i].checked)
                  {
                     var radioValue = radio[i].value;
-                    if(radioValue == "pushId" && $("#pushId").val() == ""){
-                        alert("pushId 不能为空");
-                        return false;
-                    }
-                    if(radioValue == "uid" && $("#uid").val() == ""){
-                        alert("pushUid 不能为空");
+                    if(radioValue == "no" && $("#pushId").val() == "" && $("#uid").val() == ""){
+                        alert("pushId和uid不能都为空");
                         return false;
                     }
                  }
@@ -173,15 +164,21 @@
                 url: '/api/notification',
                 data:"notification="+ str +"&pushAll="+pushAll+"&pushId="+$("#pushId").val()+"&uid="+$("#uid").val(),
                 success: function (data) {
-                    var message = data.message;
-                    var code = data.code;
-                    document.getElementById("result").innerHTML = message;
+                    document.getElementById("result").innerHTML = JSON.stringify(data);
                 },
                 error: function(){
                     alert("连接失败！");
                 }
            });
         }
+
+         $("#pushId").bind('input propertychange', function() {
+            $("#uid").val("");
+         });
+
+         $("#uid").bind('input propertychange', function() {
+            $("#pushId").val("");
+         });
 
 </script>
 

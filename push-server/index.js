@@ -19,7 +19,7 @@ var uidStore = require('./lib/redis/uidStore.js')(statClient);
 var proxyServer = require('./lib/server/proxyServer.js')(io, stats, redisStore, uidStore);
 
 // push
-var restApi = require('./lib/api/restApi.js')(io, stats, redisStore, apiPort, uidStore);
+var restApi = require('./lib/api/restApi.js')(io, stats, redisStore, apiPort, uidStore, pubClient);
 
 
 
