@@ -1,4 +1,5 @@
 module.exports = RedisStore;
+
 var debug = require('debug')('RedisStore');
 var randomstring = require("randomstring");
 var util = require('./util.js');
@@ -71,7 +72,6 @@ function updatePathServer(handlerInfo) {
         }
         pathToServer[path] = updatedServers;
     }
-//    debug("updatePathServer %s",JSON.stringify(pathToServer));
 }
 
 function hashIndex(pushId, count) {
@@ -101,36 +101,42 @@ RedisStore.prototype.publishPacket = function (data) {
     }
 };
 
-RedisStore.prototype.publishDisconnect = function (pushId, socketId) {
-    debug("publishDisconnect pushId %s", pushId);
+RedisStore.prototype.publishDisconnect = function (socket) {
+    debug("publishDisconnect pushId %s", socket.pushId);
     var outerThis = this;
-    this.redis.get("pushIdSocketId#" + pushId, function (err, lastSocketId) {
+    this.redis.get("pushIdSocketId#" + socket.pushId, function (err, lastSocketId) {
         // reply is null when the key is missing
-        debug("pushIdSocketId redis %s %s", lastSocketId, pushId);
-        if (lastSocketId === socketId) {
-            debug("publishDisconnect current socket disconnect %s", socketId);
-            outerThis.redis.del("pushIdSocketId#" + pushId);
-            var data = {pushId: pushId, path: "/socketDisconnect"};
+        debug("pushIdSocketId redis %s %s", lastSocketId, socket.pushId);
+        if (lastSocketId === socket.id) {
+            debug("publishDisconnect current socket disconnect %s", socket.id);
+            outerThis.redis.del("pushIdSocketId#" + socket.pushId);
+            var data = {pushId: socket.pushId, path: "/socketDisconnect"};
+            if (socket.uid) {
+                data.uid = socket.uid;
+            }
             outerThis.publishPacket(data);
         }
     });
 };
 
-RedisStore.prototype.publishConnect = function (pushId, socketId) {
-    debug("publishConnect pushId %s", pushId);
+RedisStore.prototype.publishConnect = function (socket) {
+    debug("publishConnect pushId %s", socket.pushId);
     var outerThis = this;
-    this.redis.get("pushIdSocketId#" + pushId, function (err, lastSocketId) {
+    this.redis.get("pushIdSocketId#" + socket.pushId, function (err, lastSocketId) {
         // reply is null when the key is missing
         debug("publishConnect query redis %s", lastSocketId);
         if (lastSocketId) {
             debug("reconnect do not publish", lastSocketId);
         } else {
             debug("first connect publish", lastSocketId);
-            var data = {pushId: pushId, path: "/socketConnect"};
+            var data = {pushId: socket.pushId, path: "/socketConnect"};
+            if (socket.uid) {
+                data.uid = socket.uid;
+            }
             outerThis.publishPacket(data);
         }
-        outerThis.redis.set("pushIdSocketId#" + pushId, socketId);
-        outerThis.redis.expire("pushIdSocketId#" + pushId, 3600 * 24 * 7);
+        outerThis.redis.set("pushIdSocketId#" + socket.pushId, socket.id);
+        outerThis.redis.expire("pushIdSocketId#" + socket.pushId, 3600 * 24 * 7);
     });
 };
 

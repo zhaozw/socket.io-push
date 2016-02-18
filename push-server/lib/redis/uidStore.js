@@ -14,11 +14,18 @@ function UidStore(redis, subClient) {
 UidStore.prototype.addUid = function (pushId, uid, timeToLive) {
     debug("addUid pushId %s %s", uid, pushId);
     var key = "pushIdToUid#" + pushId;
-    this.redis.set(key, uid);
-    if (timeToLive) {
-        this.redis.expire(key, timeToLive);
-    }
-    this.redis.hset("uidToPushId#" + uid, pushId, Date.now());
+    this.redis.get(key, function (err, oldUid) {
+        if (uid) {
+            debug("remove %s from old uid %s", pushId, oldUid);
+            this.redis.hdel("uidToPushId#" + uid, pushId);
+        }
+        this.redis.set(key, uid);
+        if (timeToLive > 0) {
+            this.redis.expire(key, timeToLive);
+        }
+        this.redis.hset("uidToPushId#" + uid, pushId, Date.now());
+    });
+
 };
 
 UidStore.prototype.batchGetPushId = function (uids, callback) {

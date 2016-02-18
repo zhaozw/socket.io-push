@@ -1,7 +1,5 @@
 module.exports = ProxyServer;
 
-var socketIdToPushId = {};
-
 function ProxyServer(io, stats, redis, uidStore) {
     if (!(this instanceof ProxyServer)) return new ProxyServer(io, stats, redis, uidStore);
     var http = require('http');
@@ -11,10 +9,9 @@ function ProxyServer(io, stats, redis, uidStore) {
 
         socket.on('disconnect', function () {
             stats.removeSession();
-            var pushId = socketIdToPushId[socket.id];
-            if (pushId) {
-                delete socketIdToPushId[socket.id];
-                redis.publishDisconnect(pushId, socket.id);
+            if (socket.pushId) {
+                debug("publishDisconnect %s", socket.pushId);
+                redis.publishDisconnect(socket);
             }
         });
 
@@ -51,12 +48,13 @@ function ProxyServer(io, stats, redis, uidStore) {
                     var reply = {id: data.id};
                     if (uid) {
                         reply.uid = uid;
+                        socket.uid = uid;
                     }
-                    socketIdToPushId[socket.id] = data.id;
-                    redis.publishConnect(data.id, socket.id);
+                    socket.pushId = data.id;
+                    redis.publishConnect(socket);
                     socket.join(data.id);
                     socket.emit('pushId', reply);
-                    debug('join room socket.id %s ,pushId %s', socket.id, socketIdToPushId[socket.id]);
+                    debug('join room socket.id %s ,pushId %s', socket.id, socket.pushId);
                 })
 
             }
@@ -83,7 +81,10 @@ function ProxyServer(io, stats, redis, uidStore) {
         });
 
         socket.on('packetProxy', function (data) {
-            data.pushId = socketIdToPushId[socket.id];
+            data.pushId = socket.pushId;
+            if (socket.uid) {
+                data.uid = socket.uid;
+            }
             redis.publishPacket(data);
         });
 
@@ -95,7 +96,3 @@ function ProxyServer(io, stats, redis, uidStore) {
 
     });
 }
-
-
-
-
