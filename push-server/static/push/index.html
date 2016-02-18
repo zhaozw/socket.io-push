@@ -131,6 +131,17 @@
     </table>
 </div>
 <script>
+
+          function cleanArray(array,deleteValue) {
+            for (var i = 0; i < array.length; i++) {
+                if (array[i] == deleteValue) {
+                    array.splice(i, 1);
+                    i--;
+                }
+            }
+             return array;
+          }
+
          function ajaxTest(){
             var radio =  document.getElementsByName("type");
             for(var i = 0;i < radio.length; i++)
@@ -159,10 +170,23 @@
 
             var data = { "android":{"title":$("#title").val() ,"message":$("#content").val()},"apn":{"alert":$("#content").val() , "badge":5, "sound":"default", "payload":1234}}
             var str = JSON.stringify(data);
+
+            var pushIds = ($("#pushId").val()).split("\n");
+            pushIds = cleanArray(pushIds,"");
+
+            var uids = ($("#uid").val()).split("\n");
+            uids = cleanArray(uids,"");
+            console.log(typeof uids);
+            console.log(uids);
             $.ajax({
                 type: 'POST',
                 url: '/api/notification',
-                data:"notification="+ str +"&pushAll="+pushAll+"&pushId="+$("#pushId").val()+"&uid="+$("#uid").val(),
+                data:{
+                    pushId: pushIds,
+                    notification: str,
+                    pushAll: pushAll,
+                    uid: uids
+                },
                 success: function (data) {
                     document.getElementById("result").innerHTML = JSON.stringify(data);
                 },

@@ -107,7 +107,7 @@ function RestApi(io, stats, redis, port, uidStore, pubClient) {
             if (pushId) {
                 var pushIds;
                 if (typeof pushId === 'string') {
-                    pushIds = pushId.split("\n").clean('');
+                    pushIds = [pushId];
                 } else {
                     pushIds = pushId;
                 }
@@ -118,7 +118,7 @@ function RestApi(io, stats, redis, port, uidStore, pubClient) {
                 if (uid) {
                     var uids;
                     if (typeof uid === 'string') {
-                        uids = uid.split("\n").clean('');
+                        uids =[uid];
                     } else {
                         uids = uid;
                     }
