@@ -1,9 +1,6 @@
 module.exports = UidStore;
 var debug = require('debug')('UidStore');
-var util = require('./util.js');
-var apn = require('apn');
-
-var socketIdToUid = {};
+var util = require('../util/util.js');
 
 function UidStore(redis, subClient) {
     if (!(this instanceof UidStore)) return new UidStore(redis, subClient);

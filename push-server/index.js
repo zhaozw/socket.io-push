@@ -12,14 +12,15 @@ var redis = require("redis")
 var pubClient = redis.createClient({host: config.redis.host, port: config.redis.port});
 var subClient = redis.createClient({host: config.redis.host, port: config.redis.port});
 var statClient = redis.createClient({host: config.redis.host, port: config.redis.port});
-var redisStore = require('./lib/redis/redisStore.js')(config, pubClient, subClient);
+var packetService = require('./lib/service/packetService.js')( pubClient, subClient);
+var notificationService = require('./lib/service/notificationService.js')(config.apn, pubClient);
 var stats = require('./lib/stats/stats.js')(statClient);
 var uidStore = require('./lib/redis/uidStore.js')(statClient);
 
-var proxyServer = require('./lib/server/proxyServer.js')(io, stats, redisStore, uidStore);
+var proxyServer = require('./lib/server/proxyServer.js')(io, stats, packetService,notificationService, uidStore);
 
 // push
-var restApi = require('./lib/api/restApi.js')(io, stats, redisStore, apiPort, uidStore, pubClient);
+var restApi = require('./lib/api/restApi.js')(io, stats, notificationService,apiPort, uidStore);
 
 
 

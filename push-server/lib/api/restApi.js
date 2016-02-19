@@ -1,6 +1,6 @@
 module.exports = RestApi;
 
-function RestApi(io, stats, redis, port, uidStore, pubClient) {
+function RestApi(io, stats, notificationService ,port, uidStore) {
 
     var restify = require('restify');
     var randomstring = require("randomstring");
@@ -10,7 +10,7 @@ function RestApi(io, stats, redis, port, uidStore, pubClient) {
     });
 
     var debug = require('debug')('RestApi');
-    var util = require('../redis/util.js');
+    //var util = require('../redis/util.js');
 
     //server.on('uncaughtException', function (req, res, route, e) {
     //    debug("uncaughtException %s", e);
@@ -100,7 +100,7 @@ function RestApi(io, stats, redis, port, uidStore, pubClient) {
         debug('notification ' + JSON.stringify(req.params));
 
         if (pushAll === 'true') {
-            redis.sendNotificationToAll(notification, io);
+            notificationService.sendAll(notification, io);
             res.send({code: "success"});
             return next();
         } else {
@@ -111,7 +111,7 @@ function RestApi(io, stats, redis, port, uidStore, pubClient) {
                 } else {
                     pushIds = pushId;
                 }
-                redis.sendNotification(pushIds, notification, io);
+                notificationService.sendByPushIds(pushIds, notification, io);
                 res.send({code: "success"});
                 return next();
             } else {
@@ -123,13 +123,13 @@ function RestApi(io, stats, redis, port, uidStore, pubClient) {
                         uids = uid;
                     }
                     var pushIds=[];
-                    util.batch(pubClient, "hkeys", "uidToPushId#", uids, function (replies) {
-                        replies.forEach(function (result, i) {
-                             pushIds = pushIds.concat(result);
-                        });
-                        redis.sendNotification(pushIds, notification, io);
-                        res.send({code: "success"});
-                    });
+                    //util.batch(pubClient, "hkeys", "uidToPushId#", uids, function (replies) {
+                    //    replies.forEach(function (result, i) {
+                    //         pushIds = pushIds.concat(result);
+                    //    });
+                    //    redis.sendNotification(pushIds, notification, io);
+                    //    res.send({code: "success"});
+                    //});
                 }
             }
         }

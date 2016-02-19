@@ -190,8 +190,8 @@
                 success: function (data) {
                     document.getElementById("result").innerHTML = JSON.stringify(data);
                 },
-                error: function(){
-                    alert("连接失败！");
+                error: function(data){
+                    document.getElementById("result").innerHTML = JSON.stringify(data);
                 }
            });
         }

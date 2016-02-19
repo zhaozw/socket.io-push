@@ -1,7 +1,7 @@
 module.exports = ProxyServer;
 
-function ProxyServer(io, stats, redis, uidStore) {
-    if (!(this instanceof ProxyServer)) return new ProxyServer(io, stats, redis, uidStore);
+function ProxyServer(io, stats, packetService, notificationService, uidStore) {
+    if (!(this instanceof ProxyServer)) return new ProxyServer(io, stats, packetService, notificationService, uidStore);
     var http = require('http');
     var debug = require('debug')('ProxyServer');
 
@@ -11,7 +11,7 @@ function ProxyServer(io, stats, redis, uidStore) {
             stats.removeSession();
             if (socket.pushId) {
                 debug("publishDisconnect %s", socket.pushId);
-                redis.publishDisconnect(socket);
+                packetService.publishDisconnect(socket);
             }
         });
 
@@ -24,7 +24,7 @@ function ProxyServer(io, stats, redis, uidStore) {
                     if (packetBody.length > 0) {
                         var json = packetBody.substring(1, packetBody.length);
                         var parsed = JSON.parse(json);
-                        for (i = 0; i < socket.packetListeners.length; i++) {
+                        for (var i = 0; i < socket.packetListeners.length; i++) {
                             socket.packetListeners[i](parsed, packet);
                         }
                     }
@@ -51,7 +51,7 @@ function ProxyServer(io, stats, redis, uidStore) {
                         socket.uid = uid;
                     }
                     socket.pushId = data.id;
-                    redis.publishConnect(socket);
+                    packetService.publishConnect(socket);
                     socket.join(data.id);
                     socket.emit('pushId', reply);
                     debug('join room socket.id %s ,pushId %s', socket.id, socket.pushId);
@@ -77,7 +77,7 @@ function ProxyServer(io, stats, redis, uidStore) {
             debug("on apnToken %s", JSON.stringify(data));
             var pushId = data.pushId;
             var apnToken = data.apnToken;
-            redis.setApnToken(pushId, apnToken);
+            notificationService.setApnToken(pushId, apnToken);
         });
 
         socket.on('packetProxy', function (data) {
@@ -85,7 +85,7 @@ function ProxyServer(io, stats, redis, uidStore) {
             if (socket.uid) {
                 data.uid = socket.uid;
             }
-            redis.publishPacket(data);
+            packetService.publishPacket(data);
         });
 
         socket.on('notificationReply', function (data) {
