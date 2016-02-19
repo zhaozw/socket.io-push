@@ -119,16 +119,18 @@
             </tr>
 
             <tr align=right>
-                <td  colspan="3" align="center"><input type="button" onclick="ajaxTest()" value="推送"/></td>
+                <td  width="400" colspan=4 align="center"><input type="button" onclick="ajaxTest()" value="推送"/></td>
             </tr>
-
             <tr></tr>
-
             <tr>
-                <td colspan="3" align="center"><font size="5" color="green" id="result"></font></td>
+                <td width="400" colspan="4" align="center"><font size="5" color="green" id="result"></font></td>
             </tr>
 
     </table>
+
+    <br/>
+    <a id="url"></a>
+
 </div>
 <script>
 
@@ -176,8 +178,6 @@
 
             var uids = ($("#uid").val()).split("\n");
             uids = cleanArray(uids,"");
-            console.log(typeof uids);
-            console.log(uids);
             $.ajax({
                 type: 'GET',
                 url: '/api/notification',
@@ -188,18 +188,15 @@
                     uid: uids
                 },
                 success: function (data) {
-                    document.getElementById("result").innerHTML = getUrl(this.url) +  "<br/>" + JSON.stringify(data);
-
+                    document.getElementById("result").innerHTML = JSON.stringify(data);
+                    $('#url').attr('href',this.url);
+                    $("#url").text(this.url);
                 },
                 error: function(data){
                     document.getElementById("result").innerHTML = JSON.stringify(data);
                 }
            });
         }
-
-          function getUrl(url){
-             return window.location.protocol + "//" + window.location.hostname + ":" + window.location.port + url;
-          }
 
          $("#pushId").bind('input propertychange', function() {
             $("#uid").val("");
