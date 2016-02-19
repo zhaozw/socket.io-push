@@ -179,7 +179,7 @@
             console.log(typeof uids);
             console.log(uids);
             $.ajax({
-                type: 'POST',
+                type: 'GET',
                 url: '/api/notification',
                 data:{
                     pushId: pushIds,
@@ -188,13 +188,18 @@
                     uid: uids
                 },
                 success: function (data) {
-                    document.getElementById("result").innerHTML = JSON.stringify(data);
+                    document.getElementById("result").innerHTML = getUrl(this.url) +  "<br/>" + JSON.stringify(data);
+
                 },
                 error: function(data){
                     document.getElementById("result").innerHTML = JSON.stringify(data);
                 }
            });
         }
+
+          function getUrl(url){
+             return window.location.protocol + "//" + window.location.hostname + ":" + window.location.port + url;
+          }
 
          $("#pushId").bind('input propertychange', function() {
             $("#uid").val("");
