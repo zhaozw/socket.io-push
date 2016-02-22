@@ -10,19 +10,6 @@ function RestApi(io, stats, notificationService ,port, uidStore) {
     });
 
     var debug = require('debug')('RestApi');
-    //var util = require('../redis/util.js');
-
-    //server.on('uncaughtException', function (req, res, route, e) {
-    //    debug("uncaughtException %s", e);
-    //
-    //    if (this.listeners('uncaughtException').length > 1 ||
-    //        res.headersSent) {
-    //        return (false);
-    //    }
-    //
-    //    res.send(new InternalError(e, e.message || 'unexpected error'));
-    //    return (true);
-    //});
 
     server.use(restify.acceptParser(server.acceptable));
     server.use(restify.queryParser());

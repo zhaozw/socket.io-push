@@ -194,6 +194,8 @@
                 },
                 error: function(data){
                     document.getElementById("result").innerHTML = JSON.stringify(data);
+                    $('#url').attr('href',this.url);
+                    $("#url").text(this.url);
                 }
            });
         }

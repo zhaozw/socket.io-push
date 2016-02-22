@@ -12,7 +12,7 @@ UidStore.prototype.addUid = function (pushId, uid, timeToLive) {
     debug("addUid pushId %s %s", uid, pushId);
     var key = "pushIdToUid#" + pushId;
     this.redis.get(key, function (err, oldUid) {
-        if (uid) {
+        if (oldUid) {
             debug("remove %s from old uid %s", pushId, oldUid);
             this.redis.hdel("uidToPushId#" + uid, pushId);
         }
@@ -25,9 +25,19 @@ UidStore.prototype.addUid = function (pushId, uid, timeToLive) {
 
 };
 
-UidStore.prototype.batchGetPushId = function (uids, callback) {
-    util.batchGet(this.redis, uids, callback);
+UidStore.prototype.removePushId = function (pushId) {
+    debug("removePushId pushId %s %s", uid, pushId);
+    var key = "pushIdToUid#" + pushId;
+    this.redis.get(key, function (err, oldUid) {
+        if (oldUid) {
+            debug("remove %s from old uid %s", pushId, oldUid);
+            this.redis.hdel("uidToPushId#" + uid, pushId);
+            this.redis.del(key);
+        }
+    });
 };
+
+
 
 UidStore.prototype.getUidByPushId = function (pushId, callback) {
     this.redis.get("pushIdToUid#" + pushId, function (err, uid) {
