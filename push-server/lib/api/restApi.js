@@ -20,6 +20,11 @@ function RestApi(io, stats, notificationService ,port, uidStore) {
         default: 'index.html'
     }));
 
+    server.get(/^\/uid\/?.*/, restify.serveStatic({
+        directory: './static',
+        default: 'index.html'
+    }));
+
     server.get(/^\/stats\/?.*/, restify.serveStatic({
         directory: './static',
         default: 'index.html'
