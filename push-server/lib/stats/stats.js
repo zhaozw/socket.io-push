@@ -16,6 +16,7 @@ function Stats(redis) {
             sessionCount: stats.sessionCount
         }));
     }, 10000);
+    redis.del("stats#sessionCount");
 }
 
 Stats.prototype.addSession = function (socket, count) {
