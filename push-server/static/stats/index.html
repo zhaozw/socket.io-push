@@ -205,7 +205,7 @@
                     pointHighlightStroke: "rgba(151,187,205,1)",
 					data : []
 		}];
-        for(i = 0;i<timestamps.length;i++){
+        for(var i = 0;i<timestamps.length;i++){
             chartData[0].data.push({x : new Date(timestamps[i]), y:serverData[i]});
         }
         return chartData;

@@ -9,9 +9,12 @@ var apnConnection;
 
 
 function NotificationService(apnConfig, redis) {
-    if (!(this instanceof NotificationService)) return new NotificationService(apnConfig,redis);
+    if (!(this instanceof NotificationService)) return new NotificationService(apnConfig, redis);
     this.redis = redis;
     apnConfig.maxConnections = 10;
+    apnConfig.cert = "cert/cert.pem";
+    apnConfig.key = "cert/key.pem";
+    apnConfig.ca = "cert/entrust_2048_ca.cer";
     apnConfig.errorCallback = function (errorCode, notification, device) {
         var id = device.token.toString('hex');
         debug("apn errorCallback %d %s", errorCode, id);

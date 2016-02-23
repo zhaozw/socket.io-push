@@ -91,6 +91,11 @@ function RestApi(io, stats, notificationService ,port, uidStore) {
 
         debug('notification ' + JSON.stringify(req.params));
 
+        var timeToLive = parseInt(req.params.timeToLive);
+        if (timeToLive){
+            notification.timeToLive = timeToLive;
+        }
+
         if (pushAll === 'true') {
             notificationService.sendAll(notification, io);
             res.send({code: "success"});

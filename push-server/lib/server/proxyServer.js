@@ -1,11 +1,12 @@
 module.exports = ProxyServer;
 
-function ProxyServer(io, stats, packetService, notificationService, uidStore) {
-    if (!(this instanceof ProxyServer)) return new ProxyServer(io, stats, packetService, notificationService, uidStore);
+function ProxyServer(io, stats, packetService, notificationService, uidStore, ttlService) {
     var http = require('http');
     var debug = require('debug')('ProxyServer');
 
     io.on('connection', function (socket) {
+
+        socket.version = 0;
 
         socket.on('disconnect', function () {
             stats.removeSession();
@@ -38,6 +39,9 @@ function ProxyServer(io, stats, packetService, notificationService, uidStore) {
             if (data.id && data.id.length >= 10) {
                 debug("on pushId %s", JSON.stringify(data));
                 var topics = data.topics;
+                if(data.version){
+                    socket.version = data.version;
+                }
                 if (topics && topics.length > 0) {
                     topics.forEach(function (topic) {
                         socket.join(topic);
@@ -55,8 +59,8 @@ function ProxyServer(io, stats, packetService, notificationService, uidStore) {
                     socket.join(data.id);
                     socket.emit('pushId', reply);
                     debug('join room socket.id %s ,pushId %s', socket.id, socket.pushId);
+                    ttlService.onPushId(socket);
                 })
-
             }
         });
 
@@ -90,9 +94,14 @@ function ProxyServer(io, stats, packetService, notificationService, uidStore) {
 
         socket.on('notificationReply', function (data) {
             stats.onNotificationReply(data.timestamp);
+            ttlService.onReply(socket);
+        });
+
+        socket.on('pushReply', function (data) {
+            ttlService.onReply(socket);
         });
 
         stats.addSession(socket);
-
+        ttlService.onConnect(socket);
     });
 }

@@ -6,6 +6,6 @@ do
     ps -p `cat pids/pid_debug` >/dev/null  # Check if the process has terminated.
 done
 
-export DEBUG=socket.io*,PacketService,NotificationService,RestApi,Stats
+export DEBUG=socket.io*,PacketService,NotificationService,RestApi,Stats,TTLService
 nohup node . > logs/debug.log 2>&1&
 echo $! > pids/pid_debug

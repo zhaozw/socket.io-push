@@ -31,9 +31,8 @@ Stats.prototype.addSession = function (socket, count) {
         debug("on stats %s", JSON.stringify(data.requestStats));
         var timestamp = Date.now();
         var totalCount = 0;
-        var totalSuccess = 0;
         if (data.requestStats && data.requestStats.length) {
-            for (i = 0; i < data.requestStats.length; i++) {
+            for (var i = 0; i < data.requestStats.length; i++) {
                 var requestStat = data.requestStats[i];
                 stats.incrby("stats#request#" + requestStat.path + "#totalCount", timestamp, requestStat.totalCount);
                 stats.incrby("stats#request#" + requestStat.path + "#successCount", timestamp, requestStat.successCount);

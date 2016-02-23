@@ -5,8 +5,6 @@ config.pingInterval = 25000;
 
 config.apn = {
     production: false,
-    cert: "cert/cert.pem",
-    key: "cert/key.pem"
 };
 
 config.redis = {

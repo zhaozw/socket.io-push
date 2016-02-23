@@ -16,11 +16,9 @@ var packetService = require('./lib/service/packetService.js')( pubClient, subCli
 var notificationService = require('./lib/service/notificationService.js')(config.apn, pubClient);
 var stats = require('./lib/stats/stats.js')(statClient);
 var uidStore = require('./lib/redis/uidStore.js')(statClient);
+var ttlService = require('./lib/service/ttlService.js')(statClient);
 
-var proxyServer = require('./lib/server/proxyServer.js')(io, stats, packetService,notificationService, uidStore);
+require('./lib/server/proxyServer.js')(io, stats, packetService,notificationService, uidStore, ttlService);
 
 // push
 var restApi = require('./lib/api/restApi.js')(io, stats, notificationService,apiPort, uidStore);
-
-
-
