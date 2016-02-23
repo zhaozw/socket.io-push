@@ -102,6 +102,5 @@ function ProxyServer(io, stats, packetService, notificationService, uidStore, tt
         });
 
         stats.addSession(socket);
-        ttlService.onConnect(socket);
     });
 }

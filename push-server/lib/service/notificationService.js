@@ -5,12 +5,11 @@ var randomstring = require("randomstring");
 var util = require('../util/util.js');
 var apn = require('apn');
 
-var apnConnection;
 
-
-function NotificationService(apnConfig, redis) {
-    if (!(this instanceof NotificationService)) return new NotificationService(apnConfig, redis);
+function NotificationService(apnConfig, redis, ttlService) {
+    if (!(this instanceof NotificationService)) return new NotificationService(apnConfig, redis, ttlService);
     this.redis = redis;
+    this.ttlService = ttlService;
     apnConfig.maxConnections = 10;
     apnConfig.cert = "cert/cert.pem";
     apnConfig.key = "cert/key.pem";
@@ -22,7 +21,7 @@ function NotificationService(apnConfig, redis) {
             redis.hdel("apnTokens", id);
         }
     }
-    apnConnection = new apn.Connection(apnConfig);
+    this.apnConnection = new apn.Connection(apnConfig);
 }
 
 NotificationService.prototype.setApnToken = function (pushId, apnToken) {
@@ -43,33 +42,35 @@ NotificationService.prototype.setApnToken = function (pushId, apnToken) {
     }
 };
 
-NotificationService.prototype.sendByPushIds = function (pushIds, notification, io) {
-    pushIds.forEach(function (pushId) {
-        io.to(pushId).emit('noti', notification);
-    });
+NotificationService.prototype.sendByPushIds = function (pushIds, notification, io, timeToLive) {
+    var ttlService = this.ttlService;
+    var apnConnection = this.apnConnection;
 
     util.batch(this.redis, "get", "pushIdToApnToken#", pushIds, function (replies) {
-        debug("util.batchGet %s", replies);
-        replies.clean();
-        if (replies.length > 0) {
-            var note = toApnNotification(notification);
-            apnConnection.pushNotification(note, replies);
+        var apnTokens = [];
+        for (var i = 0; i < pushIds.length; i++) {
+            var pushId = pushIds[i];
+            var token = replies[i];
+            if (token) {
+                debug("send to notification to ios %s %s", pushId, token);
+                apnTokens.push(token);
+            } else {
+                debug("send to notification to android %s %s", pushId, token);
+                io.to(pushId).emit('noti', notification);
+                ttlService.addPacket(pushId, 'noti', notification, timeToLive);
+            }
+        }
+        if (apnTokens.length > 0) {
+            debug("send to apn %s", apnTokens);
+            var note = toApnNotification(notification, timeToLive);
+            apnConnection.pushNotification(note, apnTokens);
         }
     });
-};
-
-Array.prototype.clean = function () {
-    for (var i = 0; i < this.length; i++) {
-        if (!this[i]) {
-            this.splice(i, 1);
-            i--;
-        }
-    }
-    return this;
 };
 
 NotificationService.prototype.sendAll = function (notification, io) {
     io.to("noti").emit('noti', notification);
+    var apnConnection = this.apnConnection;
     this.redis.hkeys("apnTokens", function (err, replies) {
         debug(replies.length + " replies:");
         var note = toApnNotification(notification);
@@ -79,7 +80,7 @@ NotificationService.prototype.sendAll = function (notification, io) {
     });
 };
 
-function toApnNotification(notification) {
+function toApnNotification(notification, timeToLive) {
     var note = new apn.Notification();
     note.badge = notification.apn.badge;
     if (notification.apn.sound) {
@@ -88,11 +89,18 @@ function toApnNotification(notification) {
         note.sound = "default";
     }
     note.alert = notification.apn.alert;
-    note.expiry = Math.floor(Date.now() / 1000) + 600;
+    var secondsToLive;
+    if (timeToLive > 0) {
+        secondsToLive = timeToLive / 1000;
+    } else {
+        secondsToLive = 600;
+    }
+    note.expiry = Math.floor(Date.now() / 1000) + secondsToLive;
     if (notification.apn.payload) {
         note.payload = notification.apn.payload;
     } else {
         note.payload = {};
     }
+    debug(" note length %d", note.length);
     return note;
 }

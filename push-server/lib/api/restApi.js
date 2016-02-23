@@ -1,6 +1,6 @@
 module.exports = RestApi;
 
-function RestApi(io, stats, notificationService ,port, uidStore) {
+function RestApi(io, stats, notificationService, port, uidStore, ttlService) {
 
     var restify = require('restify');
     var randomstring = require("randomstring");
@@ -55,6 +55,9 @@ function RestApi(io, stats, notificationService ,port, uidStore) {
         var pushAll = req.params.pushAll;
         debug('push ' + JSON.stringify(req.params));
         var pushData = {topic: topic, data: data};
+
+        var timeToLive = parseInt(req.params.timeToLive);
+
         if (pushAll === 'true') {
             io.to(topic).emit('push', pushData);
             res.send({code: "success"});
@@ -65,11 +68,13 @@ function RestApi(io, stats, notificationService ,port, uidStore) {
         } else {
             if (typeof pushId === 'string') {
                 io.to(pushId).emit('push', pushData);
+                ttlService.addPacket(pushId, 'push', pushData, timeToLive);
                 res.send({code: "success"});
                 return next();
             } else {
                 pushId.forEach(function (id) {
                     io.to(id).emit('push', pushData);
+                    ttlService.addPacket(id, 'push', pushData, timeToLive);
                 });
                 res.send({code: "success"});
                 return next();
@@ -92,9 +97,6 @@ function RestApi(io, stats, notificationService ,port, uidStore) {
         debug('notification ' + JSON.stringify(req.params));
 
         var timeToLive = parseInt(req.params.timeToLive);
-        if (timeToLive){
-            notification.timeToLive = timeToLive;
-        }
 
         if (pushAll === 'true') {
             notificationService.sendAll(notification, io);
@@ -108,18 +110,18 @@ function RestApi(io, stats, notificationService ,port, uidStore) {
                 } else {
                     pushIds = pushId;
                 }
-                notificationService.sendByPushIds(pushIds, notification, io);
+                notificationService.sendByPushIds(pushIds, notification, io, timeToLive);
                 res.send({code: "success"});
                 return next();
             } else {
                 if (uid) {
                     var uids;
                     if (typeof uid === 'string') {
-                        uids =[uid];
+                        uids = [uid];
                     } else {
                         uids = uid;
                     }
-                    var pushIds=[];
+                    var pushIds = [];
                     //util.batch(pubClient, "hkeys", "uidToPushId#", uids, function (replies) {
                     //    replies.forEach(function (result, i) {
                     //         pushIds = pushIds.concat(result);

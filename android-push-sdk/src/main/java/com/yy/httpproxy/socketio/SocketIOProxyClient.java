@@ -46,6 +46,7 @@ import javax.net.ssl.X509TrustManager;
 
 public class SocketIOProxyClient implements PushSubscriber {
 
+    private static final int PROTOCOL_VERSION = 1;
     private static String TAG = "SocketIoRequester";
     private PushCallback pushCallback;
     private String pushId;
@@ -119,6 +120,7 @@ public class SocketIOProxyClient implements PushSubscriber {
             JSONObject object = new JSONObject();
             try {
                 object.put("id", pushId);
+                object.put("version", PROTOCOL_VERSION);
                 if (topics.size() > 0) {
                     JSONArray array = new JSONArray();
                     object.put("topics", array);
@@ -179,8 +181,13 @@ public class SocketIOProxyClient implements PushSubscriber {
                     JSONObject data = (JSONObject) args[0];
                     String topic = data.optString("topic");
                     String dataBase64 = data.optString("data");
-                    Log.v(TAG, "on push topic " + topic + " data:" + dataBase64);
+                    boolean reply = data.optBoolean("reply", false);
+                    Log.v(TAG, "on push topic " + topic + ",reply " + reply + ", data:" + dataBase64);
                     pushCallback.onPush(topic, Base64.decode(dataBase64, Base64.DEFAULT));
+                    if (reply) {
+                        JSONObject object = new JSONObject();
+                        socket.emit("notificationReply", object);
+                    }
                 } catch (Exception e) {
                     Log.e(TAG, "handle push error ", e);
                 }
