@@ -16,10 +16,12 @@
     </div>
     <br/>
     <div>
-        key : <input id="key" value=""> <button onclick="javascript:loadData()">Query Data</button>
+        key : <input id="key" value="">
+        <button onclick="javascript:loadData()">Query Data</button>
     </div>
     <br/>
     <div>
+        SessionCount: <span id="sessionCount">0</span><br/>
         Total Count: <span id="totalCount">0</span><br/>
         Success Rate(percent): <span id="successRate">0</span><br/>
         Average Latency(ms): <span id="avgLatency">0</span><br/>
@@ -29,42 +31,42 @@
     <br/>
     <div>
         <label for="totalChartHour">
-            Total Count(Hour)<br /><br />
+            Total Count(Hour)<br/><br/>
             <canvas id="totalChartHour" height="300" width="800"></canvas>
         </label>
     </div>
 
     <div>
         <label for="totalChartDay">
-            Total Count(Day)<br /><br />
+            Total Count(Day)<br/><br/>
             <canvas id="totalChartDay" height="300" width="800"></canvas>
         </label>
     </div>
 
     <div>
         <label for="latencyChartHour">
-            Latency(ms)(Hour)<br /><br />
+            Latency(ms)(Hour)<br/><br/>
             <canvas id="latencyChartHour" height="400" width="800"></canvas>
         </label>
     </div>
 
     <div>
         <label for="latencyChartDay">
-            Latency(ms)(Day)<br /><br />
+            Latency(ms)(Day)<br/><br/>
             <canvas id="latencyChartDay" height="400" width="800"></canvas>
         </label>
     </div>
 
     <div>
         <label for="successRateChartHour">
-            Success Rate(%)(Hour)<br /><br />
+            Success Rate(%)(Hour)<br/><br/>
             <canvas id="successRateChartHour" height="400" width="800"></canvas>
         </label>
     </div>
 
     <div>
         <label for="successRateChartDay">
-            Success Rate(%)(Day)<br /><br />
+            Success Rate(%)(Day)<br/><br/>
             <canvas id="successRateChartDay" height="400" width="800"></canvas>
         </label>
     </div>
@@ -79,9 +81,9 @@
 
     function getUrlParameter(sParam) {
         var sPageURL = decodeURIComponent(window.location.search.substring(1)),
-            sURLVariables = sPageURL.split('&'),
-            sParameterName,
-            i;
+                sURLVariables = sPageURL.split('&'),
+                sParameterName,
+                i;
 
         for (i = 0; i < sURLVariables.length; i++) {
             sParameterName = sURLVariables[i].split('=');
@@ -90,41 +92,42 @@
                 return sParameterName[1] === undefined ? true : sParameterName[1];
             }
         }
+    }
+    ;
+
+    var options = {
+        animation: false,
+        bezierCurve: true,
+        pointDot: false,
+        showTooltips: true,
+        scaleShowHorizontalLines: true,
+        scaleShowLabels: true,
+        scaleType: "date",
+        tooltipTemplate: "<%=valueLabel%> (<%=argLabel%>)",
+        scaleDateFormat: "mm-dd",
+        scaleTimeFormat: "hh:MM",
+        scaleDateTimeFormat: "hh:MM"
     };
 
-    var options =  {
-                    animation: false,
-                    bezierCurve: true,
-                    pointDot: false,
-                    showTooltips: true,
-                    scaleShowHorizontalLines: true,
-                    scaleShowLabels: true,
-                    scaleType: "date",
-                    tooltipTemplate: "<%=valueLabel%> (<%=argLabel%>)",
-                    scaleDateFormat: "mm-dd",
-                    scaleTimeFormat: "hh:MM",
-                    scaleDateTimeFormat: "hh:MM"
-			    };
+    var optionsDay = {
+        animation: false,
+        bezierCurve: true,
+        pointDot: true,
+        showTooltips: true,
+        scaleShowHorizontalLines: true,
+        scaleShowLabels: true,
+        scaleType: "date",
+        tooltipTemplate: "<%=valueLabel%> (<%=argLabel%>)",
+        scaleDateFormat: "mm-dd",
+        scaleTimeFormat: "mm-dd",
+        scaleDateTimeFormat: "mm-dd"
+    };
 
-    var optionsDay =  {
-                    animation: false,
-                    bezierCurve: true,
-                    pointDot: true,
-                    showTooltips: true,
-                    scaleShowHorizontalLines: true,
-                    scaleShowLabels: true,
-                    scaleType: "date",
-                    tooltipTemplate: "<%=valueLabel%> (<%=argLabel%>)",
-                    scaleDateFormat: "mm-dd",
-                    scaleTimeFormat: "mm-dd",
-                    scaleDateTimeFormat: "mm-dd"
-	};
-
-	function loadData(){
-		$.ajax({
+    function loadData() {
+        $.ajax({
             type: 'GET',
             url: '/api/stats/chart',
-            data: { key: $("#key").val() },
+            data: {key: $("#key").val()},
             dataType: 'json',
             success: function (data) {
 
@@ -132,81 +135,90 @@
                 $("#avgLatency").text(data.avgLatency);
                 $("#successRate").text((data.successRate * 100).toFixed(2) + '%');
 
-                makeChart("totalChartHour","count",data.chartData.total,data.chartData.timestamps);
-                makeDayChart("totalChartDay","count",data.chartData.total,data.chartData.timestamps);
+                makeChart("totalChartHour", "count", data.chartData.total, data.chartData.timestamps);
+                makeDayChart("totalChartDay", "count", data.chartData.total, data.chartData.timestamps);
 
-			    makeChart("latencyChartHour","count",data.chartData.latency,data.chartData.timestamps);
-                makeDayChart("latencyChartDay","count",data.chartData.latencyDay,data.chartData.timestamps);
+                makeChart("latencyChartHour", "count", data.chartData.latency, data.chartData.timestamps);
+                makeDayChart("latencyChartDay", "count", data.chartData.latencyDay, data.chartData.timestamps);
 
-                makeChart("successRateChartHour","percent",data.chartData.successRate,data.chartData.timestamps);
-                makeDayChart("successRateChartDay","percent",data.chartData.successRateDay,data.chartData.timestamps);
+                makeChart("successRateChartHour", "percent", data.chartData.successRate, data.chartData.timestamps);
+                makeDayChart("successRateChartDay", "percent", data.chartData.successRateDay, data.chartData.timestamps);
             }
         });
-	}
 
-	window.onload = function(){
-	    if(!$("#key").val()){
+        $.ajax({
+            type: 'GET',
+            url: '/api/stats/base',
+            success: function (data) {
+
+                $("#sessionCount").text(data.sessionCount);
+            }
+        });
+    }
+
+    window.onload = function () {
+        if (!$("#key").val()) {
             var key = getUrlParameter('key');
             $("#key").val(key);
-	    }
-	    loadData();
-	}
+        }
+        loadData();
+    }
 
-	function makeDayChart(canvas,name,serverData,timestamps){
-	    var chart = document.getElementById(canvas).getContext("2d");
-        var data = convertDay(name,serverData,timestamps);
+    function makeDayChart(canvas, name, serverData, timestamps) {
+        var chart = document.getElementById(canvas).getContext("2d");
+        var data = convertDay(name, serverData, timestamps);
         new Chart(chart).Scatter(data, optionsDay);
-	}
+    }
 
-	function makeChart(canvas,name,serverData,timestamps){
-         var chart = document.getElementById(canvas).getContext("2d");
-         var data = convert(name,serverData,timestamps);
-         new Chart(chart).Scatter(data, options);
-	}
+    function makeChart(canvas, name, serverData, timestamps) {
+        var chart = document.getElementById(canvas).getContext("2d");
+        var data = convert(name, serverData, timestamps);
+        new Chart(chart).Scatter(data, options);
+    }
 
-	function convertDay(name,serverData,timestamps){
+    function convertDay(name, serverData, timestamps) {
         var chartData = [
-				{
-					label: name,
-					fillColor: "rgba(151,187,205,0.2)",
-                    strokeColor: "rgba(151,187,205,1)",
-                    pointColor: "rgba(151,187,205,1)",
-                    pointStrokeColor: "#fff",
-                    pointHighlightFill: "#fff",
-                    pointHighlightStroke: "rgba(151,187,205,1)",
-					data : []
-		}];
-		var dayTotal = 0;
-        for(i = 0;i<timestamps.length;i++) {
-            if(serverData.length != 7){
+            {
+                label: name,
+                fillColor: "rgba(151,187,205,0.2)",
+                strokeColor: "rgba(151,187,205,1)",
+                pointColor: "rgba(151,187,205,1)",
+                pointStrokeColor: "#fff",
+                pointHighlightFill: "#fff",
+                pointHighlightStroke: "rgba(151,187,205,1)",
+                data: []
+            }];
+        var dayTotal = 0;
+        for (var i = 0; i < timestamps.length; i++) {
+            if (serverData.length != 7) {
                 dayTotal += serverData[i];
             } else {
-                console.log("xxx " + Math.floor(i/24));
-                dayTotal = serverData[Math.floor(i/24)];
+                console.log("xxx " + Math.floor(i / 24));
+                dayTotal = serverData[Math.floor(i / 24)];
             }
-            if((i + 1) % 24 == 0 ){
+            if ((i + 1) % 24 == 0) {
 
-                chartData[0].data.push({x : new Date(timestamps[i - 23]), y:dayTotal});
+                chartData[0].data.push({x: new Date(timestamps[i - 23]), y: dayTotal});
                 dayTotal = 0;
             }
         }
         return chartData;
     }
 
-    function convert(name,serverData,timestamps){
+    function convert(name, serverData, timestamps) {
         var chartData = [
-				{
-					label: name,
-					fillColor: "rgba(151,187,205,0.2)",
-                    strokeColor: "rgba(151,187,205,1)",
-                    pointColor: "rgba(151,187,205,1)",
-                    pointStrokeColor: "#fff",
-                    pointHighlightFill: "#fff",
-                    pointHighlightStroke: "rgba(151,187,205,1)",
-					data : []
-		}];
-        for(var i = 0;i<timestamps.length;i++){
-            chartData[0].data.push({x : new Date(timestamps[i]), y:serverData[i]});
+            {
+                label: name,
+                fillColor: "rgba(151,187,205,0.2)",
+                strokeColor: "rgba(151,187,205,1)",
+                pointColor: "rgba(151,187,205,1)",
+                pointStrokeColor: "#fff",
+                pointHighlightFill: "#fff",
+                pointHighlightStroke: "rgba(151,187,205,1)",
+                data: []
+            }];
+        for (var i = 0; i < timestamps.length; i++) {
+            chartData[0].data.push({x: new Date(timestamps[i]), y: serverData[i]});
         }
         return chartData;
     }

@@ -134,8 +134,10 @@ function RestApi(io, stats, notificationService, port, uidStore, ttlService) {
         }
     };
 
-    var handleStats = function (req, res, next) {
-        res.send({sessionCount: stats.sessionCount});
+    var handleStatsBase = function (req, res, next) {
+        stats.getSessionCount(function (count) {
+            res.send({sessionCount: count});
+        });
         return next();
     };
 
@@ -155,7 +157,7 @@ function RestApi(io, stats, notificationService, port, uidStore, ttlService) {
         return next();
     };
 
-    server.get('/api/stats', handleStats);
+    server.get('/api/stats/base', handleStatsBase);
     server.get('/api/stats/chart', handleChartStats);
     server.get('/api/push', handlePush);
     server.post('/api/push', handlePush);

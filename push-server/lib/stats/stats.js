@@ -1,12 +1,21 @@
 module.exports = Stats;
 
 var debug = require('debug')('Stats');
+var randomstring = require("randomstring");
 
 function Stats(redis) {
     if (!(this instanceof Stats)) return new Stats(redis);
     this.redis = redis;
     this.sessionCount = 0;
     this.redisIncrBuffer = require('./redisIncrBuffer.js')(redis);
+    this.id = randomstring.generate(32);
+    var stats = this;
+    setInterval(function () {
+        redis.hset("stats#sessionCount", stats.id, JSON.stringify({
+            timestamp : Date.now(),
+            sessionCount: stats.sessionCount
+        }));
+    }, 10000);
 }
 
 Stats.prototype.addSession = function (socket, count) {
@@ -79,6 +88,21 @@ Stats.prototype.onNotificationReply = function (timestamp) {
     }
 };
 
+Stats.prototype.getSessionCount = function (callback) {
+    this.redis.hvals('stats#sessionCount', function (err, results) {
+        var totalCount = 0;
+        var currentTimestamp = Date.now();
+        for (var i = 0; i < results.length; i++) {
+            var data = JSON.parse(results[i]);
+            debug("getSessionCount %s", results[i]);
+            if ((currentTimestamp - data.timestamp) < 20 * 1000) {
+                totalCount += data.sessionCount;
+            }
+        }
+        callback(totalCount)
+    });
+};
+
 Stats.prototype.find = function (key, callback) {
     var totalHour = 7 * 24;
     var timestamp = hourStrip(Date.now() - (totalHour - 1) * mSecPerHour);
@@ -87,14 +111,13 @@ Stats.prototype.find = function (key, callback) {
     var totalLatency = 0;
     var totalSuccess = 0;
     var timestamps = [];
-    for (i = 0; i < totalHour; i++) {
+    for (var i = 0; i < totalHour; i++) {
         timestamps.push(timestamp);
         keys.push("stats#" + key + "#totalCount#" + timestamp);
         keys.push("stats#" + key + "#successCount#" + timestamp);
         keys.push("stats#" + key + "#totalLatency#" + timestamp);
         timestamp += mSecPerHour;
     }
-
 
     this.redis.mget(keys, function (err, results) {
         var totalChart = [];
@@ -108,7 +131,7 @@ Stats.prototype.find = function (key, callback) {
         var successRateChartDay = [];
         var latencyChartDay = [];
 
-        for (i = 0; i < results.length / 3; i++) {
+        for (var i = 0; i < results.length / 3; i++) {
 
             var total = parseInt(results[i * 3 + 0]) || 0;
             var success = parseInt(results[i * 3 + 1]) || 0;
