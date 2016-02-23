@@ -121,6 +121,7 @@ public class SocketIOProxyClient implements PushSubscriber {
             try {
                 object.put("id", pushId);
                 object.put("version", PROTOCOL_VERSION);
+                object.put("platform", "android");
                 if (topics.size() > 0) {
                     JSONArray array = new JSONArray();
                     object.put("topics", array);
@@ -186,7 +187,7 @@ public class SocketIOProxyClient implements PushSubscriber {
                     pushCallback.onPush(topic, Base64.decode(dataBase64, Base64.DEFAULT));
                     if (reply) {
                         JSONObject object = new JSONObject();
-                        socket.emit("notificationReply", object);
+                        socket.emit("pushReply", object);
                     }
                 } catch (Exception e) {
                     Log.e(TAG, "handle push error ", e);

@@ -18,8 +18,9 @@ Stats.prototype.addSession = function (socket, count) {
     var stats = this;
 
     socket.packetListeners.push(function (parsed, packet) {
+        var timestamp = Date.now();
+        stats.incr("stats#toClientPacket#totalCount", timestamp);
         if (parsed[0] === "noti") {
-            var timestamp = Date.now();
             parsed[1]['timestamp'] = timestamp
             packet[0] = "2" + JSON.stringify(parsed);
             stats.incr("stats#notification#totalCount", timestamp);

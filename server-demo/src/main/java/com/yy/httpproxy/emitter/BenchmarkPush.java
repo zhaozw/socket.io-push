@@ -26,8 +26,6 @@ public class BenchmarkPush {
     private static int numClients = 1000;
     private static String host = "http://183.61.6.33:8080";
     private static String redisHost = "183.61.6.33:6379";
-    //    private static String host = "http://172.25.133.154:9101";
-//    private static String redisHost = "172.25.133.154:6379";
     private static AtomicInteger connected = new AtomicInteger(0);
     private static AtomicLong numRequests = new AtomicLong(0);
     private static AtomicLong seqId = new AtomicLong(0);

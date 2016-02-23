@@ -7,21 +7,14 @@ function TTLService(redis) {
     this.redis = redis;
 }
 
-//TTLService.prototype.onConnect = function (socket) {
-//    var outerThis = this;
-//    socket.packetListeners.push(function (parsed, packet) {
-//        if (socket.version > 0 && (parsed[0] === "noti" || parsed[0] === "push")) {
-//            var timestamp = Date.now();
-//            parsed[1]['timestamp'] = timestamp;
-//            var timeToLive = parsed[1]['timeToLive'];
-//            if (timeToLive > 0) {
-//                parsed[1]['reply'] = true;
-//                outerThis.addPacket(socket.pushId, parsed, timeToLive);
-//            }
-//            packet[0] = "2" + JSON.stringify(parsed);
-//        }
-//    });
-//}
+TTLService.prototype.onConnect = function (socket) {
+    var outerThis = this;
+    socket.packetListeners.push(function (parsed, packet) {
+        if (socket.version > 0 && (parsed[0] === "push")) {
+            outerThis.addPacket(socket.pushId, parsed[0], parsed[1]);
+        }
+    });
+}
 
 TTLService.prototype.onReply = function (socket) {
     var key = "ttlPacket#" + socket.pushId;
@@ -36,11 +29,16 @@ TTLService.prototype.onPushId = function (socket) {
     redis.lrange(key, 0, -1, function (err, packets) {
         if (packets.length > 0) {
             debug("onPushId key %s , %d ", key, packets.length);
+            var timestamp = Date.now();
+            var pushedIds = [];
             packets.forEach(function (raw) {
                 try {
-                    debug("ttl packet %s", raw);
                     var packet = JSON.parse(raw);
-                    socket.emit(packet[0], packet[1]);
+                    if (!(pushedIds.indexOf(packet[1].id) > -1) && packet[1]['timestampValid'] > timestamp) {
+                        debug("ttl packet %s", raw);
+                        socket.emit(packet[0], packet[1]);
+                        pushedIds.push(packet[1].id);
+                    }
                 } catch (err) {
                     debug("ttl packet parse error %s", err);
                 }
@@ -50,8 +48,8 @@ TTLService.prototype.onPushId = function (socket) {
     });
 }
 
-
-TTLService.prototype.addPacket = function (pushId, topic, data, timeToLive) {
+TTLService.prototype.addPacket = function (pushId, topic, data) {
+    var timeToLive = data.timeToLive;
     if (timeToLive > 0) {
         var redis = this.redis;
         var key = "ttlPacket#" + pushId;

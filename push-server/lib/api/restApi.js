@@ -3,7 +3,7 @@ module.exports = RestApi;
 function RestApi(io, stats, notificationService, port, uidStore, ttlService) {
 
     var restify = require('restify');
-    var randomstring = require("randomstring");
+
     var server = restify.createServer({
         name: 'myapp',
         version: '1.0.0',
@@ -56,7 +56,7 @@ function RestApi(io, stats, notificationService, port, uidStore, ttlService) {
         debug('push ' + JSON.stringify(req.params));
         var pushData = {topic: topic, data: data};
 
-        var timeToLive = parseInt(req.params.timeToLive);
+        fillPacket(pushData, req);
 
         if (pushAll === 'true') {
             io.to(topic).emit('push', pushData);
@@ -68,19 +68,20 @@ function RestApi(io, stats, notificationService, port, uidStore, ttlService) {
         } else {
             if (typeof pushId === 'string') {
                 io.to(pushId).emit('push', pushData);
-                ttlService.addPacket(pushId, 'push', pushData, timeToLive);
+                ttlService.addPacket(pushId, 'push', pushData);
                 res.send({code: "success"});
                 return next();
             } else {
                 pushId.forEach(function (id) {
                     io.to(id).emit('push', pushData);
-                    ttlService.addPacket(id, 'push', pushData, timeToLive);
+                    ttlService.addPacket(id, 'push', pushData);
                 });
                 res.send({code: "success"});
                 return next();
             }
         }
     };
+
 
     var handleNotification = function (req, res, next) {
         var notification = JSON.parse(req.params.notification);
@@ -89,14 +90,13 @@ function RestApi(io, stats, notificationService, port, uidStore, ttlService) {
             return next();
         }
 
-        notification.id = randomstring.generate(32);
         var pushId = req.params.pushId;
         var uid = req.params.uid;
         var pushAll = req.params.pushAll;
+        fillPacket(notification, req);
 
         debug('notification ' + JSON.stringify(req.params));
 
-        var timeToLive = parseInt(req.params.timeToLive);
 
         if (pushAll === 'true') {
             notificationService.sendAll(notification, io);
@@ -110,7 +110,7 @@ function RestApi(io, stats, notificationService, port, uidStore, ttlService) {
                 } else {
                     pushIds = pushId;
                 }
-                notificationService.sendByPushIds(pushIds, notification, io, timeToLive);
+                notificationService.sendByPushIds(pushIds, notification, io);
                 res.send({code: "success"});
                 return next();
             } else {
@@ -178,5 +178,15 @@ function RestApi(io, stats, notificationService, port, uidStore, ttlService) {
         console.log('%s listening at %s', server.name, server.url);
     });
 
+}
+
+var randomstring = require("randomstring");
+
+function fillPacket(packet, req) {
+    packet.id = randomstring.generate(32);
+    var timeToLive = parseInt(req.params.timeToLive);
+    if (timeToLive > 0) {
+        packet.timeToLive = timeToLive;
+    }
 }
 

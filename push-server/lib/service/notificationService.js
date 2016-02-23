@@ -1,7 +1,6 @@
 module.exports = NotificationService;
 
 var debug = require('debug')('NotificationService');
-var randomstring = require("randomstring");
 var util = require('../util/util.js');
 var apn = require('apn');
 
@@ -42,7 +41,7 @@ NotificationService.prototype.setApnToken = function (pushId, apnToken) {
     }
 };
 
-NotificationService.prototype.sendByPushIds = function (pushIds, notification, io, timeToLive) {
+NotificationService.prototype.sendByPushIds = function (pushIds, notification, io) {
     var ttlService = this.ttlService;
     var apnConnection = this.apnConnection;
 
@@ -57,12 +56,12 @@ NotificationService.prototype.sendByPushIds = function (pushIds, notification, i
             } else {
                 debug("send to notification to android %s %s", pushId, token);
                 io.to(pushId).emit('noti', notification);
-                ttlService.addPacket(pushId, 'noti', notification, timeToLive);
+                ttlService.addPacket(pushId, 'noti', notification);
             }
         }
         if (apnTokens.length > 0) {
             debug("send to apn %s", apnTokens);
-            var note = toApnNotification(notification, timeToLive);
+            var note = toApnNotification(notification, notification.timeToLive);
             apnConnection.pushNotification(note, apnTokens);
         }
     });
