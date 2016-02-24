@@ -12,6 +12,7 @@ TTLService.prototype.onConnect = function (socket) {
     socket.packetListeners.push(function (parsed, packet) {
         if (socket.version > 0 && (parsed[0] === "push")) {
             outerThis.addPacket(socket.pushId, parsed[0], parsed[1]);
+            packet[0] = "2" + JSON.stringify(parsed);
         }
     });
 }

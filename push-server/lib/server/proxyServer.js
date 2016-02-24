@@ -97,7 +97,7 @@ function ProxyServer(io, stats, packetService, notificationService, uidStore, tt
             ttlService.onReply(socket);
         });
 
-        socket.on('pushReply', function (data) {
+        socket.on('pushReply', function () {
             ttlService.onReply(socket);
         });
 
