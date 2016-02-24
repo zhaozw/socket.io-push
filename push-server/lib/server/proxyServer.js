@@ -39,7 +39,7 @@ function ProxyServer(io, stats, packetService, notificationService, uidStore, tt
             if (data.id && data.id.length >= 10) {
                 debug("on pushId %s", JSON.stringify(data));
                 var topics = data.topics;
-                if(data.version){
+                if (data.version) {
                     socket.version = data.version;
                 }
                 if (topics && topics.length > 0) {
@@ -81,7 +81,7 @@ function ProxyServer(io, stats, packetService, notificationService, uidStore, tt
             debug("on apnToken %s", JSON.stringify(data));
             var pushId = data.pushId;
             var apnToken = data.apnToken;
-            notificationService.setApnToken(pushId, apnToken);
+            notificationService.setApnToken(pushId, apnToken, data.bundleId);
         });
 
         socket.on('packetProxy', function (data) {

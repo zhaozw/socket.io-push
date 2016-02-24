@@ -3,9 +3,20 @@ var config = {};
 config.pingTimeOut = 70000;
 config.pingInterval = 25000;
 
-config.apn = {
-    production: false,
-};
+config.apns = [
+    {
+        production: false,
+        bundleId: "com.xuduo.pushtest",
+        cert: "cert/com.xuduo.pushtest/cert.pem",
+        key: "cert/com.xuduo.pushtest/key.pem"
+    },
+    {
+        production: false,
+        bundleId: "com.xuduo.pushtest2",
+        cert: "cert/com.xuduo.pushtest2/cert.pem",
+        key: "cert/com.xuduo.pushtest2/key.pem"
+    }
+];
 
 config.redis = {
     host: "127.0.0.1",
