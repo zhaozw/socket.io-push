@@ -43,17 +43,18 @@ NotificationService.prototype.setApnToken = function (pushId, apnToken, bundleId
         }
         var apnData = JSON.stringify({bundleId: bundleId, apnToken: apnToken});
         var outerThis = this;
+        var timestamp = Date.now();
         this.redis.get("apnTokenToPushId#" + apnToken, function (err, oldApnData) {
             if (oldApnData !== apnData) {
                 outerThis.redis.set("pushIdToApnData#" + pushId, apnData);
                 outerThis.redis.set("apnTokenToPushId#" + apnToken, pushId);
-                outerThis.redis.hset("apnTokens#" + bundleId, apnToken, 1);
                 if (oldApnData && oldApnData.pushId){
                     outerThis.redis.del("pushIdToApnData#" + oldApnData.pushId);
                 }
                 debug("set pushIdToApnData %s %s", pushId, apnData);
             }
 
+            outerThis.redis.hset("apnTokens#" + bundleId, apnToken, timestamp);
             outerThis.redis.expire("pushIdToApnData#" + pushId, 3600 * 24 * 7);
             outerThis.redis.expire("apnTokenToPushId#" + pushId, 3600 * 24 * 7);
 
