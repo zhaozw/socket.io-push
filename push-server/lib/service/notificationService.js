@@ -48,6 +48,9 @@ NotificationService.prototype.setApnToken = function (pushId, apnToken, bundleId
                 outerThis.redis.set("pushIdToApnData#" + pushId, apnData);
                 outerThis.redis.set("apnTokenToPushId#" + apnToken, pushId);
                 outerThis.redis.hset("apnTokens#" + bundleId, apnToken, 1);
+                if (apnData && oldApnData.pushId){
+                    outerThis.redis.del("pushIdToApnData#" + oldApnData.pushId);
+                }
                 debug("set pushIdToApnData %s %s", pushId, apnData);
             }
 
@@ -106,23 +109,11 @@ NotificationService.prototype.sendAll = function (notification, io) {
         for (var i = 0; i < bundleIds.length; i++) {
             var apnConnection = apnConnections[bundleIds[i]];
             if (replies[i].length > 0) {
-                debug("bundleId %s replies %d", bundleIds[i], replies.length);
+                debug("bundleId %s replies %d", bundleIds[i], replies[i].length);
                 apnConnection.pushNotification(note, replies[i]);
             }
         }
     });
-
-    //for (var key in this.apnConnections) {
-    //    var bundleId = key;
-    //    var apnConnection = this.apnConnections[bundleId];
-    //    this.redis.hkeys("apnTokens#" + bundleId, function (err, replies) {
-    //        var note = toApnNotification(notification);
-    //        debug("bundleId %s replies %d", bundleId, replies.length);
-    //        if (replies.length > 0) {
-    //            apnConnection.pushNotification(note, replies);
-    //        }
-    //    });
-    //}
 
 };
 
