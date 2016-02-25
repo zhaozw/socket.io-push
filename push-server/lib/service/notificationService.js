@@ -48,7 +48,7 @@ NotificationService.prototype.setApnToken = function (pushId, apnToken, bundleId
                 outerThis.redis.set("pushIdToApnData#" + pushId, apnData);
                 outerThis.redis.set("apnTokenToPushId#" + apnToken, pushId);
                 outerThis.redis.hset("apnTokens#" + bundleId, apnToken, 1);
-                if (apnData && oldApnData.pushId){
+                if (oldApnData && oldApnData.pushId){
                     outerThis.redis.del("pushIdToApnData#" + oldApnData.pushId);
                 }
                 debug("set pushIdToApnData %s %s", pushId, apnData);
