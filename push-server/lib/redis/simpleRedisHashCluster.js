@@ -3,7 +3,6 @@ module.exports = SimpleRedisHashCluster;
 var commands = require('redis-commands');
 var redis = require('redis');
 var util = require("../util/util.js");
-var debug = require('debug')('SimpleRedisHashCluster');
 
 function SimpleRedisHashCluster(addrs) {
     if (!(this instanceof SimpleRedisHashCluster)) return new SimpleRedisHashCluster(addrs);
@@ -28,7 +27,6 @@ commands.list.forEach(function (command) {
 
     SimpleRedisHashCluster.prototype[command.toUpperCase()] = SimpleRedisHashCluster.prototype[command] = function (key, arg, callback) {
         if (Array.isArray(key)) {
-            debug("multiple key not supported ");
             console.log("multiple key not supported ");
             throw "multiple key not supported";
         }
@@ -61,7 +59,6 @@ SimpleRedisHashCluster.prototype.on = function (message, callback) {
         this.messageCallbacks.push[callback];
     } else {
         var err = "on " + message + " not supported";
-        debug(err);
         console.log(err);
         throw err;
     }
