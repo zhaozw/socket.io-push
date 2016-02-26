@@ -18,17 +18,41 @@ config.apns = [
     }
 ];
 
-config.redis = {
-    host: "127.0.0.1",
-    port: 6379
-};
+config.redis = [
+    {
+        host: "127.0.0.1",
+        port: 30001
+    },
+    {
+        host: "127.0.0.1",
+        port: 30002
+    },
+    {
+        host: "127.0.0.1",
+        port: 30003
+    },
+    {
+        host: "127.0.0.1",
+        port: 30004
+    },
+    {
+        host: "127.0.0.1",
+        port: 30005
+    },
+    {
+        host: "127.0.0.1",
+        port: 30006
+    }
+
+];
+
 
 config.io_1 = {
-    port: 9101
+    port: 9103
 };
 
 config.api_1 = {
-    port: 9102
+    port: 9104
 };
 
 config.io_2 = {

@@ -47,7 +47,7 @@ NotificationService.prototype.setApnToken = function (pushId, apnToken, bundleId
             if (oldPushId !== pushId) {
                 outerThis.redis.set("pushIdToApnData#" + pushId, apnData);
                 outerThis.redis.set("apnTokenToPushId#" + apnToken, pushId);
-                if (oldPushId){
+                if (oldPushId) {
                     outerThis.redis.del("pushIdToApnData#" + oldPushId);
                     debug("remove old pushId to apnToken %s %s", oldPushId, apnData);
                 }
@@ -63,48 +63,52 @@ NotificationService.prototype.setApnToken = function (pushId, apnToken, bundleId
 };
 
 NotificationService.prototype.sendByPushIds = function (pushIds, notification, io) {
-    var ttlService = this.ttlService;
-    var apnConnections = this.apnConnections;
-
-    util.batch(this.redis, "get", "pushIdToApnData#", pushIds, function (replies) {
-        var apnTokens = [];
-        for (var i = 0; i < pushIds.length; i++) {
-            var pushId = pushIds[i];
-            if (replies[i]) {
-                var apnData = JSON.parse(replies[i]);
+    var outerThis = this;
+    pushIds.forEach(function (pushId) {
+        outerThis.redis.get("pushIdToApnData#" + pushId, function (err, reply) {
+            if (reply) {
+                var apnData = JSON.parse(reply);
                 var bundleId = apnData.bundleId;
-                if (apnConnections[bundleId]) {
-                    var bundledToken = apnTokens[apnConnections[bundleId].index];
-                    if (!bundledToken) {
-                        bundledToken = [];
-                        apnTokens[apnConnections[bundleId].index] = bundledToken;
-                    }
-                    bundledToken.push(apnData.apnToken);
+                var apnConnection = outerThis.apnConnections[bundleId];
+                if (apnConnection) {
+                    var note = toApnNotification(notification, notification.timeToLive);
+                    apnConnection.pushNotification(note, apnData.apnToken);
                     debug("send to notification to ios %s %s", pushId, apnData.apnToken);
                 }
             } else {
                 debug("send to notification to android %s", pushId);
                 io.to(pushId).emit('noti', notification);
-                ttlService.addPacket(pushId, 'noti', notification);
+                outerThis.ttlService.addPacket(pushId, 'noti', notification);
             }
-        }
-        if (apnTokens.length > 0) {
-            var note = toApnNotification(notification, notification.timeToLive);
-            for (var bundleId in apnConnections) {
-                var apnConnection = apnConnections[bundleId];
-                debug("send notification by bundle id %s %s", bundleId, apnTokens[apnConnection.index]);
-                if (apnTokens[apnConnection.index]) {
-                    apnConnection.pushNotification(note, apnTokens[apnConnection.index]);
-                }
-            }
-        }
+
+        });
     });
+
 };
 
 NotificationService.prototype.sendAll = function (notification, io) {
     io.to("noti").emit('noti', notification);
     var bundleIds = this.bundleIds;
     var apnConnections = this.apnConnections;
+    pushIds.forEach(function (pushId) {
+        outerThis.redis.get("pushIdToApnData#" + pushId, function (err, reply) {
+            if (reply) {
+                var apnData = JSON.parse(reply);
+                var bundleId = apnData.bundleId;
+                var apnConnection = outerThis.apnConnections[bundleId];
+                if (apnConnection) {
+                    var note = toApnNotification(notification, notification.timeToLive);
+                    apnConnection.pushNotification(note, apnData.apnToken);
+                    debug("send to notification to ios %s %s", pushId, apnData.apnToken);
+                }
+            } else {
+                debug("send to notification to android %s", pushId);
+                io.to(pushId).emit('noti', notification);
+                outerThis.ttlService.addPacket(pushId, 'noti', notification);
+            }
+
+        });
+    });
     util.batch(this.redis, "hkeys", "apnTokens#", bundleIds, function (replies) {
         var note = toApnNotification(notification);
         for (var i = 0; i < bundleIds.length; i++) {
