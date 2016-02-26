@@ -12,7 +12,7 @@ function NotificationService(apnConfigs, redis, ttlService) {
     this.apnConnections = {};
     var outerThis = this;
     var fs = require('fs');
-    var ca = [fs.readFileSync("cert/entrust_2048_ca.cer")];
+    var ca = [fs.readFileSync(__dirname + "/../../cert/entrust_2048_ca.cer")];
 
     apnConfigs.forEach(function (apnConfig, index) {
         apnConfig.maxConnections = 10;
