@@ -3,16 +3,23 @@ module.exports = Stats;
 var debug = require('debug')('Stats');
 var randomstring = require("randomstring");
 
-function Stats(redis) {
-    if (!(this instanceof Stats)) return new Stats(redis);
+function Stats(redis, port) {
+    if (!(this instanceof Stats)) return new Stats(redis, port);
     this.redis = redis;
     this.sessionCount = 0;
     this.redisIncrBuffer = require('./redisIncrBuffer.js')(redis);
-    this.id = randomstring.generate(32);
+    var ipPath = process.cwd() + "/ip";
+    var fs = require('fs');
+    var ip;
+    if (fs.existsSync(ipPath)) {
+        ip = fs.readFileSync(ipPath) + ":" + port;
+    }
+    debug("ip file %s %s", ipPath, ip);
+    this.id = ip || randomstring.generate(32);
     var stats = this;
     setInterval(function () {
         redis.hset("stats#sessionCount", stats.id, JSON.stringify({
-            timestamp : Date.now(),
+            timestamp: Date.now(),
             sessionCount: stats.sessionCount
         }));
     }, 10000);
@@ -90,17 +97,20 @@ Stats.prototype.onNotificationReply = function (timestamp) {
 };
 
 Stats.prototype.getSessionCount = function (callback) {
-    this.redis.hvals('stats#sessionCount', function (err, results) {
+    this.redis.hgetall('stats#sessionCount', function (err, results) {
+        debug("stats#sessionCount %s", results.length);
         var totalCount = 0;
         var currentTimestamp = Date.now();
-        for (var i = 0; i < results.length; i++) {
-            var data = JSON.parse(results[i]);
-            debug("getSessionCount %s", results[i]);
+        var processCount = [];
+        for (var id in results) {
+            var data = JSON.parse(results[id]);
             if ((currentTimestamp - data.timestamp) < 20 * 1000) {
                 totalCount += data.sessionCount;
+                processCount.push({id: id, count: data.sessionCount});
             }
         }
-        callback(totalCount)
+
+        callback({sessionCount: totalCount, processCount: processCount.sort()})
     });
 };
 

@@ -12,7 +12,6 @@ function SimpleRedisHashCluster(addrs) {
     addrs.forEach(function (addr) {
         var client = redis.createClient({host: addr.host, port: addr.port});
         client.on("message", function (channel, message) {
-            console.log("client1 channel " + channel + ": " + message);
             outerThis.messageCallbacks.forEach(function (callback) {
                 callback(channel, message);
             });

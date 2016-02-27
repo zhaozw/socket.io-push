@@ -1,0 +1,12 @@
+.idea
+local.properties
+*.iml
+node_modules
+*.log
+dump.rdb
+log.txt
+pid
+pids
+pid_debug
+logs
+ip

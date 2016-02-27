@@ -15,30 +15,20 @@ function RestApi(io, stats, notificationService, port, uidStore, ttlService) {
     server.use(restify.queryParser());
     server.use(restify.bodyParser());
 
-    server.get(/^\/push\/?.*/, restify.serveStatic({
-        directory: './static',
+    var staticConfig = restify.serveStatic({
+        directory: __dirname + '/../../static',
         default: 'index.html'
-    }));
+    });
 
-    server.get(/^\/uid\/?.*/, restify.serveStatic({
-        directory: './static',
-        default: 'index.html'
-    }));
+    server.get(/^\/push\/?.*/, staticConfig);
 
-    server.get(/^\/stats\/?.*/, restify.serveStatic({
-        directory: './static',
-        default: 'index.html'
-    }));
+    server.get(/^\/uid\/?.*/, staticConfig);
 
-    server.get(/^\/js\/?.*/, restify.serveStatic({
-        directory: './static',
-        default: 'index.html'
-    }));
+    server.get(/^\/stats\/?.*/, staticConfig);
 
-    server.get("/", restify.serveStatic({
-        directory: './static',
-        default: 'index.html'
-    }));
+    server.get(/^\/js\/?.*/, staticConfig);
+
+    server.get("/", staticConfig);
 
     var handlePush = function (req, res, next) {
         var topic = req.params.topic;
@@ -136,7 +126,7 @@ function RestApi(io, stats, notificationService, port, uidStore, ttlService) {
 
     var handleStatsBase = function (req, res, next) {
         stats.getSessionCount(function (count) {
-            res.send({sessionCount: count});
+            res.send(count);
         });
         return next();
     };
@@ -166,9 +156,33 @@ function RestApi(io, stats, notificationService, port, uidStore, ttlService) {
     server.get('/api/addPushIdToUid', handleAddPushIdToUid);
     server.post('/api/addPushIdToUid', handleAddPushIdToUid);
 
-    server.get('/api/stats', function (req, res, nex) {
+    server.get('/api/nginx', function (req, res, next) {
+        stats.getSessionCount(function (count) {
+            res.writeHead(200, {
+                'Content-Type': 'text/plain'
+            });
+            count.processCount.forEach(function (process) {
+                res.write("server " + process.id + ";\n");
+            });
+            res.end();
+        });
+        return next();
+    });
+
+    server.get('/api/ip', function (req, res, next) {
+        var ip = req.connection.remoteAddress;
+        ip = ip.substr(ip.lastIndexOf(':') + 1, ip.length);
+        res.writeHead(200, {
+            'Content-Length': Buffer.byteLength(ip),
+            'Content-Type': 'text/plain'
+        });
+        res.write(ip);
+        res.end();
+        return next();
+    });
+
+    server.get('/api/stats', function (req, res, next) {
         res.send({
-            connectCounter: connectCounter,
             sentCounter: sentCounter,
             receiveCounter: receiveCounter,
             percent: receiveCounter / sentCounter

@@ -3,6 +3,7 @@ module.exports = NotificationService;
 var debug = require('debug')('NotificationService');
 var util = require('../util/util.js');
 var apn = require('apn');
+var apnTokenTTL = 3600 * 24 * 7;
 
 
 function NotificationService(apnConfigs, redis, ttlService) {
@@ -55,8 +56,8 @@ NotificationService.prototype.setApnToken = function (pushId, apnToken, bundleId
             }
 
             outerThis.redis.hset("apnTokens#" + bundleId, apnToken, Date.now());
-            outerThis.redis.expire("pushIdToApnData#" + pushId, 3600 * 24 * 7);
-            outerThis.redis.expire("apnTokenToPushId#" + apnToken, 3600 * 24 * 7);
+            outerThis.redis.expire("pushIdToApnData#" + pushId, apnTokenTTL);
+            outerThis.redis.expire("apnTokenToPushId#" + apnToken, apnTokenTTL);
 
         });
     }
@@ -88,36 +89,29 @@ NotificationService.prototype.sendByPushIds = function (pushIds, notification, i
 
 NotificationService.prototype.sendAll = function (notification, io) {
     io.to("noti").emit('noti', notification);
-    var bundleIds = this.bundleIds;
     var apnConnections = this.apnConnections;
-    pushIds.forEach(function (pushId) {
-        outerThis.redis.get("pushIdToApnData#" + pushId, function (err, reply) {
-            if (reply) {
-                var apnData = JSON.parse(reply);
-                var bundleId = apnData.bundleId;
-                var apnConnection = outerThis.apnConnections[bundleId];
-                if (apnConnection) {
-                    var note = toApnNotification(notification, notification.timeToLive);
-                    apnConnection.pushNotification(note, apnData.apnToken);
-                    debug("send to notification to ios %s %s", pushId, apnData.apnToken);
+    var timestamp = Date.now();
+    var redis = this.redis;
+    var note = toApnNotification(notification, notification.timeToLive);
+    this.bundleIds.forEach(function (bundleId) {
+        redis.hgetall("apnTokens#" + bundleId, function (err, replies) {
+            if (replies) {
+                var tokens = [];
+                for (var token in replies) {
+                    if (timestamp - replies[token] > apnTokenTTL) {
+                        debug("delete outdated apnToken %s", token);
+                        redis.hdel("apnTokens#" + bundleId, token);
+                    } else {
+                        tokens.push(token);
+                    }
                 }
-            } else {
-                debug("send to notification to android %s", pushId);
-                io.to(pushId).emit('noti', notification);
-                outerThis.ttlService.addPacket(pushId, 'noti', notification);
+                if (tokens.length > 0) {
+                    var apnConnection = apnConnections[bundleId];
+                    debug("bundleId %s replies %d", bundleId, tokens.length);
+                    apnConnection.pushNotification(note, tokens);
+                }
             }
-
         });
-    });
-    util.batch(this.redis, "hkeys", "apnTokens#", bundleIds, function (replies) {
-        var note = toApnNotification(notification);
-        for (var i = 0; i < bundleIds.length; i++) {
-            var apnConnection = apnConnections[bundleIds[i]];
-            if (replies[i].length > 0) {
-                debug("bundleId %s replies %d", bundleIds[i], replies[i].length);
-                apnConnection.pushNotification(note, replies[i]);
-            }
-        }
     });
 
 };

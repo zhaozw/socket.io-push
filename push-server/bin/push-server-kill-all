@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 mkdir -p logs
 mkdir -p pids
@@ -26,9 +26,9 @@ shift $((OPTIND-1))
 
 [ "$1" = "--" ] && shift
 
-echo "DEBUG=$DEBUG, COUNT='$COUNT',FOREGROUND='$FOREGROUND', Leftovers: $@"
+echo "DEBUG=$DEBUG, COUNT='$COUNT',COUNT='$COUNT', Leftovers: $@"
 
-if [ $DEBUG = 1 ]; then
+if [ "$DEBUG" -gt 0 ]; then
     export DEBUG=apn,SimpleRedisHashCluster,socket.io*,PacketService,NotificationService,RestApi,Stats,TTLService
 else
 	export DEBUG=
@@ -38,7 +38,15 @@ BASEDIR=$(dirname $0)
 
 node_script="$BASEDIR/node-push-server"
 
-if [ $FOREGROUND = 1 ]; then
+if [ -f "$node_script" ]
+then
+	echo "dev dir"
+else
+	echo "use npm package bin"
+	$node_script = node-push-server
+fi
+
+if [ "$FOREGROUND" -gt 0 ]; then
     $node_script "$@"
 fi
 
