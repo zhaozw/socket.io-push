@@ -90,8 +90,8 @@ PacketService.prototype.publishDisconnect = function (socket) {
     var outerThis = this;
     this.redis.get("pushIdSocketId#" + socket.pushId, function (err, lastSocketId) {
         // reply is null when the key is missing
-        debug("pushIdSocketId redis %s %s", lastSocketId, socket.pushId);
-        if (lastSocketId === socket.id) {
+        debug("pushIdSocketId redis %s %s %s", socket.id, lastSocketId, socket.pushId);
+        if (lastSocketId == socket.id) {
             debug("publishDisconnect current socket disconnect %s", socket.id);
             outerThis.redis.del("pushIdSocketId#" + socket.pushId);
             var data = {pushId: socket.pushId, path: "/socketDisconnect"};

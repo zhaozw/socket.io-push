@@ -328,7 +328,7 @@ public class SocketIOProxyClient implements PushSubscriber {
     public void request(RequestInfo requestInfo) {
 
         try {
-
+            Log.v(TAG, "request " + requestInfo.getPath());
             if (requestInfo.isExpectReply()) {
                 replyCallbacks.put(requestInfo.getSequenceId(), requestInfo);
             }
@@ -339,7 +339,9 @@ public class SocketIOProxyClient implements PushSubscriber {
 
             if (socket.connected()) {
                 JSONObject object = new JSONObject();
-                object.put("data", Base64.encodeToString(requestInfo.getBody(), Base64.NO_WRAP));
+                if (requestInfo.getBody() != null) {
+                    object.put("data", Base64.encodeToString(requestInfo.getBody(), Base64.NO_WRAP));
+                }
                 object.put("path", requestInfo.getPath());
                 object.put("sequenceId", String.valueOf(requestInfo.getSequenceId()));
 
@@ -378,7 +380,7 @@ public class SocketIOProxyClient implements PushSubscriber {
         this.notificationCallback = notificationCallback;
     }
 
-    public String getUid(){
+    public String getUid() {
         return uid;
     }
 

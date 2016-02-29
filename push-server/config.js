@@ -1,7 +1,7 @@
 var config = {};
 
-config.pingTimeOut = 70000;
-config.pingInterval = 25000;
+config.pingTimeout = 5000;
+config.pingInterval = 5000;
 
 config.apns = [
     {
@@ -25,27 +25,6 @@ config.redis = [
     }
 ];
 
-//config.redis = [
-//    {
-//        host: "127.0.0.1",
-//        port: 6379
-//    },{
-//        host: "127.0.0.1",
-//        port: 6380
-//    },{
-//        host: "127.0.0.1",
-//        port: 6381
-//    },{
-//        host: "127.0.0.1",
-//        port: 6382
-//    },{
-//        host: "127.0.0.1",
-//        port: 6383
-//    },{
-//        host: "127.0.0.1",
-//        port: 6384
-//    }
-//];
 
 config.io_port = 10001;
 config.api_port = 11001;

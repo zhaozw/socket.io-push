@@ -3,6 +3,7 @@ module.exports = SimpleRedisHashCluster;
 var commands = require('redis-commands');
 var redis = require('redis');
 var util = require("../util/util.js");
+var debug = require('debug')('SimpleRedisHashCluster');
 
 function SimpleRedisHashCluster(addrs) {
     if (!(this instanceof SimpleRedisHashCluster)) return new SimpleRedisHashCluster(addrs);
@@ -10,8 +11,20 @@ function SimpleRedisHashCluster(addrs) {
     this.messageCallbacks = [];
     var outerThis = this;
     addrs.forEach(function (addr) {
-        var client = redis.createClient({host: addr.host, port: addr.port});
+        var client = redis.createClient({
+            host: addr.host,
+            port: addr.port,
+            return_buffers: true,
+            retry_max_delay: 3000,
+            max_attempts: 0,
+            connect_timeout: 10000000000000000
+        });
+        client.on("error", function (err) {
+            console.log("redis connect Error %s:%s %s", addr.host, addr.port, err);
+        });
+        client.port = addr.port;
         client.on("message", function (channel, message) {
+            debug("on message %s %s %s", channel, message, client.port);
             outerThis.messageCallbacks.forEach(function (callback) {
                 callback(channel, message);
             });
@@ -55,7 +68,8 @@ commands.list.forEach(function (command) {
 
 SimpleRedisHashCluster.prototype.on = function (message, callback) {
     if (message === "message") {
-        this.messageCallbacks.push[callback];
+        debug("add messageCallbacks %s", callback);
+        this.messageCallbacks.push(callback);
     } else {
         var err = "on " + message + " not supported";
         console.log(err);

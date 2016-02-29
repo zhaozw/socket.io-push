@@ -45,8 +45,8 @@ NotificationService.prototype.setApnToken = function (pushId, apnToken, bundleId
         var apnData = JSON.stringify({bundleId: bundleId, apnToken: apnToken});
         var outerThis = this;
         this.redis.get("apnTokenToPushId#" + apnToken, function (err, oldPushId) {
-            if (oldPushId !== pushId) {
-                outerThis.redis.set("pushIdToApnData#" + pushId, apnData);
+            debug("oldPushId %s", oldPushId);
+            if (oldPushId && oldPushId.toString() != pushId) {
                 outerThis.redis.set("apnTokenToPushId#" + apnToken, pushId);
                 if (oldPushId) {
                     outerThis.redis.del("pushIdToApnData#" + oldPushId);
@@ -54,7 +54,7 @@ NotificationService.prototype.setApnToken = function (pushId, apnToken, bundleId
                 }
                 debug("set pushIdToApnData %s %s", pushId, apnData);
             }
-
+            outerThis.redis.set("pushIdToApnData#" + pushId, apnData);
             outerThis.redis.hset("apnTokens#" + bundleId, apnToken, Date.now());
             outerThis.redis.expire("pushIdToApnData#" + pushId, apnTokenTTL);
             outerThis.redis.expire("apnTokenToPushId#" + apnToken, apnTokenTTL);
@@ -67,6 +67,7 @@ NotificationService.prototype.sendByPushIds = function (pushIds, notification, i
     var outerThis = this;
     pushIds.forEach(function (pushId) {
         outerThis.redis.get("pushIdToApnData#" + pushId, function (err, reply) {
+            debug("pushIdToApnData " + reply);
             if (reply) {
                 var apnData = JSON.parse(reply);
                 var bundleId = apnData.bundleId;

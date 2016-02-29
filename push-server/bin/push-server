@@ -29,7 +29,7 @@ shift $((OPTIND-1))
 echo "DEBUG=$DEBUG, COUNT='$COUNT',FOREGROUND='$FOREGROUND', Leftovers: $@"
 
 if [ $DEBUG = 1 ]; then
-    export DEBUG=apn,SimpleRedisHashCluster,socket.io*,PacketService,NotificationService,RestApi,Stats,TTLService
+    export DEBUG=apn,Stats,socket.io*,PacketService,NotificationService,RestApi,TTLService
 else
 	export DEBUG=
 fi
@@ -40,6 +40,7 @@ node_script="$BASEDIR/node-push-server"
 
 if [ $FOREGROUND = 1 ]; then
     $node_script "$@"
+    exit
 fi
 
 for (( c=1; c<=COUNT; c++ ))

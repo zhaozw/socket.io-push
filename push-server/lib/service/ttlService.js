@@ -28,7 +28,7 @@ TTLService.prototype.onPushId = function (socket) {
     var redis = this.redis;
     var key = "ttlPacket#" + socket.pushId;
     redis.lrange(key, 0, -1, function (err, packets) {
-        if (packets.length > 0) {
+        if (packets && packets.length > 0) {
             debug("onPushId key %s , %d ", key, packets.length);
             var timestamp = Date.now();
             var pushedIds = [];

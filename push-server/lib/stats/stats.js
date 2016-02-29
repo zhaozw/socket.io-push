@@ -110,7 +110,13 @@ Stats.prototype.getSessionCount = function (callback) {
             }
         }
 
-        callback({sessionCount: totalCount, processCount: processCount.sort()})
+        callback({
+            sessionCount: totalCount, processCount: processCount.sort(function (a, b) {
+                if (a.id < b.id) return -1;
+                if (a.id > b.id) return 1;
+                return 0;
+            })
+        })
     });
 };
 
@@ -130,65 +136,86 @@ Stats.prototype.find = function (key, callback) {
         timestamp += mSecPerHour;
     }
 
-    this.redis.mget(keys, function (err, results) {
-        var totalChart = [];
-        var latencyChart = [];
-        var successRateChart = [];
-        var countPerSecondChart = [];
+    var results = [];
+    var redis = this.redis;
+    redis.get(timestamps.shift(), function (err, replies) {
+        results.push(replies);
 
-        var totalDay = 0;
-        var successDay = 0;
-        var latencyDay = 0;
-        var successRateChartDay = [];
-        var latencyChartDay = [];
+        redis.get("stats#" + key + "#successCount#" + timestamp, function (err, replies) {
+            results.push(replies);
 
-        for (var i = 0; i < results.length / 3; i++) {
-
-            var total = parseInt(results[i * 3 + 0]) || 0;
-            var success = parseInt(results[i * 3 + 1]) || 0;
-            var latency = parseInt(results[i * 3 + 2]) || 0;
-
-            totalCount += total;
-            totalDay += total;
-            totalSuccess += success;
-            successDay += success;
-            totalLatency += latency;
-            latencyDay += latency;
-            totalChart.push(total);
-            latencyChart.push(Math.round(latency / success) || 0);
-            successRateChart.push(((100 * success / total) || 0).toFixed(2));
-            countPerSecondChart.push(total / mSecPerHour * 1000);
-
-            if ((i + 1) % (24) == 0) {
-                successRateChartDay.push(((100 * successDay / totalDay) || 0).toFixed(2));
-                latencyChartDay.push(Math.round(latencyDay / successDay) || 0);
-                totalDay = 0;
-                successDay = 0;
-                latencyDay = 0;
-            }
-
-        }
-        var avgLatency = Math.round(totalLatency / totalSuccess) || 0;
-        var successRate = totalSuccess / totalCount;
-        var countPerSecond = totalCount / totalHour / mSecPerHour * 1000;
-
-        var chartData = {
-            timestamps: timestamps,
-            total: totalChart,
-            latency: latencyChart,
-            successRate: successRateChart,
-            countPerSecond: countPerSecondChart,
-            successRateDay: successRateChartDay,
-            latencyDay: latencyChartDay
-        };
-
-        callback({
-            "totalCount": totalCount,
-            "totalSuccess": totalSuccess,
-            "avgLatency": avgLatency,
-            "successRate": successRate,
-            "countPerSecond": countPerSecond,
-            "chartData": chartData
         });
     });
+
+
+    var recursive = function (err, replies) {
+        results.push(replies);
+        if (keys.length > 0) {
+            redis.get(keys.shift(), recursive);
+        } else {
+            var totalChart = [];
+            var latencyChart = [];
+            var successRateChart = [];
+            var countPerSecondChart = [];
+
+            var totalDay = 0;
+            var successDay = 0;
+            var latencyDay = 0;
+            var successRateChartDay = [];
+            var latencyChartDay = [];
+
+            for (var i = 0; i < results.length / 3; i++) {
+
+                var total = parseInt(results[i * 3 + 0]) || 0;
+                var success = parseInt(results[i * 3 + 1]) || 0;
+                var latency = parseInt(results[i * 3 + 2]) || 0;
+
+                totalCount += total;
+                totalDay += total;
+                totalSuccess += success;
+                successDay += success;
+                totalLatency += latency;
+                latencyDay += latency;
+                totalChart.push(total);
+                latencyChart.push(Math.round(latency / success) || 0);
+                successRateChart.push(((100 * success / total) || 0).toFixed(2));
+                countPerSecondChart.push(total / mSecPerHour * 1000);
+
+                if ((i + 1) % (24) == 0) {
+                    successRateChartDay.push(((100 * successDay / totalDay) || 0).toFixed(2));
+                    latencyChartDay.push(Math.round(latencyDay / successDay) || 0);
+                    totalDay = 0;
+                    successDay = 0;
+                    latencyDay = 0;
+                }
+
+            }
+            var avgLatency = Math.round(totalLatency / totalSuccess) || 0;
+            var successRate = totalSuccess / totalCount;
+            var countPerSecond = totalCount / totalHour / mSecPerHour * 1000;
+
+            var chartData = {
+                timestamps: timestamps,
+                total: totalChart,
+                latency: latencyChart,
+                successRate: successRateChart,
+                countPerSecond: countPerSecondChart,
+                successRateDay: successRateChartDay,
+                latencyDay: latencyChartDay
+            };
+
+            callback({
+                "totalCount": totalCount,
+                "totalSuccess": totalSuccess,
+                "avgLatency": avgLatency,
+                "successRate": successRate,
+                "countPerSecond": countPerSecond,
+                "chartData": chartData
+            });
+        }
+    };
+
+    recursive();
+
 }
+

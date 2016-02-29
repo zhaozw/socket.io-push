@@ -69,6 +69,9 @@ public class BindService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         Log.d(TAG, "onBind");
+        RequestInfo requestInfo = new RequestInfo();
+        requestInfo.setPath("/androidBind");
+        ConnectionService.client.request(requestInfo);
         return messenger.getBinder();
     }
 
@@ -86,6 +89,9 @@ public class BindService extends Service {
     @Override
     public boolean onUnbind(Intent intent) {
         Log.d(TAG, "onUnbind");
+        RequestInfo requestInfo = new RequestInfo();
+        requestInfo.setPath("/androidUnbind");
+        ConnectionService.client.request(requestInfo);
         bound = false;
         return true;
     }
