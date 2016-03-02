@@ -5,9 +5,10 @@ var redis = require('redis');
 var util = require("../util/util.js");
 var debug = require('debug')('SimpleRedisHashCluster');
 
-function SimpleRedisHashCluster(addrs) {
-    if (!(this instanceof SimpleRedisHashCluster)) return new SimpleRedisHashCluster(addrs);
-    this.clients = [];
+function SimpleRedisHashCluster(addrs, salveAddrs) {
+    if (!(this instanceof SimpleRedisHashCluster)) return new SimpleRedisHashCluster(addrs, salveAddrs);
+    this.masters = [];
+    this.slaves = [];
     this.messageCallbacks = [];
     var outerThis = this;
     addrs.forEach(function (addr) {
@@ -23,14 +24,32 @@ function SimpleRedisHashCluster(addrs) {
             console.log("redis connect Error %s:%s %s", addr.host, addr.port, err);
         });
         client.port = addr.port;
+        outerThis.masters.push(client);
+    });
+
+    salveAddrs.forEach(function (addr) {
+        var client = redis.createClient({
+            host: addr.host,
+            port: addr.port,
+            return_buffers: true,
+            retry_max_delay: 3000,
+            max_attempts: 0,
+            connect_timeout: 10000000000000000
+        });
+        client.on("error", function (err) {
+            console.log("redis connect Error %s:%s %s", addr.host, addr.port, err);
+        });
+        client.port = addr.port;
         client.on("message", function (channel, message) {
-            debug("on message %s %s %s", channel, message, client.port);
+            debug("on slave message %s %s %s", channel, message, client.port);
             outerThis.messageCallbacks.forEach(function (callback) {
                 callback(channel, message);
             });
         });
-        outerThis.clients.push(client);
+        outerThis.slaves.push(client);
     });
+
+
     var defaultPubAddr = util.getByHash(addrs, "packetProxy#default");
     console.log("packetProxy#default " + defaultPubAddr.host + ":" + defaultPubAddr.port);
 }
@@ -43,28 +62,52 @@ commands.list.forEach(function (command) {
             throw "multiple key not supported";
         }
         var client;
-        if (this.clients.length == 1) {
-            client = this.clients[0];
+        if (this.masters.length == 1) {
+            client = this.masters[0];
         } else {
-            client = util.getByHash(this.clients, key);
+            client = util.getByHash(this.masters, key);
         }
 
-        if (Array.isArray(arg)) {
-            arg = [key].concat(arg);
-            return client.send_command(command, arg, callback);
-        }
-        // Speed up the common case
-        var len = arguments.length;
-        if (len === 2) {
-            return client.send_command(command, [key, arg]);
-        }
-        if (len === 3) {
-            return client.send_command(command, [key, arg, callback]);
-        }
-        return client.send_command(command, toArray(arguments));
+        handleCommand(command, arguments, key, arg, callback, client);
     }
 
 });
+
+['subscribe'].forEach(function (command) {
+
+    SimpleRedisHashCluster.prototype[command.toUpperCase()] = SimpleRedisHashCluster.prototype[command] = function (key, arg, callback) {
+        if (Array.isArray(key)) {
+            console.log("multiple key not supported ");
+            throw "multiple key not supported";
+        }
+        var client;
+        if (this.slaves.length == 1) {
+            client = this.slaves[0];
+        } else {
+            client = util.getByHash(this.slaves, key);
+        }
+
+        handleCommand(command, arguments, key, arg, callback, client);
+    }
+
+});
+
+function handleCommand(command, callArguments, key, arg, callback, client) {
+
+    if (Array.isArray(arg)) {
+        arg = [key].concat(arg);
+        return client.send_command(command, arg, callback);
+    }
+    // Speed up the common case
+    var len = callArguments.length;
+    if (len === 2) {
+        return client.send_command(command, [key, arg]);
+    }
+    if (len === 3) {
+        return client.send_command(command, [key, arg, callback]);
+    }
+    return client.send_command(command, toArray(callArguments));
+}
 
 SimpleRedisHashCluster.prototype.on = function (message, callback) {
     if (message === "message") {

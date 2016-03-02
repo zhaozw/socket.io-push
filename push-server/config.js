@@ -25,6 +25,13 @@ config.redis = [
     }
 ];
 
+config.redisSlave = [
+    {
+        host: "127.0.0.1",
+        port: 6380
+    }
+];
+
 
 config.io_port = 10001;
 config.api_port = 11001;

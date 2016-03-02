@@ -1,6 +1,6 @@
 module.exports = RestApi;
 
-function RestApi(io, stats, notificationService, port, uidStore, ttlService) {
+function RestApi(io, stats, notificationService, port, uidStore, ttlService, redis) {
 
     var restify = require('restify');
 
@@ -8,6 +8,7 @@ function RestApi(io, stats, notificationService, port, uidStore, ttlService) {
         name: 'myapp',
         version: '1.0.0',
     });
+
 
     var debug = require('debug')('RestApi');
 
@@ -155,6 +156,19 @@ function RestApi(io, stats, notificationService, port, uidStore, ttlService) {
     server.post('/api/notification', handleNotification);
     server.get('/api/addPushIdToUid', handleAddPushIdToUid);
     server.post('/api/addPushIdToUid', handleAddPushIdToUid);
+
+    server.get('/api/redis/del', function (req, res, next) {
+        redis.del(req.params.key);
+        res.send({code: "success", key: req.params.key});
+        return next();
+    });
+
+    server.get('/api/redis/get', function (req, res, next) {
+        redis.get(req.params.key, function (err, result) {
+            res.send({key: req.params.key, value: result, result: result});
+        });
+        return next();
+    });
 
     server.get('/api/nginx', function (req, res, next) {
         stats.getSessionCount(function (count) {

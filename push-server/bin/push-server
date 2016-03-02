@@ -9,14 +9,17 @@ OPTIND=1         # Reset in case getopts has been used previously in the shell.
 # Initialize our own variables:
 COUNT=1
 DEBUG=0
+VERBOSE=0
 FOREGROUND=0
 
-while getopts "h?c:d?f?" opt; do
+while getopts "h?c:d?f?v?" opt; do
     case "$opt" in
     c)  COUNT=$OPTARG
         ;;
     d)  DEBUG=1
         ;;
+    v)  VERBOSE=1
+                ;;
     f)  FOREGROUND=1
         ;;
     esac
@@ -29,7 +32,13 @@ shift $((OPTIND-1))
 echo "DEBUG=$DEBUG, COUNT='$COUNT',FOREGROUND='$FOREGROUND', Leftovers: $@"
 
 if [ $DEBUG = 1 ]; then
-    export DEBUG=apn,Stats,socket.io*,PacketService,NotificationService,RestApi,TTLService
+    export DEBUG=apn,PacketService,NotificationService,RestApi,TTLService
+else
+	export DEBUG=
+fi
+
+if [ $VERBOSE = 1 ]; then
+    export DEBUG=SimpleRedisHashCluster,apn,Stats,socket.io*,PacketService,NotificationService,RestApi,TTLService
 else
 	export DEBUG=
 fi
