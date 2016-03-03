@@ -157,6 +157,11 @@ function RestApi(io, stats, notificationService, port, uidStore, ttlService, red
     server.get('/api/addPushIdToUid', handleAddPushIdToUid);
     server.post('/api/addPushIdToUid', handleAddPushIdToUid);
 
+    server.get('/api/status', function (req, res, next) {
+        res.send(redis.status());
+        return next();
+    });
+
     server.get('/api/redis/del', function (req, res, next) {
         redis.del(req.params.key);
         res.send({code: "success", key: req.params.key});

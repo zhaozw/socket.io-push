@@ -1,17 +1,10 @@
 package com.yy.httpproxy.serializer;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.yy.httpproxy.nyy.NyyRequestData;
 import com.yy.httpproxy.requester.RequestException;
-import com.yy.httpproxy.serializer.RequestSerializer;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
-import java.net.URLEncoder;
-import java.util.Map;
 
 public class JsonSerializer implements RequestSerializer {
 

@@ -120,6 +120,20 @@ SimpleRedisHashCluster.prototype.on = function (message, callback) {
     }
 }
 
+
+SimpleRedisHashCluster.prototype.status = function () {
+    var masterError = 0;
+    this.masters.forEach(function (master) {
+        !master.ready && masterError++;
+    });
+    var slaveError = 0;
+    this.slaves.forEach(function (slave) {
+        !slave.ready && slaveError++;
+    });
+    return {masterError: masterError, slaveError: slaveError};
+}
+
+
 function toArray(args) {
     var len = args.length,
         arr = new Array(len), i;

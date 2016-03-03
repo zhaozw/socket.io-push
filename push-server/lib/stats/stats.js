@@ -12,7 +12,7 @@ function Stats(redis, port) {
     var fs = require('fs');
     var ip;
     if (fs.existsSync(ipPath)) {
-        ip = fs.readFileSync(ipPath) + ":" + port;
+        ip = fs.readFileSync(ipPath,"utf8").trim() + ":" + port;
     }
     debug("ip file %s %s", ipPath, ip);
     this.id = ip || randomstring.generate(32);

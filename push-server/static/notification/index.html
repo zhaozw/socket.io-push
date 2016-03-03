@@ -60,35 +60,31 @@
     window.onload = function () {
         change();
     }
-
 </script>
 
 <h1>Push Test</h1>
 
-<form id="myDiv">
+<div id="myDiv">
     <table cellspacing="10" cellpadding="0" width="400">
         <tr align=left>
-            <td width="100" align=right>Topic :</td>
+            <td width="100" align=right>标&nbsp&nbsp&nbsp题 :</td>
             <td width="300" colspan="3"><input id="title" name="id" type="text"></td>
         </tr>
 
         <tr align=left>
-            <td width="100" align=right>data</td>
+            <td width="100" align=right>消息编辑框:&nbsp&nbsp&nbsp</td>
             <td width="300" colspan="3"><textarea id="content" name="content" cols="40" rows="4"
                                                   placeholder="内容输入框" value=""></textarea></td>
         </tr>
-
 
         <tr align=left>
             <td width="100" align=right><font size="2">pushAll</font>
             </td>
 
-            <td width="100" align="right"><input name="type" type="radio" value="yes"
-                                                 onchange="change();"/>是
+            <td width="100" align="right"><input name="type" type="radio" value="yes" onchange="change();"/>是
             </td>
 
-            <td width="100" align="right"><input name="type" type="radio" value="no" checked=true
-                                                 onchange="change();"/>否
+            <td width="100" align="right"><input name="type" type="radio" value="no" checked=true onchange="change();"/>否
             </td>
 
         </tr>
@@ -97,23 +93,21 @@
             <div id="pushIdText">
                 <td width="100" align=right>pushId: &nbsp&nbsp&nbsp</td>
                 <td width="300" colspan="3"><textarea id="pushId" name="pushId" cols="40" rows="4"
-                                                      placeholder="多个Id换行分开" value=""></textarea>
-                </td>
+                                                      placeholder="多个Id换行分开" value=""></textarea></td>
             </div>
         </tr>
         <tr align=left id="pushUidDiv">
             <div id="pushUidText">
                 <td width="100" align=right>uid: &nbsp&nbsp&nbsp</td>
                 <td width="300" colspan="3"><textarea id="uid" name="uid" cols="40" rows="4"
-                                                      placeholder="多个Id换行分开" value=""></textarea>
-                </td>
+                                                      placeholder="多个Id换行分开" value=""></textarea></td>
             </div>
         </tr>
 
         <tr align=left id="ttlDiv">
             <div id="timeToLiveDiv">
                 <td width="100" align=right>timeToLive: &nbsp&nbsp&nbsp</td>
-                <td width="300" colspan="3"><input id="timeToLive" name="timeToLive" value=""/></td>
+                <td width="300" colspan="3"><input id="timeToLive" name="timeToLive" value=""></input></td>
             </div>
         </tr>
 
@@ -126,19 +120,17 @@
         </tr>
 
         <tr align=right>
-            <td width="400" colspan=4 align="center"><input type="button" onclick="ajaxTest()"
-                                                            value="推送"/></td>
+            <td width="400" colspan=4 align="center"><input type="button" onclick="ajaxTest()" value="推送"/></td>
         </tr>
         <tr></tr>
         <tr>
-            <td width="400" colspan="4" align="center"><font size="5" color="green"
-                                                             id="result"></font></td>
+            <td width="400" colspan="4" align="center"><font size="5" color="green" id="result"></font></td>
         </tr>
 
     </table>
-</form>
-<br/>
-<a id="url"></a>
+
+    <br/>
+    <a id="url"></a>
 
 </div>
 <script>
@@ -175,6 +167,10 @@
             return false
         }
 
+        var data = {
+            "android": {"title": $("#title").val(), "message": $("#content").val()},
+            "apn": {"alert": $("#content").val(), "badge": 5, "sound": "default", "payload": {}}
+        }
         var str = JSON.stringify(data);
 
         var pushIds = ($("#pushId").val()).split("\n");
@@ -182,22 +178,16 @@
 
         var uids = ($("#uid").val()).split("\n");
         uids = cleanArray(uids, "");
-
-        var uri = $('input[name=uri]:checked').val();
-
-        var data = {
-            pushId: pushIds,
-            pushAll: pushAll,
-            topic : $("#title").val(),
-            uid: uids,
-            data: $("#content").val(),
-            timeToLive: $("#timeToLive").val()
-        };
-
         $.ajax({
             type: 'GET',
-            url: '/api/push',
-            data: data,
+            url: '/api/notification',
+            data: {
+                pushId: pushIds,
+                notification: str,
+                pushAll: pushAll,
+                uid: uids,
+                timeToLive: $("#timeToLive").val()
+            },
             success: function (data) {
                 document.getElementById("result").innerHTML = JSON.stringify(data);
                 $('#url').attr('href', this.url);
@@ -218,7 +208,6 @@
     $("#uid").bind('input propertychange', function () {
         $("#pushId").val("");
     });
-
 
 </script>
 
