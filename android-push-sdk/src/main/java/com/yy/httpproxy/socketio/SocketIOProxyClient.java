@@ -5,7 +5,6 @@ import android.util.Base64;
 import android.util.Log;
 
 import com.yy.httpproxy.AndroidLoggingHandler;
-import com.yy.httpproxy.pojo.Push;
 import com.yy.httpproxy.requester.RequestException;
 import com.yy.httpproxy.requester.RequestInfo;
 import com.yy.httpproxy.requester.ResponseHandler;
@@ -18,15 +17,9 @@ import com.yy.httpproxy.subscribe.PushSubscriber;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.msgpack.MessagePack;
-import org.msgpack.template.Template;
-import org.msgpack.template.Templates;
-import org.msgpack.type.MapValue;
-import org.msgpack.type.Value;
-import org.msgpack.unpacker.Unpacker;
 
-import java.io.ByteArrayInputStream;
 import java.net.URISyntaxException;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -37,6 +30,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
 import io.socket.client.IO;
@@ -52,7 +46,7 @@ import javax.net.ssl.X509TrustManager;
 
 public class SocketIOProxyClient implements PushSubscriber {
 
-    private static final int PROTOCOL_VERSION = 2;
+    private static final int PROTOCOL_VERSION = 1;
     private static String TAG = "SocketIoRequester";
     private PushCallback pushCallback;
     private String pushId;
@@ -63,8 +57,6 @@ public class SocketIOProxyClient implements PushSubscriber {
     private boolean connected = false;
     private String uid;
     private Stats stats = new Stats();
-    private MessagePack msgpack = new MessagePack();
-
 
     public void setResponseHandler(ResponseHandler responseHandler) {
         this.responseHandler = responseHandler;
@@ -137,7 +129,6 @@ public class SocketIOProxyClient implements PushSubscriber {
                         array.put(topic);
                     }
                 }
-
                 socket.emit("pushId", object);
             } catch (JSONException e) {
                 Log.e(TAG, "connectListener error ", e);
@@ -188,16 +179,12 @@ public class SocketIOProxyClient implements PushSubscriber {
         public void call(Object... args) {
             if (pushCallback != null) {
                 try {
-                    Template<Map<String, Value>> mapTmpl = Templates.tMap(Templates.TString, Templates.TValue);
-                    ByteArrayInputStream in = new ByteArrayInputStream((byte[]) args[0]);
-                    Unpacker unpacker = msgpack.createUnpacker(in);
-                    Map<String, Value> dstMap = unpacker.read(mapTmpl);
-
-                    String topic = dstMap.get("topic").toString();
-                    boolean reply = dstMap.get("reply") != null && dstMap.get("data").asBooleanValue().getBoolean();
-                    byte[] data = dstMap.get("data").asRawValue().getByteArray();
-                    Log.v(TAG, "on push topic " + topic + ",reply " + reply + " ,data:" + data.length);
-                    pushCallback.onPush(topic.toString(), dstMap.get("data").asRawValue().getByteArray());
+                    JSONObject data = (JSONObject) args[0];
+                    String topic = data.optString("topic");
+                    String dataBase64 = data.optString("data");
+                    boolean reply = data.optBoolean("reply", false);
+                    Log.v(TAG, "on push topic " + topic + ",reply " + reply + ", data:" + dataBase64);
+                    pushCallback.onPush(topic, Base64.decode(dataBase64, Base64.DEFAULT));
                     if (reply) {
                         JSONObject object = new JSONObject();
                         socket.emit("pushReply", object);
