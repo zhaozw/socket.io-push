@@ -22,6 +22,8 @@
     <br/>
     <div>
         SessionCount: <span id="sessionCount">0</span><br/>
+        ios: <span id="iosSessionCount">0</span><br/>
+        android: <span id="androidSessionCount">0</span><br/>
         Total Count: <span id="totalCount">0</span><br/>
         Success Rate(percent): <span id="successRate">0</span><br/>
         Average Latency(ms): <span id="avgLatency">0</span><br/>
@@ -150,8 +152,9 @@
             type: 'GET',
             url: '/api/stats/base',
             success: function (data) {
-
                 $("#sessionCount").text(data.sessionCount);
+                $("#iosSessionCount").text(data.ios);
+                $("#androidSessionCount").text(data.android);
             }
         });
     }

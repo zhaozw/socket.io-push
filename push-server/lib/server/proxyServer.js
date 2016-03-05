@@ -10,6 +10,7 @@ function ProxyServer(io, stats, packetService, notificationService, uidStore, tt
 
         socket.on('disconnect', function () {
             stats.removeSession();
+            stats.removePlatformSession(socket.platform);
             if (socket.pushId) {
                 debug("publishDisconnect %s", socket.pushId);
                 packetService.publishDisconnect(socket);
@@ -38,6 +39,8 @@ function ProxyServer(io, stats, packetService, notificationService, uidStore, tt
         socket.on('pushId', function (data) {
             if (data.id && data.id.length >= 10) {
                 debug("on pushId %s", JSON.stringify(data));
+                socket.platform = data.platform;
+                stats.addPlatformSession(socket.platform);
                 var topics = data.topics;
                 if (data.version) {
                     socket.version = data.version;

@@ -4,15 +4,14 @@ var debug = require('debug')('Stats');
 var randomstring = require("randomstring");
 
 function Stats(redis, port) {
-    if (!(this instanceof Stats)) return new Stats(redis, port);
     this.redis = redis;
-    this.sessionCount = 0;
+    this.sessionCount = {ios: 0, android: 0, total: 0};
     this.redisIncrBuffer = require('./redisIncrBuffer.js')(redis);
     var ipPath = process.cwd() + "/ip";
     var fs = require('fs');
     var ip;
     if (fs.existsSync(ipPath)) {
-        ip = fs.readFileSync(ipPath,"utf8").trim() + ":" + port;
+        ip = fs.readFileSync(ipPath, "utf8").trim() + ":" + port;
     }
     debug("ip file %s %s", ipPath, ip);
     this.id = ip || randomstring.generate(32);
@@ -26,11 +25,33 @@ function Stats(redis, port) {
     redis.del("stats#sessionCount");
 }
 
+Stats.prototype.addPlatformSession = function (platform, count) {
+    if (!count) {
+        count = 1;
+    }
+    if (platform == 'ios') {
+        this.sessionCount.ios += count;
+    } else if (platform == 'android') {
+        this.sessionCount.android += count;
+    }
+}
+
+Stats.prototype.removePlatformSession = function (platform, count) {
+    if (!count) {
+        count = 1;
+    }
+    if (platform == 'ios') {
+        this.sessionCount.ios -= count;
+    } else if (platform == 'android') {
+        this.sessionCount.android -= count;
+    }
+}
+
 Stats.prototype.addSession = function (socket, count) {
     if (!count) {
         count = 1;
     }
-    this.sessionCount += count;
+    this.sessionCount.total += count;
 
     var stats = this;
 
@@ -64,7 +85,7 @@ Stats.prototype.removeSession = function (count) {
     if (!count) {
         count = 1;
     }
-    this.sessionCount -= count;
+    this.sessionCount.total -= count;
 };
 
 var mSecPerHour = 60 * 60 * 1000
@@ -100,18 +121,25 @@ Stats.prototype.getSessionCount = function (callback) {
     this.redis.hgetall('stats#sessionCount', function (err, results) {
         debug("stats#sessionCount %s", results.length);
         var totalCount = 0;
+        var androidCount = 0;
+        var iosCount = 0;
         var currentTimestamp = Date.now();
         var processCount = [];
         for (var id in results) {
             var data = JSON.parse(results[id]);
             if ((currentTimestamp - data.timestamp) < 20 * 1000) {
-                totalCount += data.sessionCount;
+                totalCount += data.sessionCount.total;
+                iosCount += data.sessionCount.ios;
+                androidCount += data.sessionCount.android;
                 processCount.push({id: id, count: data.sessionCount});
             }
         }
 
         callback({
-            sessionCount: totalCount, processCount: processCount.sort(function (a, b) {
+            sessionCount: totalCount,
+            android: androidCount,
+            ios: iosCount,
+            processCount: processCount.sort(function (a, b) {
                 if (a.id < b.id) return -1;
                 if (a.id > b.id) return 1;
                 return 0;

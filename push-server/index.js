@@ -33,7 +33,8 @@ var socketIoRedis = require('socket.io-redis')({pubClient: pubClient, subClient:
 io.adapter(socketIoRedis);
 
 var packetService = require('./lib/service/packetService.js')(pubClient, pubClient);
-var stats = require('./lib/stats/stats.js')(pubClient, ioPort);
+var Stats = require('./lib/stats/stats.js');
+var stats = new Stats(pubClient, ioPort);
 var uidStore = require('./lib/redis/uidStore.js')(pubClient);
 var ttlService = require('./lib/service/ttlService.js')(pubClient);
 var notificationService = require('./lib/service/notificationService.js')(config.apns, pubClient, ttlService);
