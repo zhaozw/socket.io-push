@@ -27,4 +27,10 @@ public class Performance {
                 ", totalLatency=" + totalLatency +
                 '}';
     }
+
+    public void add(int successCount, int errorCount, int latency) {
+        this.successCount += successCount;
+        this.errorCount += errorCount;
+        this.totalLatency += latency;
+    }
 }

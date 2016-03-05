@@ -23,6 +23,8 @@ function RestApi(io, stats, notificationService, port, uidStore, ttlService, red
 
     server.get(/^\/push\/?.*/, staticConfig);
 
+    server.get(/^\/notification\/?.*/, staticConfig);
+
     server.get(/^\/uid\/?.*/, staticConfig);
 
     server.get(/^\/stats\/?.*/, staticConfig);
@@ -170,7 +172,25 @@ function RestApi(io, stats, notificationService, port, uidStore, ttlService, red
 
     server.get('/api/redis/get', function (req, res, next) {
         redis.get(req.params.key, function (err, result) {
-            res.send({key: req.params.key, value: result, result: result});
+            res.send({key: req.params.key, result: result});
+        });
+        return next();
+    });
+
+    server.get('/api/redis/hgetall', function (req, res, next) {
+        redis.hgetall(req.params.key, function (err, result) {
+            res.send({key: req.params.key, count: result.length, result: result});
+        });
+        return next();
+    });
+
+    server.get('/api/redis/hkeys', function (req, res, next) {
+        redis.hkeys(req.params.key, function (err, result) {
+            var strs = [];
+            result.forEach(function(token){
+                strs.push(token.toString('ascii'));
+            });
+            res.send({key: req.params.key, count: strs.length, result: strs});
         });
         return next();
     });

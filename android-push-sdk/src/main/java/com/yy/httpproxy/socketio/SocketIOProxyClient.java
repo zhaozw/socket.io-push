@@ -19,7 +19,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.URISyntaxException;
-import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -30,18 +29,17 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
-
-import io.socket.client.IO;
-import io.socket.client.Socket;
-import io.socket.emitter.Emitter;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+
+import io.socket.client.IO;
+import io.socket.client.Socket;
+import io.socket.emitter.Emitter;
 
 
 public class SocketIOProxyClient implements PushSubscriber {
@@ -251,7 +249,10 @@ public class SocketIOProxyClient implements PushSubscriber {
         }
         handler.removeCallbacks(statsTask);
         handler.postDelayed(statsTask, 10 * 60 * 1000L);
-//        handler.postDelayed(statsTask, 10 * 1000L);
+    }
+
+    public void reportStats(String path, int successCount, int errorCount, int latency) {
+        stats.reportStats(path, successCount, errorCount, latency);
     }
 
     private final Emitter.Listener httpProxyListener = new Emitter.Listener() {

@@ -13,7 +13,7 @@ import java.util.Map;
  */
 public class Stats {
 
-    private Map<String,Performance> performances = new HashMap<>();
+    private Map<String, Performance> performances = new HashMap<>();
 
     public void reportError(String path) {
         Performance performance = getPerformance(path);
@@ -28,6 +28,11 @@ public class Stats {
             performances.put(path, performance);
         }
         return performance;
+    }
+
+    public void reportStats(String path, int successCount, int errorCount, int latency) {
+        Performance performance = getPerformance(path);
+        performance.add(successCount, errorCount, latency);
     }
 
     public void reportSuccess(String path, long timestamp) {

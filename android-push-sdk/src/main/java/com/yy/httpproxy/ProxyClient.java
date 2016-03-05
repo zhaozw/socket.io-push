@@ -28,7 +28,7 @@ public class ProxyClient implements PushCallback {
         }
     }
 
-    public boolean isConnected(){
+    public boolean isConnected() {
         return config.getRemoteClient().isConnected();
     }
 
@@ -44,6 +44,11 @@ public class ProxyClient implements PushCallback {
 
         config.getRemoteClient().
                 request(requestInfo);
+    }
+
+    public void reportStats(String path, int successCount, int errorCount, int latency) {
+        config.getRemoteClient().
+                reportStats(path, successCount, errorCount, latency);
     }
 
     public void subscribe(String topic, ReplyHandler handler) {
@@ -65,7 +70,7 @@ public class ProxyClient implements PushCallback {
         ReplyHandler handler = pushHandlers.get(topic);
         if (handler != null) {
             Object result;
-            if(data == null || data.length == 0 || config.getPushSerializer() == null) {
+            if (data == null || data.length == 0 || config.getPushSerializer() == null) {
                 result = null;
             } else {
                 try {

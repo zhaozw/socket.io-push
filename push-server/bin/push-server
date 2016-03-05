@@ -13,6 +13,7 @@ COUNT=1
 DEBUG=0
 VERBOSE=0
 FOREGROUND=0
+LOG_FILE=prod.log
 
 while getopts "h?c:d?f?v?" opt; do
     case "$opt" in
@@ -35,12 +36,14 @@ echo "DEBUG=$DEBUG, COUNT='$COUNT',FOREGROUND='$FOREGROUND', Leftovers: $@"
 
 if [ $DEBUG = 1 ]; then
     export DEBUG=apn,PacketService,NotificationService,RestApi,TTLService
+    LOG_FILE=debug.log
 else
 	export DEBUG=
 fi
 
 if [ $VERBOSE = 1 ]; then
     export DEBUG=SimpleRedisHashCluster,apn,Stats,socket.io*,ProxyServer,PacketService,NotificationService,RestApi,TTLService
+    LOG_FILE=verbose.log
 else
 	export DEBUG=
 fi
@@ -68,5 +71,6 @@ do
      rm pid/$c.pid
    fi
    echo "starting instance #$c in background"
-   nohup $node_script "$@" -i $c  > log/$c.log 2>&1 & echo $! > pid/$c.pid
+   rm -f log/$LOG_FILE
+   nohup $node_script "$@" -i $c  >> log/$LOG_FILE 2>&1 & echo $! > pid/$c.pid
 done

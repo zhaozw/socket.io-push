@@ -31,11 +31,11 @@ public class RemoteClient implements PushSubscriber, HttpRequester {
     public static final int CMD_REQUEST = 3;
     public static final int CMD_REGISTER_CLIENT = 4;
     public static final int CMD_UNSUBSCRIBE_BROADCAST = 5;
+    public static final int CMD_STATS = 6;
     private Set<String> topics = new HashSet<>();
     private ProxyClient proxyClient;
     private Messenger mService;
     private boolean mBound;
-    private String pushId;
     private final Messenger messenger = new Messenger(new IncomingHandler());
     private Context context;
     private boolean connected = false;
@@ -51,6 +51,17 @@ public class RemoteClient implements PushSubscriber, HttpRequester {
 
     public boolean isConnected() {
         return connected;
+    }
+
+    public void reportStats(String path, int successCount, int errorCount, int latency) {
+        Message msg = Message.obtain(null, CMD_STATS, 0, 0);
+        Bundle bundle = new Bundle();
+        bundle.putString("path", path);
+        bundle.putInt("successCount", successCount);
+        bundle.putInt("errorCount", errorCount);
+        bundle.putInt("latency", latency);
+        msg.setData(bundle);
+        sendMsg(msg);
     }
 
     private class IncomingHandler extends Handler {

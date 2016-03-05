@@ -95,7 +95,7 @@ NotificationService.prototype.sendAll = function (notification, io) {
             if (replies) {
                 var tokens = [];
                 for (var token in replies) {
-                    if (timestamp - replies[token] > apnTokenTTL) {
+                    if (timestamp - replies[token] > apnTokenTTL * 1000) {
                         debug("delete outdated apnToken %s", token);
                         redis.hdel("apnTokens#" + bundleId, token);
                     } else {
@@ -103,6 +103,7 @@ NotificationService.prototype.sendAll = function (notification, io) {
                     }
                 }
                 if (tokens.length > 0) {
+                    //tokens.push("123123123");
                     var apnConnection = apnConnections[bundleId];
                     debug("bundleId %s replies %d", bundleId, tokens.length);
                     apnConnection.pushNotification(note, tokens);

@@ -45,6 +45,12 @@ public class BindService extends Service {
             } else if (cmd == RemoteClient.CMD_UNSUBSCRIBE_BROADCAST) {
                 String topic = bundle.getString("topic");
                 ConnectionService.client.unsubscribeBroadcast(topic);
+            } else if (cmd == RemoteClient.CMD_STATS) {
+                String path = bundle.getString("path");
+                int successCount = bundle.getInt("successCount");
+                int errorCount = bundle.getInt("errorCount");
+                int latency = bundle.getInt("latency");
+                ConnectionService.client.reportStats(path, successCount, errorCount, latency);
             }
         }
     }

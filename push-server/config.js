@@ -1,7 +1,7 @@
 var config = {};
 
-config.pingTimeout = 5000;
-config.pingInterval = 5000;
+config.pingTimeout = 25000;
+config.pingInterval = 25000;
 
 config.apns = [
     {
