@@ -71,6 +71,6 @@ do
      rm pid/$c.pid
    fi
    echo "starting instance #$c in background"
-   rm -f log/$LOG_FILE
-   nohup $node_script "$@" -i $c  >> log/$LOG_FILE 2>&1 & echo $! > pid/$c.pid
+   rm -f log/*
+   nohup $node_script "$@" -i $c  >> log/$c.log 2>&1 & echo $! > pid/$c.pid
 done
