@@ -3,8 +3,6 @@
 mkdir -p log
 mkdir -p pid
 
-export TZ=Asia/Shanghai
-
 ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}' > ip
 
 # A POSIX variable
@@ -44,7 +42,7 @@ else
 fi
 
 if [ $VERBOSE = 1 ]; then
-    export DEBUG=SimpleRedisHashCluster,apn,Stats,socket.io*,ProxyServer,PacketService,NotificationService,RestApi,TTLService
+    export DEBUG=SimpleRedisHashCluster,apn,Stats,socket.io*,ProxyServer,PacketService,NotificationService,RestApi,TTLService,Sentinel
     LOG_FILE=verbose.log
 else
 	export DEBUG=

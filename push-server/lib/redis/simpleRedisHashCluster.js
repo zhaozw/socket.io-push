@@ -5,13 +5,18 @@ var redis = require('redis');
 var util = require("../util/util.js");
 var debug = require('debug')('SimpleRedisHashCluster');
 
-function SimpleRedisHashCluster(addrs, salveAddrs) {
-    if (!(this instanceof SimpleRedisHashCluster)) return new SimpleRedisHashCluster(addrs, salveAddrs);
+function SimpleRedisHashCluster(config, completeCallback) {
+    if (!(this instanceof SimpleRedisHashCluster)) return new SimpleRedisHashCluster(config, completeCallback);
     this.masters = [];
     this.slaves = [];
     this.messageCallbacks = [];
     var outerThis = this;
-    addrs.forEach(function (addr) {
+    var masterAddrs = config.masters;
+    var slaveAddrs = config.slaves;
+    if (!slaveAddrs) {
+        slaveAddrs = masterAddrs;
+    }
+    slaveAddrs.forEach(function (addr) {
         var client = redis.createClient({
             host: addr.host,
             port: addr.port,
@@ -21,23 +26,7 @@ function SimpleRedisHashCluster(addrs, salveAddrs) {
             connect_timeout: 10000000000000000
         });
         client.on("error", function (err) {
-            console.log("redis connect Error %s:%s %s", addr.host, addr.port, err);
-        });
-        client.port = addr.port;
-        outerThis.masters.push(client);
-    });
-
-    salveAddrs.forEach(function (addr) {
-        var client = redis.createClient({
-            host: addr.host,
-            port: addr.port,
-            return_buffers: true,
-            retry_max_delay: 3000,
-            max_attempts: 0,
-            connect_timeout: 10000000000000000
-        });
-        client.on("error", function (err) {
-            console.log("redis connect Error %s:%s %s", addr.host, addr.port, err);
+            console.log("redis slave connect Error %s:%s %s", addr.host, addr.port, err);
         });
         client.port = addr.port;
         client.on("message", function (channel, message) {
@@ -49,9 +38,54 @@ function SimpleRedisHashCluster(addrs, salveAddrs) {
         outerThis.slaves.push(client);
     });
 
-
-    var defaultPubAddr = util.getByHash(addrs, "packetProxy#default");
+    var defaultPubAddr = util.getByHash(masterAddrs, "packetProxy#default");
     console.log("packetProxy#default " + defaultPubAddr.host + ":" + defaultPubAddr.port);
+
+    if (config.sentinels) {
+        var sentinel = require('./sentinel.js')(config.sentinels, config.sentinelMasters, function () {
+            sentinel.masters.forEach(function (addr) {
+                var client = redis.createClient({
+                    host: addr.host,
+                    port: addr.port,
+                    return_buffers: true,
+                    retry_max_delay: 3000,
+                    max_attempts: 0,
+                    connect_timeout: 10000000000000000
+                });
+                client.on("error", function (err) {
+                    console.log("redis master connect Error %s: %s %s", client.connection_options.host, client.connection_options.port, err);
+                });
+                client.port = addr.port;
+                outerThis.masters.push(client);
+            });
+            completeCallback();
+        }, function (newMaster, i) {
+            var master = outerThis.masters[i];
+            debug('current master %j', master.connection_options);
+            if (master.connection_options.port != newMaster.port || master.connection_options.host != newMaster.host) {
+                debug("switch master %j", newMaster);
+                master.connection_options.port = newMaster.port;
+                master.connection_options.host = newMaster.host;
+            }
+        });
+    } else {
+        masterAddrs.forEach(function (addr) {
+            var client = redis.createClient({
+                host: addr.host,
+                port: addr.port,
+                return_buffers: true,
+                retry_max_delay: 3000,
+                max_attempts: 0,
+                connect_timeout: 10000000000000000
+            });
+            client.on("error", function (err) {
+                console.log("redis connect Error %s:%s %s", addr.host, addr.port, err);
+            });
+            client.port = addr.port;
+            outerThis.masters.push(client);
+        });
+        completeCallback();
+    }
 }
 
 commands.list.forEach(function (command) {

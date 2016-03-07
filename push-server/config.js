@@ -18,19 +18,29 @@ config.apns = [
     }
 ];
 
-config.redis = [
-    {
-        host: "127.0.0.1",
-        port: 6379
-    }
-];
-
-config.redisSlave = [
-    {
-        host: "127.0.0.1",
-        port: 6380
-    }
-];
+config.redis = {
+    masters: [
+        {
+            host: "127.0.0.1",
+            port: 6379
+        }
+    ],
+    slaves: [
+        {
+            host: "127.0.0.1",
+            port: 6380
+        }
+    ],
+    sentinels: [
+        {
+            host: "127.0.0.1",
+            port: 26379
+        }
+    ],
+    sentinelMasters: [
+        'm1'
+    ]
+};
 
 
 config.io_port = 10001;

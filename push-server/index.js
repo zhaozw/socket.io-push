@@ -23,23 +23,21 @@ var io = require('socket.io')(ioPort, {pingTimeout: config.pingTimeout, pingInte
 
 var simpleRedisHashCluster = require('./lib/redis/simpleRedisHashCluster.js');
 
-if (!config.redisSlave){
-    config.redisSlave = config.redis;
-}
+var pubClient = simpleRedisHashCluster(config.redis,function(){
 
-var pubClient = simpleRedisHashCluster(config.redis, config.redisSlave);
+    var socketIoRedis = require('socket.io-redis')({pubClient: pubClient, subClient: pubClient});
+    io.adapter(socketIoRedis);
 
-var socketIoRedis = require('socket.io-redis')({pubClient: pubClient, subClient: pubClient});
-io.adapter(socketIoRedis);
+    var packetService = require('./lib/service/packetService.js')(pubClient, pubClient);
+    var Stats = require('./lib/stats/stats.js');
+    var stats = new Stats(pubClient, ioPort);
+    var uidStore = require('./lib/redis/uidStore.js')(pubClient);
+    var ttlService = require('./lib/service/ttlService.js')(pubClient);
+    var notificationService = require('./lib/service/notificationService.js')(config.apns, pubClient, ttlService);
 
-var packetService = require('./lib/service/packetService.js')(pubClient, pubClient);
-var Stats = require('./lib/stats/stats.js');
-var stats = new Stats(pubClient, ioPort);
-var uidStore = require('./lib/redis/uidStore.js')(pubClient);
-var ttlService = require('./lib/service/ttlService.js')(pubClient);
-var notificationService = require('./lib/service/notificationService.js')(config.apns, pubClient, ttlService);
-
-require('./lib/server/proxyServer.js')(io, stats, packetService, notificationService, uidStore, ttlService);
+    require('./lib/server/proxyServer.js')(io, stats, packetService, notificationService, uidStore, ttlService);
 
 // push
-var restApi = require('./lib/api/restApi.js')(io, stats, notificationService, apiPort, uidStore, ttlService, pubClient);
+    var restApi = require('./lib/api/restApi.js')(io, stats, notificationService, apiPort, uidStore, ttlService, pubClient);
+});
+
