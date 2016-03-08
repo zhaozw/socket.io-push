@@ -90,7 +90,6 @@ function RestApi(io, stats, notificationService, port, uidStore, ttlService, red
 
         debug('notification ' + JSON.stringify(req.params));
 
-
         if (pushAll === 'true') {
             notificationService.sendAll(notification, io);
             res.send({code: "success"});
@@ -153,11 +152,7 @@ function RestApi(io, stats, notificationService, port, uidStore, ttlService, red
     var handleQueryDataKeys = function (req, res, next) {
         stats.getQueryDataKeys(function (result) {
             debug("getQueryDataKeys result: " + result);
-            var strs = [];
-            result.forEach(function (token) {
-                strs.push(token.toString('ascii'));
-            });
-            res.send({"result":strs});
+            res.send({"result":result});
         });
         return next();
     }

@@ -119,7 +119,6 @@ Stats.prototype.onNotificationReply = function (timestamp) {
 
 Stats.prototype.getSessionCount = function (callback) {
     this.redis.hgetall('stats#sessionCount', function (err, results) {
-        debug("stats#sessionCount %s", results.length);
         var totalCount = 0;
         var androidCount = 0;
         var iosCount = 0;
@@ -150,8 +149,21 @@ Stats.prototype.getSessionCount = function (callback) {
 
 Stats.prototype.getQueryDataKeys = function(callback) {
     this.redis.hkeys("queryDataKeys", function (err, replies) {
-        callback(replies);
+        var strs = [];
+        replies.forEach(function(buffer){
+            strs.push(buffer.toString());
+        });
+        callback(strs.sort(sortString));
+
     });
+}
+
+var sortString = function (a, b)    {
+    a = a.toLowerCase();
+    b = b.toLowerCase();
+    if (a < b) return 1;
+    if (a > b) return -1;
+    return 0;
 }
 
 Stats.prototype.find = function (key, callback) {
