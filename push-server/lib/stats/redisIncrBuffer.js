@@ -22,6 +22,12 @@ RedisIncrBuffer.prototype.checkCommit = function () {
         debug("stats threshold committing");
         for (var key in this.map) {
             this.redis.incrby(key, this.map[key]);
+            var index = key.indexOf("#totalCount");
+            if(index != -1){
+                var str = key.substring(6, index);
+                debug("checkCommit:  " + str);  //stats#request#/addDot#totalCount#1457344800000
+                this.redis.hset("queryDataKeys", str, Date.now())
+            }
         }
         this.map = {};
         this.timestamp = timestamp;

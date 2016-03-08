@@ -148,6 +148,12 @@ Stats.prototype.getSessionCount = function (callback) {
     });
 };
 
+Stats.prototype.getQueryDataKeys = function(callback) {
+    this.redis.hkeys("queryDataKeys", function (err, replies) {
+        callback(replies);
+    });
+}
+
 Stats.prototype.find = function (key, callback) {
     var totalHour = 7 * 24;
     var timestamp = hourStrip(Date.now() - (totalHour - 1) * mSecPerHour);
@@ -174,7 +180,6 @@ Stats.prototype.find = function (key, callback) {
 
         });
     });
-
 
     var recursive = function (err, replies) {
         results.push(replies);

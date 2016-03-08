@@ -150,6 +150,18 @@ function RestApi(io, stats, notificationService, port, uidStore, ttlService, red
         return next();
     };
 
+    var handleQueryDataKeys = function (req, res, next) {
+        stats.getQueryDataKeys(function (result) {
+            debug("getQueryDataKeys result: " + result);
+            var strs = [];
+            result.forEach(function (token) {
+                strs.push(token.toString('ascii'));
+            });
+            res.send({"result":strs});
+        });
+        return next();
+    }
+
     server.get('/api/stats/base', handleStatsBase);
     server.get('/api/stats/chart', handleChartStats);
     server.get('/api/push', handlePush);
@@ -158,6 +170,7 @@ function RestApi(io, stats, notificationService, port, uidStore, ttlService, red
     server.post('/api/notification', handleNotification);
     server.get('/api/addPushIdToUid', handleAddPushIdToUid);
     server.post('/api/addPushIdToUid', handleAddPushIdToUid);
+    server.get('api/state/getQueryDataKeys', handleQueryDataKeys)
 
     server.get('/api/status', function (req, res, next) {
         res.send(redis.status());
@@ -187,7 +200,7 @@ function RestApi(io, stats, notificationService, port, uidStore, ttlService, red
     server.get('/api/redis/hkeys', function (req, res, next) {
         redis.hkeys(req.params.key, function (err, result) {
             var strs = [];
-            result.forEach(function(token){
+            result.forEach(function (token) {
                 strs.push(token.toString('ascii'));
             });
             res.send({key: req.params.key, count: strs.length, result: strs});
