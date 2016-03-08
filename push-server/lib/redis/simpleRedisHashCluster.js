@@ -40,6 +40,7 @@ function SimpleRedisHashCluster(config, completeCallback) {
     console.log("packetProxy#default " + defaultPubAddr.host + ":" + defaultPubAddr.port);
 
     if (config.sentinels) {
+        debug('use sentinels %j', config.sentinels);
         var sentinel = require('./sentinel.js')(config.sentinels, config.sentinelMasters, function () {
             sentinel.masters.forEach(function (addr) {
                 var client = redis.createClient({
@@ -66,6 +67,7 @@ function SimpleRedisHashCluster(config, completeCallback) {
             }
         });
     } else {
+        debug('use masters %j', masterAddrs);
         masterAddrs.forEach(function (addr) {
             var client = redis.createClient({
                 host: addr.host,
@@ -76,7 +78,7 @@ function SimpleRedisHashCluster(config, completeCallback) {
                 connect_timeout: 10000000000000000
             });
             client.on("error", function (err) {
-                console.log("redis master connect Error %s", err);
+                console.log("redis master %s", err);
             });
             outerThis.masters.push(client);
         });
