@@ -25,18 +25,21 @@ function Sentinel(sentinelAddrs, masterNames, completeCallback, masterChangeCall
                 name: masterName
             };
             client.send_command("SENTINEL", ['get-master-addr-by-name', masterName], function (err, replies) {
-                var allQueried = true;
-                masters.forEach(function (master) {
-                    if (master.name == masterName) {
-                        master.host = replies[0].toString();
-                        master.port = parseInt(replies[1].toString());
-                    } else if (!masters.host) {
-                        allQueried = false;
+                if (replies) {
+                    debug("get-master-addr-by-name %s %j", masterName, replies);
+                    var allQueried = true;
+                    masters.forEach(function (master) {
+                        if (master.name == masterName) {
+                            master.host = replies[0].toString();
+                            master.port = parseInt(replies[1].toString());
+                        } else if (!master.host) {
+                            allQueried = false;
+                        }
+                    });
+                    if (allQueried) {
+                        debug("masters all queried %j", masters)
+                        completeCallback();
                     }
-                });
-                if (allQueried) {
-                    debug("masters all queried %j", masters)
-                    completeCallback();
                 }
             })
         });

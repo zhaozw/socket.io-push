@@ -6,7 +6,6 @@ var util = require("../util/util.js");
 var debug = require('debug')('SimpleRedisHashCluster');
 
 function SimpleRedisHashCluster(config, completeCallback) {
-    if (!(this instanceof SimpleRedisHashCluster)) return new SimpleRedisHashCluster(config, completeCallback);
     this.masters = [];
     this.slaves = [];
     this.messageCallbacks = [];
@@ -28,7 +27,6 @@ function SimpleRedisHashCluster(config, completeCallback) {
         client.on("error", function (err) {
             console.log("redis slave connect Error %s:%s %s", addr.host, addr.port, err);
         });
-        client.port = addr.port;
         client.on("message", function (channel, message) {
             debug("on slave message %s %s %s", channel, message, client.port);
             outerThis.messageCallbacks.forEach(function (callback) {
@@ -53,12 +51,11 @@ function SimpleRedisHashCluster(config, completeCallback) {
                     connect_timeout: 10000000000000000
                 });
                 client.on("error", function (err) {
-                    console.log("redis master connect Error %s: %s %s", client.connection_options.host, client.connection_options.port, err);
+                    console.log("redis master connect Error %s", err);
                 });
-                client.port = addr.port;
                 outerThis.masters.push(client);
             });
-            completeCallback();
+            completeCallback(outerThis);
         }, function (newMaster, i) {
             var master = outerThis.masters[i];
             debug('current master %j', master.connection_options);
@@ -79,12 +76,11 @@ function SimpleRedisHashCluster(config, completeCallback) {
                 connect_timeout: 10000000000000000
             });
             client.on("error", function (err) {
-                console.log("redis connect Error %s:%s %s", addr.host, addr.port, err);
+                console.log("redis master connect Error %s", err);
             });
-            client.port = addr.port;
             outerThis.masters.push(client);
         });
-        completeCallback();
+        completeCallback(outerThis);
     }
 }
 
