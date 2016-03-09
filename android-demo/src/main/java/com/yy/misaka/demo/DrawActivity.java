@@ -62,7 +62,6 @@ public class DrawActivity extends Activity implements ConnectCallback {
         msg = (TextView) findViewById(R.id.tv_msg);
 
         String pushServerHost = getIntent().getStringExtra("ipAddress");
-        String pushId = getIntent().getStringExtra("pushId");
 //        String pushServerHost = "https://183.60.221.91:443";
 //        String pushServerHost = "http://ws.tt.yy.csom";
 //        String pushServerHost = "http://61.160.36.69:9101";

@@ -43,10 +43,8 @@ public class MainActivity extends Activity{
 
                 Intent intent = new Intent();
                 intent.putExtra("ipAddress", ip);
-                intent.putExtra("pushId", id);
                 intent.setClass(MainActivity.this, DrawActivity.class);
                 startActivity(intent);
-                MainActivity.this.finish();
             }
         });
     }
