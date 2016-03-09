@@ -36,12 +36,10 @@ function SimpleRedisHashCluster(config, completeCallback) {
         outerThis.slaves.push(client);
     });
 
-    var defaultPubAddr = util.getByHash(masterAddrs, "packetProxy#default");
-    console.log("packetProxy#default " + defaultPubAddr.host + ":" + defaultPubAddr.port);
-
     if (config.sentinels) {
         debug('use sentinels %j', config.sentinels);
-        var sentinel = require('./sentinel.js')(config.sentinels, config.sentinelMasters, function () {
+        var Sentinel = require('./sentinel.js');
+        var sentinel = new Sentinel(config.sentinels, config.sentinelMasters, function () {
             sentinel.masters.forEach(function (addr) {
                 var client = redis.createClient({
                     host: addr.host,
@@ -56,6 +54,8 @@ function SimpleRedisHashCluster(config, completeCallback) {
                 });
                 outerThis.masters.push(client);
             });
+            var defaultPubAddr = util.getByHash(sentinel.masters, "packetProxy#default");
+            console.log("packetProxy#default " + defaultPubAddr.host + ":" + defaultPubAddr.port);
             completeCallback(outerThis);
         }, function (newMaster, i) {
             var master = outerThis.masters[i];
@@ -82,6 +82,8 @@ function SimpleRedisHashCluster(config, completeCallback) {
             });
             outerThis.masters.push(client);
         });
+        var defaultPubAddr = util.getByHash(masterAddrs, "packetProxy#default");
+        console.log("packetProxy#default " + defaultPubAddr.host + ":" + defaultPubAddr.port);
         completeCallback(outerThis);
     }
 }

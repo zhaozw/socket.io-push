@@ -18,16 +18,16 @@ var instance = program.instance;
 console.log("starting instance #" + instance);
 var ioPort = config.io_port + instance - 1;
 var apiPort = config.api_port + instance - 1;
-console.log("start server on port " + ioPort);
+
 
 var simpleRedisHashCluster = require('./lib/redis/simpleRedisHashCluster.js');
 
 new simpleRedisHashCluster(config.redis, function (cluster) {
 
     var io = require('socket.io')(ioPort, {pingTimeout: config.pingTimeout, pingInterval: config.pingInterval});
+    console.log("start server on port " + ioPort);
     var socketIoRedis = require('socket.io-redis')({pubClient: cluster, subClient: cluster});
     io.adapter(socketIoRedis);
-    console.log("cluster " + cluster);
     var packetService = require('./lib/service/packetService.js')(cluster, cluster);
     var Stats = require('./lib/stats/stats.js');
     var stats = new Stats(cluster, ioPort);
@@ -37,7 +37,6 @@ new simpleRedisHashCluster(config.redis, function (cluster) {
 
     require('./lib/server/proxyServer.js')(io, stats, packetService, notificationService, uidStore, ttlService);
 
-// push
     var restApi = require('./lib/api/restApi.js')(io, stats, notificationService, apiPort, uidStore, ttlService, cluster);
 });
 

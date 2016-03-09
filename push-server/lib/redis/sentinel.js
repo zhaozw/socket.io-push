@@ -4,9 +4,10 @@ var redis = require('redis');
 var debug = require('debug')('Sentinel');
 
 function Sentinel(sentinelAddrs, masterNames, completeCallback, masterChangeCallback) {
-    if (!(this instanceof Sentinel)) return new Sentinel(sentinelAddrs, masterNames, completeCallback, masterChangeCallback);
     var masters = [];
     this.masters = masters;
+    this.completeCallback = completeCallback;
+    var outerThis = this;
     sentinelAddrs.forEach(function (addr) {
         var client = redis.createClient({
             host: addr.host,
@@ -25,7 +26,7 @@ function Sentinel(sentinelAddrs, masterNames, completeCallback, masterChangeCall
                 name: masterName
             };
             client.send_command("SENTINEL", ['get-master-addr-by-name', masterName], function (err, replies) {
-                if (replies) {
+                if (replies && outerThis.completeCallback) {
                     debug("get-master-addr-by-name %s %j", masterName, replies);
                     var allQueried = true;
                     masters.forEach(function (master) {
@@ -38,7 +39,8 @@ function Sentinel(sentinelAddrs, masterNames, completeCallback, masterChangeCall
                     });
                     if (allQueried) {
                         debug("masters all queried %j", masters)
-                        completeCallback();
+                        outerThis.completeCallback();
+                        outerThis.completeCallback = null;
                     }
                 }
             })
