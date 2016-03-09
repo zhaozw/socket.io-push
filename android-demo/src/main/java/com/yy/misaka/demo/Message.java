@@ -5,10 +5,4 @@ package com.yy.misaka.demo;
  */
 public class Message {
     public String msg;
-
-    public long timestamp;
-
-    public Message(){
-        this.timestamp = System.currentTimeMillis();
-    }
 }
