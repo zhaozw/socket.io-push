@@ -4,100 +4,68 @@ Push-Server
 
 ##install & run
 
-* 安装 redis 并修改config.js
+* 安装/更新
+sudo npm install -g socket.io-push
+
+* 新建工作目录
+
+mkdir push-server
+cd push-server
+
+* 新建config.js
 
 ```
-#config.js
-
 var config = {};
 
-config.apn = {
-  production : true
-};
+config.pingTimeout = 25000;
+config.pingInterval = 25000;
+config.apns = [];
 
 config.redis = {
-  host : "localhost",
-  port : 6379
+    masters: [
+        {
+            host: "127.0.0.1",
+            port: 6379
+        }
+    ]
 };
 
-#实例1的websocket端口
-config.io_1 = {
-  port : 9101
-};
-
-#实例1的rest_api端口
-config.api_1 = {
-  port : 9102
-};
-
-config.io_2 = {
-  port : 9201
-};
-
-config.api_2 = {
-  port : 9202
-};
-
-config.io_3 = {
-  port : 9301
-};
-
-config.api_3 = {
-  port : 9302
-};
+config.io_port = 10001;
+config.api_port = 11001;
 
 module.exports = config;
-
 ```
 
+#运行
+push-server -v -f
+-v verbose
+-f foreground
+-d debug
+-c 起的进程数
 
-* install nodejs
+#后台地址
+http://yourip:10001/
 
-```
-sudo apt-get update
-curl -sL https://deb.nodesource.com/setup | sudo bash -
-sudo apt-get install -y nodejs
-#sudo apt-get install -y npm
-sudo npm install -g n
-sudo n stable
-```
+#websocket地址
+http://yourip:11001/
 
-* install node modules
-
-```
-npm install
-```
-
-* run
-
-```
-#前台运行
-node . 
-
-#前台运行,开启debug日志
-./debug.sh
-
-#后台运行 ,3为运行的实例数
-./restart 3
-
-
-```
 ##Nginx reverse proxy
 
 nginx.conf
+
 ```
 upstream ws_backend {
     ip_hash;
-    server 127.0.0.1:9101;
-    server 127.0.0.1:9201;
-    server 127.0.0.1:9301;
+    server 127.0.0.1:11001;
+    server 127.0.0.1:11002;
+    server 127.0.0.1:11003;
 }
 
 upstream ws_api {
     ip_hash;
-    server 127.0.0.1:9102;
-    server 127.0.0.1:9202;
-    server 127.0.0.1:9302;
+    server 127.0.0.1:12001;
+    server 127.0.0.1:12002;
+    server 127.0.0.1:12003;
 }
 
 server
@@ -117,9 +85,6 @@ server
         proxy_pass ws_api;
     }
 }
-
-
-
 ```
 
 ##HTTP API
