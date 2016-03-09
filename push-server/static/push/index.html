@@ -185,12 +185,14 @@
 
         var uri = $('input[name=uri]:checked').val();
 
+        var content = btoa($("#content").val());
+
         var data = {
             pushId: pushIds,
             pushAll: pushAll,
             topic : $("#title").val(),
             uid: uids,
-            data: $("#content").val(),
+            data: content,
             timeToLive: $("#timeToLive").val()
         };
 

@@ -15,8 +15,6 @@ import com.yy.httpproxy.ReplyHandler;
 import com.yy.httpproxy.serializer.JsonPushSerializer;
 import com.yy.httpproxy.serializer.JsonSerializer;
 import com.yy.httpproxy.subscribe.ConnectCallback;
-import com.yy.httpproxy.subscribe.SharedPreferencePushIdGenerator;
-
 import java.util.Random;
 
 
@@ -32,6 +30,7 @@ public class DrawActivity extends Activity implements ConnectCallback {
     private long totalCount;
     public int myColors[] = {Color.BLACK, Color.DKGRAY, Color.CYAN, Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW, Color.MAGENTA};
     public int myColor;
+    private TextView msg;
 
 
     private void updateLatency(long timestamp) {
@@ -60,8 +59,10 @@ public class DrawActivity extends Activity implements ConnectCallback {
         latency = (TextView) findViewById(R.id.tv_latency);
         count = (TextView) findViewById(R.id.tv_count);
         connect = (TextView) findViewById(R.id.tv_connect);
+        msg = (TextView) findViewById(R.id.tv_msg);
 
-        String pushServerHost = "http://172.26.86.22:9101";
+        String pushServerHost = getIntent().getStringExtra("ipAddress");
+        String pushId = getIntent().getStringExtra("pushId");
 //        String pushServerHost = "https://183.60.221.91:443";
 //        String pushServerHost = "http://ws.tt.yy.csom";
 //        String pushServerHost = "http://61.160.36.69:9101";
@@ -70,7 +71,7 @@ public class DrawActivity extends Activity implements ConnectCallback {
 
         myColor = myColors[new Random().nextInt(myColors.length)];
 
-        proxyClient = new ProxyClient(new Config(this.getApplicationContext())
+        proxyClient = new ProxyClient(new Config(this.getApplicationContext(), pushId)
                 .setHost(pushServerHost)
                 .setPushSerializer(new JsonPushSerializer())
                 .setRequestSerializer(new JsonSerializer()).setConnectCallback(this));
@@ -134,6 +135,13 @@ public class DrawActivity extends Activity implements ConnectCallback {
                 resetLatency();
             }
 
+        });
+
+        proxyClient.subscribeBroadcast("message", new PushHandler<Message>(Message.class) {
+            @Override
+            public void onSuccess(Message result) {
+                msg.setText("Msg: " + result.msg);
+            }
         });
 
         proxyClient.subscribeBroadcast("/endLine", new PushHandler<DrawView.Dot>(DrawView.Dot.class) {

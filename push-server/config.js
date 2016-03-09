@@ -28,19 +28,12 @@ config.redis = {
     slaves: [
         {
             host: "127.0.0.1",
-            port: 6380
+            port: 6379
         }
-    ],
-    sentinels: [
-        {
-            host: "127.0.0.1",
-            port: 26379
-        }
-    ],
-    sentinelMasters: [
-        'm1'
     ]
+
 };
+
 
 
 config.io_port = 10001;

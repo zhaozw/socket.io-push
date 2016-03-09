@@ -18,14 +18,17 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
 
-        <activity
-            android:name=".DrawActivity"
-            android:screenOrientation="portrait"
-            android:label="SyncWhiteBoard" >
+        <activity android:name=".MainActivity" android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".DrawActivity"
+            android:screenOrientation="portrait"
+            android:label="SyncWhiteBoard" >
         </activity>
 
         <service android:name="com.yy.httpproxy.service.BindService" android:process=":push" android:enabled="true"/>
