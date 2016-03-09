@@ -9,7 +9,7 @@ sudo npm install -g socket.io-push
 
 * 新建工作目录
 
-mkdir push-server
+mkdir push-server    
 cd push-server
 
 * 新建config.js
@@ -37,10 +37,10 @@ module.exports = config;
 ```
 
 #运行
-push-server -v -f
--v verbose
--f foreground
--d debug
+push-server -v -f    
+-v verbose   
+-f foreground   
+-d debug     
 -c 起的进程数
 
 #后台地址
