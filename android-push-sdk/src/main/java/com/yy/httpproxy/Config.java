@@ -26,9 +26,9 @@ public class Config {
     private String pushId;
     private String notificationHandler;
 
-    public Config(Context context, String pushId) {
+    public Config(Context context) {
         this.context = context;
-        this.pushId = pushId;
+        this.pushId = new SharedPreferencePushIdGenerator(context).generatePushId();
     }
 
     public RemoteClient getRemoteClient() {
