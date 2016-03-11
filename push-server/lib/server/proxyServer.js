@@ -3,6 +3,7 @@ module.exports = ProxyServer;
 function ProxyServer(io, stats, packetService, notificationService, uidStore, ttlService) {
     var http = require('http');
     var debug = require('debug')('ProxyServer');
+    var msgpack = require('msgpack5')();
 
     io.on('connection', function (socket) {
 
@@ -28,6 +29,25 @@ function ProxyServer(io, stats, packetService, notificationService, uidStore, tt
                         var parsed = JSON.parse(json);
                         for (var i = 0; i < socket.packetListeners.length; i++) {
                             socket.packetListeners[i](parsed, packet);
+                        }
+
+                        if(parsed[0] === "push" && socket.version > 1) {
+                            parsed[1]["data"] = new Buffer(parsed[1]["data"], 'base64');
+                            var json =  JSON.stringify(parsed[1]);
+
+                            var jsonPacket = JSON.parse(json);
+                            jsonPacket.data = parsed[1]["data"];
+                            console.log("pushJson:  " + JSON.stringify(jsonPacket));
+                            var encodeJson =  msgpack.encode(jsonPacket);
+                            var bufferPacket = new Buffer(encodeJson, 'base64');
+
+                            var data = ["push"];
+                            data.push(bufferPacket);
+                            var myPacket = { type: 5, data: data };
+                            console.log("push myPacket: " + JSON.stringify(myPacket));
+
+                            packet = myPacket;
+                            preEncoded.preEncoded = false;
                         }
                     }
                 }
