@@ -20,22 +20,19 @@ import org.json.JSONObject;
 import org.msgpack.MessagePack;
 import org.msgpack.template.Template;
 import org.msgpack.template.Templates;
-import org.msgpack.type.Value;
 import org.msgpack.unpacker.Unpacker;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.net.URISyntaxException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Level;
 
 import javax.net.ssl.HostnameVerifier;
@@ -52,16 +49,19 @@ import io.socket.emitter.Emitter;
 public class SocketIOProxyClient implements PushSubscriber {
 
     private static final int PROTOCOL_VERSION = 2;
-    private static String TAG = "SocketIoRequester";
+    private static String TAG = "SocketIOProxyClient";
     private PushCallback pushCallback;
     private String pushId;
     private NotificationCallback notificationCallback;
-    private Set<String> topics = new HashSet<>();
+    private String lastUnicastId;
+    private Map<String, Boolean> topics = new HashMap<>();
+    private Map<String, String> topicToLastPacketId = new HashMap<>();
     private ResponseHandler responseHandler;
     private ConnectCallback connectCallback;
     private boolean connected = false;
     private String uid;
     private Stats stats = new Stats();
+    private MessagePack messagePack = new MessagePack();
 
     public void setResponseHandler(ResponseHandler responseHandler) {
         this.responseHandler = responseHandler;
@@ -69,6 +69,7 @@ public class SocketIOProxyClient implements PushSubscriber {
 
     public void unsubscribeBroadcast(String topic) {
         topics.remove(topic);
+        topicToLastPacketId.remove(topic);
         if (socket.connected()) {
             JSONObject data = new JSONObject();
             try {
@@ -130,8 +131,18 @@ public class SocketIOProxyClient implements PushSubscriber {
                 if (topics.size() > 0) {
                     JSONArray array = new JSONArray();
                     object.put("topics", array);
-                    for (String topic : topics) {
+                    for (String topic : topics.keySet()) {
                         array.put(topic);
+                    }
+                    JSONObject lastPacketIds = new JSONObject();
+                    object.put("lastPacketIds", lastPacketIds);
+                    for (Map.Entry<String, String> entry : topicToLastPacketId.entrySet()) {
+                        if (entry.getValue() != null && topics.containsKey(entry.getKey())) {
+                            lastPacketIds.put(entry.getKey(), entry.getValue());
+                        }
+                    }
+                    if (lastUnicastId != null) {
+                        object.put("lastUnicastId", lastUnicastId);
                     }
                 }
                 socket.emit("pushId", object);
@@ -165,6 +176,7 @@ public class SocketIOProxyClient implements PushSubscriber {
                     Log.v(TAG, "on notification topic " + android);
                     String id = data.optString("id", null);
                     notificationCallback.onNotification(id, android);
+                    updateLastPacketId(id, data.optString("ttl", null), data.optString("unicast", null), "noti");
                     long timestamp = data.optLong("timestamp", 0);
                     if (timestamp > 0 && id != null) {
                         JSONObject object = new JSONObject();
@@ -179,48 +191,38 @@ public class SocketIOProxyClient implements PushSubscriber {
         }
     };
 
+    private void updateLastPacketId(String id, Object ttl, Object unicast, String topic) {
+        Boolean reciveTtl = topics.get(topic);
+        if (id != null && ttl != null) {
+            Log.v(TAG, "on push topic " + topic + " id " + id);
+            if (unicast != null) {
+                lastUnicastId = id;
+            } else if (reciveTtl) {
+                topicToLastPacketId.put(topic, id);
+            }
+        }
+    }
+
+    Template<Map<String, byte[]>> msgPackTemplate = Templates.tMap(Templates.TString, Templates.TByteArray);
+
     private final Emitter.Listener pushListener = new Emitter.Listener() {
         @Override
         public void call(Object... args) {
             if (pushCallback != null) {
                 try {
-                    switch (PROTOCOL_VERSION){
-                        case 1:
-                            JSONObject data = (JSONObject) args[0];
-                            String topic = data.optString("topic");
-                            String dataBase64 = data.optString("data");
-                            boolean reply = data.optBoolean("reply", false);
-                            Log.v(TAG, "on push topic1 " + topic + ",reply " + reply + ", data:" + dataBase64 + " dataToString: " + data.toString());
-                            pushCallback.onPush(topic, Base64.decode(dataBase64, Base64.DEFAULT));
-                            if (reply) {
-                                JSONObject object = new JSONObject();
-                                socket.emit("pushReply", object);
-                            }
-                            break;
-                        case 2:
-                            MessagePack messagePack = new MessagePack();
-                            Template<Map<String, byte[]>> mapTmpl = Templates.tMap(Templates.TString, Templates.TByteArray);
-                            ByteArrayInputStream in = new ByteArrayInputStream((byte[]) args[0]);
-                            Unpacker unpacker = messagePack.createUnpacker(in);
-                            Map<String,  byte[]> dstMap = null;
-                            dstMap = unpacker.read(mapTmpl);
-                            String topic2 = new String(dstMap.get("topic"));
-                            byte[] dataBytes = dstMap.get("data");
-                            String msg = new String(dataBytes);
-                            boolean reply2 = false;
-                            if(dstMap.get("reply")!=null){
-                                if((new String(dstMap.get("reply"))).equals("true")){
-                                    reply2 = true;
-                                }
-                            }
-                            Log.v(TAG, "on push topic2 " + topic2  + " length:" + topic2.length() + "  data: " + msg );
-                            pushCallback.onPush(topic2, dataBytes);
-                            if (reply2) {
-                                JSONObject object = new JSONObject();
-                                socket.emit("pushReply", object);
-                            }
-                            break;
+                    Log.v(TAG, "pushListener " + new String((byte[]) args[0]));
+                    ByteArrayInputStream in = new ByteArrayInputStream((byte[]) args[0]);
+                    Unpacker unpacker = messagePack.createUnpacker(in);
+                    Map<String, byte[]> dstMap = unpacker.read(msgPackTemplate);
+
+                    String topic = new String(dstMap.get("topic"));
+                    String id = null;
+                    if (dstMap.get("id") != null) {
+                        id = new String(dstMap.get("id"));
                     }
+                    byte[] dataBytes = dstMap.get("data");
+                    pushCallback.onPush(topic, dataBytes);
+                    updateLastPacketId(id, dstMap.get("ttl"), dstMap.get("unicast"), topic);
                 } catch (Exception e) {
                     Log.e(TAG, "handle push error ", e);
                 }
@@ -316,7 +318,7 @@ public class SocketIOProxyClient implements PushSubscriber {
     public SocketIOProxyClient(String host) {
         AndroidLoggingHandler.reset(new AndroidLoggingHandler());
         java.util.logging.Logger.getLogger("").setLevel(Level.FINEST);
-        topics.add("noti");
+        topics.put("noti", true);
         try {
             IO.Options opts = new IO.Options();
             opts.transports = new String[]{"websocket"};
@@ -389,15 +391,21 @@ public class SocketIOProxyClient implements PushSubscriber {
     }
 
     @Override
-    public void subscribeBroadcast(String topic) {
-        topics.add(topic);
-        if (socket.connected()) {
-            JSONObject data = new JSONObject();
-            try {
-                data.put("topic", topic);
-                socket.emit("subscribeTopic", data);
-            } catch (JSONException e) {
-                e.printStackTrace();
+    public void subscribeBroadcast(String topic, boolean receiveTtlPackets) {
+        if (!topics.containsKey(topic)) {
+            topics.put(topic, receiveTtlPackets);
+            if (socket.connected()) {
+                JSONObject data = new JSONObject();
+                try {
+                    data.put("topic", topic);
+                    String lastPacketId = topicToLastPacketId.get(topic);
+                    if (lastPacketId != null && receiveTtlPackets) {
+                        data.put("lastPacketId", lastPacketId);
+                    }
+                    socket.emit("subscribeTopic", data);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }

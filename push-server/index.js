@@ -32,7 +32,8 @@ new simpleRedisHashCluster(config.redis, function (cluster) {
     var Stats = require('./lib/stats/stats.js');
     var stats = new Stats(cluster, ioPort);
     var uidStore = require('./lib/redis/uidStore.js')(cluster);
-    var ttlService = require('./lib/service/ttlService.js')(cluster);
+    var TtlService = require('./lib/service/ttlService.js');
+    var ttlService = new TtlService(cluster);
     var notificationService = require('./lib/service/notificationService.js')(config.apns, cluster, ttlService);
 
     require('./lib/server/proxyServer.js')(io, stats, packetService, notificationService, uidStore, ttlService);

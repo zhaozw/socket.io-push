@@ -19,7 +19,9 @@ import com.yy.httpproxy.service.DummyService;
 import com.yy.httpproxy.service.BindService;
 import com.yy.httpproxy.subscribe.PushSubscriber;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 
@@ -32,7 +34,7 @@ public class RemoteClient implements PushSubscriber, HttpRequester {
     public static final int CMD_REGISTER_CLIENT = 4;
     public static final int CMD_UNSUBSCRIBE_BROADCAST = 5;
     public static final int CMD_STATS = 6;
-    private Set<String> topics = new HashSet<>();
+    private Map<String, Boolean> topics = new HashMap<>();
     private ProxyClient proxyClient;
     private Messenger mService;
     private boolean mBound;
@@ -109,8 +111,8 @@ public class RemoteClient implements PushSubscriber, HttpRequester {
             msg.replyTo = messenger;
             sendMsg(msg);
 
-            for (String topic : topics) {
-                doSubscribe(topic);
+            for (Map.Entry<String, Boolean> topic : topics.entrySet()) {
+                doSubscribe(topic.getKey(), topic.getValue());
             }
 
         }
@@ -167,17 +169,18 @@ public class RemoteClient implements PushSubscriber, HttpRequester {
     }
 
     @Override
-    public void subscribeBroadcast(String topic) {
-        doSubscribe(topic);
+    public void subscribeBroadcast(String topic, boolean receiveTtlPackets) {
+        topics.put(topic, receiveTtlPackets);
+        doSubscribe(topic, receiveTtlPackets);
     }
 
-    private void doSubscribe(String topic) {
+    private void doSubscribe(String topic, boolean receiveTtlPackets) {
         Message msg = Message.obtain(null, CMD_SUBSCRIBE_BROADCAST, 0, 0);
         Bundle bundle = new Bundle();
         bundle.putString("topic", topic);
+        bundle.putBoolean("receiveTtlPackets", receiveTtlPackets);
         msg.setData(bundle);
         sendMsg(msg);
-        topics.add(topic);
     }
 
     public void setProxyClient(ProxyClient proxyClient) {

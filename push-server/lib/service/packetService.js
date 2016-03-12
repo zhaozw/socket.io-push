@@ -2,7 +2,6 @@ module.exports = PacketService;
 
 var debug = require('debug')('PacketService');
 var randomstring = require("randomstring");
-
 var pathToServer = {};
 
 String.prototype.hashCode = function () {

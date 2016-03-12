@@ -55,9 +55,19 @@ public class ProxyClient implements PushCallback {
         pushHandlers.put(topic, handler);
     }
 
+    private void subscribeBroadcast(String topic, boolean receiveTtlPackets, ReplyHandler handler) {
+        pushHandlers.put(topic, handler);
+        config.getRemoteClient().subscribeBroadcast(topic, receiveTtlPackets);
+    }
+
     public void subscribeBroadcast(String topic, ReplyHandler handler) {
         pushHandlers.put(topic, handler);
-        config.getRemoteClient().subscribeBroadcast(topic);
+        config.getRemoteClient().subscribeBroadcast(topic, false);
+    }
+
+    public void subscribeAndReceiveTtlPackets(String topic, ReplyHandler handler) {
+        pushHandlers.put(topic, handler);
+        config.getRemoteClient().subscribeBroadcast(topic, true);
     }
 
     public void unsubscribeBroadcast(String topic) {

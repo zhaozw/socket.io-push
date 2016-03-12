@@ -14,7 +14,6 @@ import com.yy.httpproxy.requester.ResponseHandler;
 import com.yy.httpproxy.socketio.SocketIOProxyClient;
 import com.yy.httpproxy.subscribe.ConnectCallback;
 import com.yy.httpproxy.subscribe.PushCallback;
-import com.yy.httpproxy.subscribe.SharedPreferencePushIdGenerator;
 
 import org.json.JSONObject;
 

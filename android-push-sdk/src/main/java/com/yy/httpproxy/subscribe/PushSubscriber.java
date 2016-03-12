@@ -5,6 +5,6 @@ package com.yy.httpproxy.subscribe;
  */
 public interface PushSubscriber {
 
-    void subscribeBroadcast(String topic);
+    void subscribeBroadcast(String topic, boolean receiveTtlPackets);
 
 }

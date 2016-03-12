@@ -3,7 +3,7 @@ module.exports = ProxyServer;
 function ProxyServer(io, stats, packetService, notificationService, uidStore, ttlService) {
     var http = require('http');
     var debug = require('debug')('ProxyServer');
-    var msgpack = require('msgpack5')();
+    var msgpack = require('msgpack-lite');
 
     io.on('connection', function (socket) {
 
@@ -31,20 +31,20 @@ function ProxyServer(io, stats, packetService, notificationService, uidStore, tt
                             socket.packetListeners[i](parsed, packet);
                         }
 
-                        if(parsed[0] === "push" && socket.version > 1) {
+                        if (parsed[0] === "push" && socket.version > 1) {
                             parsed[1]["data"] = new Buffer(parsed[1]["data"], 'base64');
-                            var json =  JSON.stringify(parsed[1]);
+                            var json = JSON.stringify(parsed[1]);
 
                             var jsonPacket = JSON.parse(json);
                             jsonPacket.data = parsed[1]["data"];
-                            console.log("pushJson:  " + JSON.stringify(jsonPacket));
-                            var encodeJson =  msgpack.encode(jsonPacket);
+                            debug("pushJson:  " + JSON.stringify(jsonPacket));
+                            var encodeJson = msgpack.encode(jsonPacket);
                             var bufferPacket = new Buffer(encodeJson, 'base64');
 
                             var data = ["push"];
                             data.push(bufferPacket);
-                            var myPacket = { type: 5, data: data };
-                            console.log("push myPacket: " + JSON.stringify(myPacket));
+                            var myPacket = {type: 5, data: data};
+                            debug("push myPacket: " + JSON.stringify(myPacket));
 
                             packet = myPacket;
                             preEncoded.preEncoded = false;
@@ -59,7 +59,7 @@ function ProxyServer(io, stats, packetService, notificationService, uidStore, tt
         socket.on('pushId', function (data) {
             if (data.id && data.id.length >= 10) {
                 debug("on pushId %s", JSON.stringify(data));
-                if(data.platform){
+                if (data.platform) {
                     socket.platform = data.platform.toLowerCase();
                 }
                 stats.addPlatformSession(socket.platform);
@@ -73,6 +73,16 @@ function ProxyServer(io, stats, packetService, notificationService, uidStore, tt
                         debug('join topic ' + topic);
                     });
                 }
+                var lastPacketIds = data.lastPacketIds;
+                if (lastPacketIds) {
+                    for (var topic in lastPacketIds) {
+                        ttlService.getPackets(topic, lastPacketIds[topic], socket);
+                    }
+                }
+                if (data.lastUnicastId) {
+                    ttlService.getPackets(data.id, data.lastUnicastId, socket);
+                }
+
                 uidStore.getUidByPushId(data.id, function (uid) {
                     var reply = {id: data.id};
                     if (uid) {
@@ -92,6 +102,7 @@ function ProxyServer(io, stats, packetService, notificationService, uidStore, tt
         socket.on('subscribeTopic', function (data) {
             debug("on subscribeTopic %s", JSON.stringify(data));
             var topic = data.topic;
+            ttlService.getPackets(topic, data.lastPacketId, socket);
             socket.join(topic);
         });
 
@@ -119,14 +130,8 @@ function ProxyServer(io, stats, packetService, notificationService, uidStore, tt
 
         socket.on('notificationReply', function (data) {
             stats.onNotificationReply(data.timestamp);
-            ttlService.onReply(socket);
-        });
-
-        socket.on('pushReply', function () {
-            ttlService.onReply(socket);
         });
 
         stats.addSession(socket);
-        ttlService.onConnect(socket);
     });
 }

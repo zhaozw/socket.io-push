@@ -32,7 +32,8 @@ public class BindService extends Service {
             Bundle bundle = msg.getData();
             if (cmd == RemoteClient.CMD_SUBSCRIBE_BROADCAST) {
                 String topic = bundle.getString("topic");
-                ConnectionService.client.subscribeBroadcast(topic);
+                boolean receiveTtlPackets = bundle.getBoolean("receiveTtlPackets", false);
+                ConnectionService.client.subscribeBroadcast(topic, receiveTtlPackets);
             } else if (cmd == RemoteClient.CMD_SET_PUSH_ID) {
                 ConnectionService.client.setPushId(bundle.getString("pushId"));
             } else if (cmd == RemoteClient.CMD_REQUEST) {

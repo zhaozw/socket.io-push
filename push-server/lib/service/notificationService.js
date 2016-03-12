@@ -59,7 +59,7 @@ NotificationService.prototype.setApnToken = function (pushId, apnToken, bundleId
     }
 };
 
-NotificationService.prototype.sendByPushIds = function (pushIds, notification, io) {
+NotificationService.prototype.sendByPushIds = function (pushIds, timeToLive, notification, io) {
     var outerThis = this;
     pushIds.forEach(function (pushId) {
         outerThis.redis.get("pushIdToApnData#" + pushId, function (err, reply) {
@@ -69,14 +69,13 @@ NotificationService.prototype.sendByPushIds = function (pushIds, notification, i
                 var bundleId = apnData.bundleId;
                 var apnConnection = outerThis.apnConnections[bundleId];
                 if (apnConnection) {
-                    var note = toApnNotification(notification, notification.timeToLive);
+                    var note = toApnNotification(notification, timeToLive);
                     apnConnection.pushNotification(note, apnData.apnToken);
                     debug("send to notification to ios %s %s", pushId, apnData.apnToken);
                 }
             } else {
                 debug("send to notification to android %s", pushId);
-                io.to(pushId).emit('noti', notification);
-                outerThis.ttlService.addPacket(pushId, 'noti', notification);
+                outerThis.ttlService.addPacketAndEmit(pushId, 'noti', timeToLive, notification, io, true);
             }
 
         });
@@ -84,12 +83,12 @@ NotificationService.prototype.sendByPushIds = function (pushIds, notification, i
 
 };
 
-NotificationService.prototype.sendAll = function (notification, io) {
-    io.to("noti").emit('noti', notification);
+NotificationService.prototype.sendAll = function (notification, timeToLive, io) {
+    this.ttlService.addPacketAndEmit("noti", 'noti', timeToLive, notification, io, false);
     var apnConnections = this.apnConnections;
     var timestamp = Date.now();
     var redis = this.redis;
-    var note = toApnNotification(notification, notification.timeToLive);
+    var note = toApnNotification(notification, timeToLive);
     this.bundleIds.forEach(function (bundleId) {
         redis.hgetall("apnTokens#" + bundleId, function (err, replies) {
             if (replies) {
@@ -103,7 +102,6 @@ NotificationService.prototype.sendAll = function (notification, io) {
                     }
                 }
                 if (tokens.length > 0) {
-                    //tokens.push("123123123");
                     var apnConnection = apnConnections[bundleId];
                     debug("bundleId %s replies %d", bundleId, tokens.length);
                     apnConnection.pushNotification(note, tokens);
