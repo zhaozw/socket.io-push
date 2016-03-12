@@ -17,7 +17,14 @@ import com.yy.httpproxy.subscribe.PushSubscriber;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.msgpack.MessagePack;
+import org.msgpack.template.Template;
+import org.msgpack.template.Templates;
+import org.msgpack.type.Value;
+import org.msgpack.unpacker.Unpacker;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -44,7 +51,7 @@ import io.socket.emitter.Emitter;
 
 public class SocketIOProxyClient implements PushSubscriber {
 
-    private static final int PROTOCOL_VERSION = 1;
+    private static final int PROTOCOL_VERSION = 2;
     private static String TAG = "SocketIoRequester";
     private PushCallback pushCallback;
     private String pushId;
@@ -177,15 +184,42 @@ public class SocketIOProxyClient implements PushSubscriber {
         public void call(Object... args) {
             if (pushCallback != null) {
                 try {
-                    JSONObject data = (JSONObject) args[0];
-                    String topic = data.optString("topic");
-                    String dataBase64 = data.optString("data");
-                    boolean reply = data.optBoolean("reply", false);
-                    Log.v(TAG, "on push topic " + topic + ",reply " + reply + ", data:" + dataBase64);
-                    pushCallback.onPush(topic, Base64.decode(dataBase64, Base64.DEFAULT));
-                    if (reply) {
-                        JSONObject object = new JSONObject();
-                        socket.emit("pushReply", object);
+                    switch (PROTOCOL_VERSION){
+                        case 1:
+                            JSONObject data = (JSONObject) args[0];
+                            String topic = data.optString("topic");
+                            String dataBase64 = data.optString("data");
+                            boolean reply = data.optBoolean("reply", false);
+                            Log.v(TAG, "on push topic1 " + topic + ",reply " + reply + ", data:" + dataBase64 + " dataToString: " + data.toString());
+                            pushCallback.onPush(topic, Base64.decode(dataBase64, Base64.DEFAULT));
+                            if (reply) {
+                                JSONObject object = new JSONObject();
+                                socket.emit("pushReply", object);
+                            }
+                            break;
+                        case 2:
+                            MessagePack messagePack = new MessagePack();
+                            Template<Map<String, byte[]>> mapTmpl = Templates.tMap(Templates.TString, Templates.TByteArray);
+                            ByteArrayInputStream in = new ByteArrayInputStream((byte[]) args[0]);
+                            Unpacker unpacker = messagePack.createUnpacker(in);
+                            Map<String,  byte[]> dstMap = null;
+                            dstMap = unpacker.read(mapTmpl);
+                            String topic2 = new String(dstMap.get("topic"));
+                            byte[] dataBytes = dstMap.get("data");
+                            String msg = new String(dataBytes);
+                            boolean reply2 = false;
+                            if(dstMap.get("reply")!=null){
+                                if((new String(dstMap.get("reply"))).equals("true")){
+                                    reply2 = true;
+                                }
+                            }
+                            Log.v(TAG, "on push topic2 " + topic2  + " length:" + topic2.length() + "  data: " + msg );
+                            pushCallback.onPush(topic2, dataBytes);
+                            if (reply2) {
+                                JSONObject object = new JSONObject();
+                                socket.emit("pushReply", object);
+                            }
+                            break;
                     }
                 } catch (Exception e) {
                     Log.e(TAG, "handle push error ", e);
