@@ -246,7 +246,7 @@ function RestApi(io, stats, notificationService, port, uidStore, ttlService, red
 var randomstring = require("randomstring");
 
 function fillPacket(packet, req) {
-    packet.id = randomstring.generate(32);
+    packet.id = randomstring.generate(8);
     var timeToLive = parseInt(req.params.timeToLive);
     if (timeToLive > 0) {
         packet.timeToLive = timeToLive;

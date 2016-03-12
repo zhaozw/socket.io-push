@@ -55,14 +55,62 @@ TTLService.prototype.addPacket = function (pushId, topic, data) {
         var redis = this.redis;
         var key = "ttlPacket#" + pushId;
         data.timestampValid = Date.now() + timeToLive;
-        data.reply = true;
-        var packet = [topic, data];
         redis.pttl(key, function (err, oldTtl) {
             debug("addPacket key %s , %d , %d", key, oldTtl, timeToLive);
-            redis.rpush(key, JSON.stringify(packet));
+            redis.rpush(key, JSON.stringify(data));
             if (timeToLive > oldTtl) {
                 redis.pexpire(key, timeToLive);
             }
         });
     }
 };
+
+var maxTllPacketPerTopic = -50;
+
+TTLService.prototype.addPacket = function (topic, event, timeToLive, data) {
+    if (timeToLive > 0) {
+        var redis = this.redis;
+        data.timestampValid = Date.now() + timeToLive;
+        data.event = event;
+        var listKey = "ttl#packet#" + topic;
+
+        var packet = [topic, data];
+        redis.pttl(listKey, function (err, oldTtl) {
+            debug("addPacket key %s , %d , %d", key, oldTtl, timeToLive);
+            redis.rpush(listKey, JSON.stringify(packet));
+            redis.ltrim(listKey, maxTllPacketPerTopic, -1);
+            if (timeToLive > oldTtl) {
+                redis.pexpire(key, timeToLive);
+            }
+        });
+    }
+};
+
+TTLService.prototype.getPackets = function (topic, lastId, socket) {
+    if (timeToLive > 0) {
+        var redis = this.redis;
+        data.timestampValid = Date.now() + timeToLive;
+        var listKey = "ttl#packet#" + topic;
+        redis.lrange(listKey, 0, -1, function (err, list) {
+            if (list) {
+                var lastFound = false;
+                list.forEach(function (packet) {
+                    var jsonPacket = JSON.parse(packet);
+                    var now = Date.now();
+                    if (jsonPacket.id == lastId) {
+                        lastFound = true;
+                    } else if (lastFound == true && jsonPacket.timestampValid < now) {
+                        var event = jsonPacket.event;
+                        delete jsonPacket.event;
+                        delete jsonPacket.timestampValid;
+                        socket.emit(event, jsonPacket);
+                    }
+                });
+            }
+        });
+    }
+};
+
+function emitPacket(socket,packet){
+
+}
