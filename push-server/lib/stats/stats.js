@@ -47,6 +47,20 @@ Stats.prototype.removePlatformSession = function (platform, count) {
     }
 }
 
+
+Stats.prototype.onPacket = function (packetData) {
+    var timestamp = Date.now();
+    this.incr("stats#toClientPacket#totalCount", timestamp);
+    if (packetData[0] == "noti") {
+        packetData[1].timestamp = timestamp;
+        this.incr("stats#notification#totalCount", timestamp);
+        debug("adding notification timestamp %j", packetData);
+        return true;
+    } else {
+        return false;
+    }
+}
+
 Stats.prototype.addSession = function (socket, count) {
     if (!count) {
         count = 1;
@@ -54,17 +68,6 @@ Stats.prototype.addSession = function (socket, count) {
     this.sessionCount.total += count;
 
     var stats = this;
-
-    socket.packetListeners.push(function (parsed, packet) {
-        var timestamp = Date.now();
-        stats.incr("stats#toClientPacket#totalCount", timestamp);
-        if (parsed[0] === "noti") {
-            parsed[1]['timestamp'] = timestamp
-            packet[0] = "2" + JSON.stringify(parsed);
-            stats.incr("stats#notification#totalCount", timestamp);
-            debug("adding notification timestamp %s", packet[0]);
-        }
-    });
 
     socket.on('stats', function (data) {
         debug("on stats %s", JSON.stringify(data.requestStats));
@@ -110,6 +113,7 @@ Stats.prototype.incrby = function (key, timestamp, by) {
 
 Stats.prototype.onNotificationReply = function (timestamp) {
     var latency = Date.now() - timestamp;
+    debug('onNotificationReply %s',latency);
     if (latency < 10000) {
         this.incr("stats#notification#successCount", timestamp);
         this.incrby("stats#notification#totalLatency", timestamp, latency);
