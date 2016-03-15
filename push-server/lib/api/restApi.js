@@ -46,7 +46,7 @@ function RestApi(io, stats, notificationService, port, uidStore, ttlService, red
         }
         var pushId = req.params.pushId;
         var pushAll = req.params.pushAll;
-        debug('push ' + JSON.stringify(req.params));
+        debug('push %j', req.params);
         var pushData = {topic: topic, data: data};
 
         var timeToLive = parseInt(req.params.timeToLive);
@@ -86,7 +86,7 @@ function RestApi(io, stats, notificationService, port, uidStore, ttlService, red
         var pushAll = req.params.pushAll;
         var timeToLive = parseInt(req.params.timeToLive);
 
-        debug('notification ' + JSON.stringify(req.params));
+        debug('notification %j', req.params);
 
         if (pushAll === 'true') {
             notificationService.sendAll(notification, timeToLive, io);

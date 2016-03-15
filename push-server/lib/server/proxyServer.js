@@ -28,11 +28,12 @@ function ProxyServer(io, stats, packetService, notificationService, uidStore, tt
 
         var oldPacket = socket.packet;
         socket.packet = function (packet, preEncoded) {
+            var needEncode;
             try {
                 if (preEncoded && preEncoded.preEncoded) {
                     var parsed = decodeString(packet[0]);
                     debug('parsed %j %s %s %s', parsed, parsed.data[0], parsed.type, socket.version);
-                    var needEncode = stats.onPacket(parsed.data);
+                    needEncode = stats.onPacket(parsed.data);
                     if (parsed.type == 2 && parsed.data[0] == "push" && socket.version > 1) {
                         parsed.data[1].data = new Buffer(parsed.data[1].data, 'base64');
                         parsed.type = parser.BINARY_EVENT;
@@ -41,16 +42,18 @@ function ProxyServer(io, stats, packetService, notificationService, uidStore, tt
                     }
                     if (needEncode) {
                         encoder.encode(parsed, function (encoded) {
-                            debug('convert to binary packet %s', encoded);
+                            debug('encode packet %s', encoded);
                             oldPacket.call(socket, encoded, preEncoded);
                         });
-                    } else {
-                        oldPacket.call(socket, packet, preEncoded);
                     }
                 }
             } catch (err) {
                 debug('packet error %s', err.stack);
-                oldPacket.call(socket, packet, preEncoded);
+            } finally {
+                if (!needEncode) {
+                    debug('call old packet');
+                    oldPacket.call(socket, packet, preEncoded);
+                }
             }
         };
 
