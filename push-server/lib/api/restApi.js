@@ -183,6 +183,12 @@ function RestApi(io, stats, notificationService, port, uidStore, ttlService, red
         return next();
     });
 
+    server.get('/api/admin/command', function (req, res, next) {
+        redis.publish("adminCommand", req.params.command);
+        res.send({code: "success"});
+        return next();
+    });
+
     server.get('/api/redis/hgetall', function (req, res, next) {
         redis.hgetall(req.params.key, function (err, result) {
             res.send({key: req.params.key, count: result.length, result: result});

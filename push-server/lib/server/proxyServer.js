@@ -28,6 +28,9 @@ function ProxyServer(io, stats, packetService, notificationService, uidStore, tt
 
         var oldPacket = socket.packet;
         socket.packet = function (packet, preEncoded) {
+            if (stats.shouldDrop()) {
+                return;
+            }
             var needEncode;
             try {
                 if (preEncoded && preEncoded.preEncoded) {

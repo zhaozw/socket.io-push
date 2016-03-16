@@ -20,7 +20,7 @@ function PacketService(redis, subClient) {
     this.redis = redis;
     subClient.on("message", function (channel, message) {
         //debug("subscribe message " + channel + ": " + message);
-        if (channel === "packetServer") {
+        if (channel == "packetServer") {
             var handlerInfo = JSON.parse(message);
             updatePathServer(handlerInfo);
         }

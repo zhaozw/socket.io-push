@@ -7,6 +7,9 @@ function Stats(redis, port) {
     this.redis = redis;
     this.sessionCount = {ios: 0, android: 0, total: 0};
     this.redisIncrBuffer = require('./redisIncrBuffer.js')(redis);
+    this.packetDrop = 0;
+    this.packetDropThreshold = 0;
+    this.ms = new (require('./moving-sum.js'))();
     var ipPath = process.cwd() + "/ip";
     var fs = require('fs');
     var ip;
@@ -17,12 +20,41 @@ function Stats(redis, port) {
     this.id = ip || randomstring.generate(32);
     var stats = this;
     setInterval(function () {
+        var packetAverage = stats.ms.sum([60 * 1000, 5 * 60 * 1000]);
+        stats.packetAverage1Minute = packetAverage[0];
+        stats.packetAverage5Minute = packetAverage[1];
         redis.hset("stats#sessionCount", stats.id, JSON.stringify({
             timestamp: Date.now(),
-            sessionCount: stats.sessionCount
+            sessionCount: stats.sessionCount,
+            packetAverage1Minute: stats.packetAverage1Minute,
+            packetAverage5Minute: stats.packetAverage5Minute,
+            packetDrop: stats.packetDrop,
+            packetDropThreshold: stats.packetDropThreshold
         }));
-    }, 10000);
+    }, 5000);
     redis.del("stats#sessionCount");
+
+    redis.on("message", function (channel, message) {
+        if (channel == "adminCommand") {
+            debug('adminCommand %s', message);
+            var command = JSON.parse(message);
+            if (command.command = 'packetDropThreshold') {
+                debug('setting packetDropThreshold %d', stats.packetDropThreshold);
+                stats.packetDropThreshold = command.packetDropThreshold;
+            }
+        }
+    });
+    redis.subscribe("adminCommand");
+}
+
+Stats.prototype.shouldDrop = function () {
+    if (this.packetDropThreshold != 0 && this.packetAverage1Minute > this.packetDropThreshold) {
+        this.packetDrop++;
+        debug('threshold exceeded dropping packet %d > %d', this.packetAverage1Minute, this.packetDropThreshold);
+        return true;
+    } else {
+        return false;
+    }
 }
 
 Stats.prototype.addPlatformSession = function (platform, count) {
@@ -50,6 +82,8 @@ Stats.prototype.removePlatformSession = function (platform, count) {
 
 Stats.prototype.onPacket = function (packetData) {
     var timestamp = Date.now();
+    this.ms.push(timestamp);
+
     this.incr("stats#toClientPacket#totalCount", timestamp);
     if (packetData[0] == "noti") {
         packetData[1].timestamp = timestamp;
@@ -113,7 +147,7 @@ Stats.prototype.incrby = function (key, timestamp, by) {
 
 Stats.prototype.onNotificationReply = function (timestamp) {
     var latency = Date.now() - timestamp;
-    debug('onNotificationReply %s',latency);
+    debug('onNotificationReply %s', latency);
     if (latency < 10000) {
         this.incr("stats#notification#successCount", timestamp);
         this.incrby("stats#notification#totalLatency", timestamp, latency);
@@ -128,13 +162,28 @@ Stats.prototype.getSessionCount = function (callback) {
         var iosCount = 0;
         var currentTimestamp = Date.now();
         var processCount = [];
+        var packetAverage1Minute = 0;
+        var packetAverage5Minute = 0;
+        var packetDrop = 0;
+        var packetDropThreshold = 0;
         for (var id in results) {
             var data = JSON.parse(results[id]);
             if ((currentTimestamp - data.timestamp) < 20 * 1000) {
                 totalCount += data.sessionCount.total;
                 iosCount += data.sessionCount.ios;
                 androidCount += data.sessionCount.android;
-                processCount.push({id: id, count: data.sessionCount});
+                packetAverage1Minute += data.packetAverage1Minute || 0;
+                packetAverage5Minute += data.packetAverage5Minute || 0;
+                packetDrop += data.packetDrop || 0;
+                packetDropThreshold += data.packetDropThreshold || 0;
+                processCount.push({
+                    id: id,
+                    count: data.sessionCount,
+                    packetAverage1Minute: packetAverage1Minute,
+                    packetAverage5Minute: packetAverage5Minute,
+                    packetDrop: packetDrop,
+                    packetDropThreshold: packetDropThreshold
+                });
             }
         }
 
@@ -142,6 +191,8 @@ Stats.prototype.getSessionCount = function (callback) {
             sessionCount: totalCount,
             android: androidCount,
             ios: iosCount,
+            packetAverage1Minute: packetAverage1Minute,
+            packetAverage5Minute: packetAverage5Minute,
             processCount: processCount.sort(function (a, b) {
                 if (a.id < b.id) return -1;
                 if (a.id > b.id) return 1;
@@ -151,10 +202,10 @@ Stats.prototype.getSessionCount = function (callback) {
     });
 };
 
-Stats.prototype.getQueryDataKeys = function(callback) {
+Stats.prototype.getQueryDataKeys = function (callback) {
     this.redis.hkeys("queryDataKeys", function (err, replies) {
         var strs = [];
-        replies.forEach(function(buffer){
+        replies.forEach(function (buffer) {
             strs.push(buffer.toString());
         });
         callback(strs.sort(sortString));
@@ -162,7 +213,7 @@ Stats.prototype.getQueryDataKeys = function(callback) {
     });
 }
 
-var sortString = function (a, b)    {
+var sortString = function (a, b) {
     a = a.toLowerCase();
     b = b.toLowerCase();
     if (a < b) return 1;

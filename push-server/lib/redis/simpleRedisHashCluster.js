@@ -28,9 +28,11 @@ function SimpleRedisHashCluster(config, completeCallback) {
             console.log("redis slave connect Error %s:%s %s", addr.host, addr.port, err);
         });
         client.on("message", function (channel, message) {
-            debug("on slave message %s %s %s", channel, message, client.port);
             outerThis.messageCallbacks.forEach(function (callback) {
-                callback(channel, message);
+                try {
+                    callback(channel, message);
+                } catch (err) {
+                }
             });
         });
         outerThis.slaves.push(client);
