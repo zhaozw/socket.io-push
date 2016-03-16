@@ -89,9 +89,9 @@ server
 
 ##HTTP API
 
-string[]类型,表示http协议中list类型参数,如 get?uid=123&uid=456 ,表示一个uid数组 [123, 456]
+string[]类型,表示http协议中list类型参数，如 get?uid=123&uid=456 ,表示一个uid数组 [123, 456]. get?uid=123 表示单个uid数组 [123]
 
-* /api/push 应用内透传
+### /api/push 应用内透传
 
 //推送给abc,def两个客户端.透传数据为字符串hello world (base64 aGVsbG8gd29ybGQ),到topic=/topic/test
 
@@ -110,7 +110,7 @@ data -> string, base64编码的二进制数据
 topic -> string, 客户端订阅的topic, (subscribeBroadcast的才能收到)
 
 
-* /api/notification 状态栏通知api
+### /api/notification 状态栏通知api
 
 http://yourip:11001/api/notification?pushId=true&notification=%7B%20%22android%22%3A%7B%22title%22%3A%22title%22%2C%22message%22%3A%22message%22%7D%2C%22apn%22%3A%7B%22alert%22%3A%22message%22%20%2C%20%22badge%22%3A5%2C%20%22sound%22%3A%22default%22%2C%20%22payload%22%3A1234%7D%7D
 
@@ -148,7 +148,7 @@ sound(ios) - (apn对应的sound字段) 可选
 payload - 发送给应用非显示用的透传信息, 需要是一个json map
 
 
-* /api/addPushIdToUid 绑定UID和pushId
+### /api/addPushIdToUid 绑定UID和pushId
 
 http://yourip:11001/api/addPushIdToUid?pushId=abc&uid=123
 
