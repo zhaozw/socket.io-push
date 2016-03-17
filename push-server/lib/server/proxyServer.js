@@ -35,16 +35,15 @@ function ProxyServer(io, stats, packetService, notificationService, uidStore, tt
             try {
                 if (preEncoded && preEncoded.preEncoded) {
                     if(socket.version < 2){
+                        debug('packet %j', packet);
                         var parsed = decodeString(packet[0]);
                         debug('parsed %j %s %s %s', parsed, parsed.data[0], parsed.type, socket.version);
                         if (parsed.type == 5 && parsed.data[0] == "push") {
-                            parsed.data[1].data = parsed.data[1].data.toString('base64');
+                            parsed.data[1].data = packet[1].toString('base64');
                             parsed.type = parser.EVENT;
-                            parsed.data[1] = msgpack.encode(parsed.data[1]);
                             needEncode = true;
                         }
                     }
-                    debug('packet %j', packet);
                     if (needEncode) {
                         encoder.encode(parsed, function (encoded) {
                             debug('encode packet %s', encoded);
