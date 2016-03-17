@@ -46,6 +46,7 @@ function RestApi(io, stats, notificationService, port, uidStore, ttlService, red
         }
         var pushId = req.params.pushId;
         var pushAll = req.params.pushAll;
+        var uid = req.params.uid;
         debug('push %j', req.params);
         var pushData = {topic: topic, data: data};
 
@@ -55,20 +56,44 @@ function RestApi(io, stats, notificationService, port, uidStore, ttlService, red
             ttlService.addPacketAndEmit(topic, 'push', timeToLive, pushData, io, false);
             res.send({code: "success"});
             return next();
-        } else if (!pushId) {
+        }/* else if (!pushId) {
             res.send({code: "error", message: 'pushId is required'});
             return next();
-        } else {
-            if (typeof pushId === 'string') {
-                ttlService.addPacketAndEmit(pushId, 'push', timeToLive, pushData, io, true);
-                res.send({code: "success"});
-                return next();
-            } else {
-                pushId.forEach(function (id) {
-                    ttlService.addPacketAndEmit(id, 'push', timeToLive, pushData, io, true);
-                });
-                res.send({code: "success"});
-                return next();
+        } */else {
+            if(pushId) {
+                if (typeof pushId === 'string') {
+                    ttlService.addPacketAndEmit(pushId, 'push', timeToLive, pushData, io, true);
+                    res.send({code: "success"});
+                    return next();
+                } else {
+                    pushId.forEach(function (id) {
+                        ttlService.addPacketAndEmit(id, 'push', timeToLive, pushData, io, true);
+                    });
+                    res.send({code: "success"});
+                    return next();
+                }
+            }else {
+                if(uid){
+                    if(typeof uid === 'string') {
+                        uidStore.getPushIdByUid(uid, function(pushIds){
+                            pushIds.forEach(function (id) {
+                                ttlService.addPacketAndEmit(id, 'push', timeToLive, pushData, io, true);
+                            });
+                            res.send({code: "success"});
+                            return next();
+                        });
+                    }else {
+                        uid.forEach(function(id, i){
+                            uidStore.getPushIdByUid(id, function(pushIds){
+                                pushIds.forEach(function (result) {
+                                    ttlService.addPacketAndEmit(result, 'push', timeToLive, pushData, io, true);
+                                });
+                            });
+                        });
+                        res.send({code: "success"});
+                        return next();
+                    }
+                }
             }
         }
     };
@@ -111,14 +136,12 @@ function RestApi(io, stats, notificationService, port, uidStore, ttlService, red
                     } else {
                         uids = uid;
                     }
-                    var pushIds = [];
-                    //util.batch(pubClient, "hkeys", "uidToPushId#", uids, function (replies) {
-                    //    replies.forEach(function (result, i) {
-                    //         pushIds = pushIds.concat(result);
-                    //    });
-                    //    redis.sendNotification(pushIds, notification, io);
-                    //    res.send({code: "success"});
-                    //});
+                    uids.forEach(function(uid, i){
+                        uidStore.getPushIdByUid(uid, function(pushIds){
+                            notificationService.sendByPushIds(pushIds, timeToLive, notification, io);
+                        });
+                    });
+                    res.send({code: "success"});
                 }
             }
         }
