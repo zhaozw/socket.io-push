@@ -14,7 +14,7 @@ function PushServer(config) {
 
         var io = require('socket.io')(ioPort, {pingTimeout: config.pingTimeout, pingInterval: config.pingInterval});
         console.log("start server on port " + ioPort);
-        var socketIoRedis = require('socket.io-redis')({pubClient: cluster, subClient: cluster});
+        var socketIoRedis = require('./redis/redisAdapter.js')({pubClient: cluster, subClient: cluster});
         io.adapter(socketIoRedis);
         var packetService = require('./service/packetService.js')(cluster, cluster);
         var Stats = require('./stats/stats.js');

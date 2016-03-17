@@ -80,19 +80,10 @@ Stats.prototype.removePlatformSession = function (platform, count) {
 }
 
 
-Stats.prototype.onPacket = function (packetData) {
+Stats.prototype.onPacket = function () {
     var timestamp = Date.now();
     this.ms.push(timestamp);
-
     this.incr("stats#toClientPacket#totalCount", timestamp);
-    if (packetData[0] == "noti") {
-        packetData[1].timestamp = timestamp;
-        this.incr("stats#notification#totalCount", timestamp);
-        debug("adding notification timestamp %j", packetData);
-        return true;
-    } else {
-        return false;
-    }
 }
 
 Stats.prototype.addSession = function (socket, count) {

@@ -36,7 +36,7 @@ TTLService.prototype.addPacketAndEmit = function (topic, event, timeToLive, pack
             }
         });
     }
-    io.to(topic).emit(event, packet);
+    io.to(topic).emit(event, msgpack.encode(packet));
 };
 
 TTLService.prototype.getPackets = function (topic, lastId, socket) {
