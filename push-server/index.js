@@ -12,7 +12,7 @@ if (!program.instance) {
     program.instance = 1;
 }
 var config = require(process.cwd() + "/config");
-var instance = program.instance;
+config.instance = program.instance;
 
 require('./lib/push-server.js')(config);
 

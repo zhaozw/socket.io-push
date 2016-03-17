@@ -1,7 +1,7 @@
 module.exports = ProxyServer;
 var debug = require('debug')('ProxyServer');
 var http = require('http');
-var msgpack = require('msgpack-lite');
+var msgpack = require('msgpack');
 var parser = require('socket.io-parser');
 var encoder = new parser.Encoder();
 var decoder = new parser.Decoder();

@@ -179,10 +179,10 @@ Stats.prototype.getSessionCount = function (callback) {
                 processCount.push({
                     id: id,
                     count: data.sessionCount,
-                    packetAverage1Minute: packetAverage1Minute,
-                    packetAverage5Minute: packetAverage5Minute,
-                    packetDrop: packetDrop,
-                    packetDropThreshold: packetDropThreshold
+                    packetAverage1Minute: data.packetAverage1Minute,
+                    packetAverage5Minute: data.packetAverage5Minute,
+                    packetDrop: data.packetDrop,
+                    packetDropThreshold: data.packetDropThreshold
                 });
             }
         }
