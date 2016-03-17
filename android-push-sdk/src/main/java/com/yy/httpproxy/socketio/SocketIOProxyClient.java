@@ -17,12 +17,13 @@ import com.yy.httpproxy.subscribe.PushSubscriber;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.msgpack.MessagePack;
-import org.msgpack.template.Template;
-import org.msgpack.template.Templates;
-import org.msgpack.unpacker.Unpacker;
+import org.msgpack.core.MessageFormat;
+import org.msgpack.core.MessagePack;
+import org.msgpack.core.MessageUnpacker;
+import org.msgpack.value.ImmutableMapValue;
+import org.msgpack.value.Value;
+import org.msgpack.value.impl.ImmutableStringValueImpl;
 
-import java.io.ByteArrayInputStream;
 import java.net.URISyntaxException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -61,7 +62,6 @@ public class SocketIOProxyClient implements PushSubscriber {
     private boolean connected = false;
     private String uid;
     private Stats stats = new Stats();
-    private MessagePack messagePack = new MessagePack();
 
     public void setResponseHandler(ResponseHandler responseHandler) {
         this.responseHandler = responseHandler;
@@ -203,26 +203,29 @@ public class SocketIOProxyClient implements PushSubscriber {
         }
     }
 
-    Template<Map<String, byte[]>> msgPackTemplate = Templates.tMap(Templates.TString, Templates.TByteArray);
 
     private final Emitter.Listener pushListener = new Emitter.Listener() {
         @Override
         public void call(Object... args) {
             if (pushCallback != null) {
                 try {
-                    Log.v(TAG, "pushListener " + new String((byte[]) args[0]));
-                    ByteArrayInputStream in = new ByteArrayInputStream((byte[]) args[0]);
-                    Unpacker unpacker = messagePack.createUnpacker(in);
-                    Map<String, byte[]> dstMap = unpacker.read(msgPackTemplate);
+                    Log.v(TAG, "pushListener onPush length " + ((byte[]) args[0]).length);
+                    MessageUnpacker unpacker = MessagePack.newDefaultUnpacker((byte[]) args[0]);
+                    if (unpacker.hasNext() && unpacker.getNextFormat() == MessageFormat.FIXMAP) {
 
-                    String topic = new String(dstMap.get("topic"));
-                    String id = null;
-                    if (dstMap.get("id") != null) {
-                        id = new String(dstMap.get("id"));
+                        ImmutableMapValue mapValue = (ImmutableMapValue) unpacker.unpackValue();
+                        Map<Value, Value> map = mapValue.map();
+                        String topic = map.get(new ImmutableStringValueImpl("topic")).toString();
+                        String id = null;
+                        Value idValue = map.get(new ImmutableStringValueImpl("id"));
+                        if (idValue != null) {
+                            id = idValue.toString();
+                        }
+                        Value dataValue = map.get(new ImmutableStringValueImpl("data"));
+                        byte[] dataBytes = dataValue.asBinaryValue().asByteArray();
+                        pushCallback.onPush(topic, dataBytes);
+                        updateLastPacketId(id, map.get(new ImmutableStringValueImpl("ttl")), map.get(new ImmutableStringValueImpl("unicast")), topic);
                     }
-                    byte[] dataBytes = dstMap.get("data");
-                    pushCallback.onPush(topic, dataBytes);
-                    updateLastPacketId(id, dstMap.get("ttl"), dstMap.get("unicast"), topic);
                 } catch (Exception e) {
                     Log.e(TAG, "handle push error ", e);
                 }

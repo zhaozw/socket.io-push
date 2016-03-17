@@ -1,11 +1,10 @@
 module.exports = ProxyServer;
 var debug = require('debug')('ProxyServer');
 var http = require('http');
-var msgpack = require('msgpack');
+var msgpack = require('msgpack-lite');
 var parser = require('socket.io-parser');
 var encoder = new parser.Encoder();
 var decoder = new parser.Decoder();
-var json = require('json3');
 
 function ProxyServer(io, stats, packetService, notificationService, uidStore, ttlService) {
 
@@ -62,7 +61,7 @@ function ProxyServer(io, stats, packetService, notificationService, uidStore, tt
 
         socket.on('pushId', function (data) {
             if (data.id && data.id.length >= 10) {
-                debug("on pushId %s", JSON.stringify(data));
+                debug("on pushId %j", data);
                 if (data.platform) {
                     socket.platform = data.platform.toLowerCase();
                 }
@@ -104,7 +103,7 @@ function ProxyServer(io, stats, packetService, notificationService, uidStore, tt
         });
 
         socket.on('subscribeTopic', function (data) {
-            debug("on subscribeTopic %s", JSON.stringify(data));
+            debug("on subscribeTopic %j", data);
             var topic = data.topic;
             ttlService.getPackets(topic, data.lastPacketId, socket);
             socket.join(topic);
@@ -112,13 +111,13 @@ function ProxyServer(io, stats, packetService, notificationService, uidStore, tt
 
 
         socket.on('unsubscribeTopic', function (data) {
-            debug("on unsubscribeTopic %s", JSON.stringify(data));
+            debug("on unsubscribeTopic %j", data);
             var topic = data.topic;
             socket.leave(topic);
         });
 
         socket.on('apnToken', function (data) {
-            debug("on apnToken %s", JSON.stringify(data));
+            debug("on apnToken %j", data);
             var pushId = data.pushId;
             var apnToken = data.apnToken;
             notificationService.setApnToken(pushId, apnToken, data.bundleId);
@@ -207,7 +206,7 @@ function decodeString(str) {
     // look up json data
     if (str.charAt(++i)) {
         try {
-            p.data = json.parse(str.substr(i));
+            p.data = JSON.parse(str.substr(i));
         } catch (e) {
             debug('parse json error %s', e);
             return error();
