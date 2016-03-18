@@ -136,10 +136,10 @@ public class DrawActivity extends Activity implements ConnectCallback {
 
         });
 
-        proxyClient.subscribeBroadcast("message", new PushHandler<Message>(Message.class) {
+        proxyClient.subscribeAndReceiveTtlPackets("message", new PushHandler<Message>(Message.class) {
             @Override
             public void onSuccess(Message result) {
-                msg.setText("Msg: " + result.msg);
+                msg.setText("Msg: " + result.message);
             }
         });
 

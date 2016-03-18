@@ -17,12 +17,6 @@ import com.yy.httpproxy.subscribe.PushSubscriber;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.msgpack.core.MessageFormat;
-import org.msgpack.core.MessagePack;
-import org.msgpack.core.MessageUnpacker;
-import org.msgpack.value.ImmutableMapValue;
-import org.msgpack.value.Value;
-import org.msgpack.value.impl.ImmutableStringValueImpl;
 
 import java.net.URISyntaxException;
 import java.security.cert.CertificateException;
@@ -49,7 +43,7 @@ import io.socket.emitter.Emitter;
 
 public class SocketIOProxyClient implements PushSubscriber {
 
-    private static final int PROTOCOL_VERSION = 2;
+    private static final int PROTOCOL_VERSION = 1;
     private static String TAG = "SocketIOProxyClient";
     private PushCallback pushCallback;
     private String pushId;
@@ -209,23 +203,15 @@ public class SocketIOProxyClient implements PushSubscriber {
         public void call(Object... args) {
             if (pushCallback != null) {
                 try {
-                    Log.v(TAG, "pushListener onPush length " + ((byte[]) args[0]).length);
-                    MessageUnpacker unpacker = MessagePack.newDefaultUnpacker((byte[]) args[0]);
-                    if (unpacker.hasNext() && unpacker.getNextFormat() == MessageFormat.FIXMAP) {
+                    JSONObject data = (JSONObject) args[0];
+                    String topic = data.optString("topic");
+                    String dataBase64 = data.optString("data");
+                    String id = data.optString("id", null);
+                    boolean reply = data.optBoolean("reply", false);
+                    Log.v(TAG, "on push topic1 " + topic + ",reply " + reply + ", data:" + dataBase64 + " dataToString: " + data.toString());
+                    pushCallback.onPush(topic, Base64.decode(dataBase64, Base64.DEFAULT));
 
-                        ImmutableMapValue mapValue = (ImmutableMapValue) unpacker.unpackValue();
-                        Map<Value, Value> map = mapValue.map();
-                        String topic = map.get(new ImmutableStringValueImpl("topic")).toString();
-                        String id = null;
-                        Value idValue = map.get(new ImmutableStringValueImpl("id"));
-                        if (idValue != null) {
-                            id = idValue.toString();
-                        }
-                        Value dataValue = map.get(new ImmutableStringValueImpl("data"));
-                        byte[] dataBytes = dataValue.asBinaryValue().asByteArray();
-                        pushCallback.onPush(topic, dataBytes);
-                        updateLastPacketId(id, map.get(new ImmutableStringValueImpl("ttl")), map.get(new ImmutableStringValueImpl("unicast")), topic);
-                    }
+                    updateLastPacketId(id, data.optString("ttl", null), data.optString("unicast", null), topic);
                 } catch (Exception e) {
                     Log.e(TAG, "handle push error ", e);
                 }

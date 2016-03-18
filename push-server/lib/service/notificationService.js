@@ -16,7 +16,7 @@ function NotificationService(apnConfigs, redis, ttlService) {
     var ca = [fs.readFileSync(__dirname + "/../../cert/entrust_2048_ca.cer")];
 
     apnConfigs.forEach(function (apnConfig, index) {
-        apnConfig.maxConnections = 10;
+        apnConfig.maxConnections = 5;
         apnConfig.ca = ca;
         apnConfig.errorCallback = function (errorCode, notification, device) {
             var id = device.token.toString('hex');

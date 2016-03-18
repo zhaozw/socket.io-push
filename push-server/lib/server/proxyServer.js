@@ -1,9 +1,7 @@
 module.exports = ProxyServer;
 var debug = require('debug')('ProxyServer');
 var http = require('http');
-var msgpack = require('msgpack-lite');
 var parser = require('socket.io-parser');
-var encoder = new parser.Encoder();
 var decoder = new parser.Decoder();
 
 function ProxyServer(io, stats, packetService, notificationService, uidStore, ttlService) {
@@ -31,35 +29,8 @@ function ProxyServer(io, stats, packetService, notificationService, uidStore, tt
                 return;
             }
             stats.onPacket();
-            var needEncode;
-            try {
-                if (preEncoded && preEncoded.preEncoded) {
-                    if(socket.version < 2){
-                        debug('packet %j', packet);
-                        var parsed = decodeString(packet[0]);
-                        debug('parsed %j %s %s %s', parsed, parsed.data[0], parsed.type, socket.version);
-                        if (parsed.type == 5 && parsed.data[0] == "push") {
-                            parsed.data[1].data = packet[1].toString('base64');
-                            parsed.type = parser.EVENT;
-                            needEncode = true;
-                        }
-                    }
-                    if (needEncode) {
-                        encoder.encode(parsed, function (encoded) {
-                            debug('encode packet %s', encoded);
-                            oldPacket.call(socket, encoded, preEncoded);
-                        });
-                    }
-                }
-            } catch (err) {
-                debug('packet error %s', err.stack);
-            } finally {
-                if (!needEncode) {
-                    debug('call old packet');
-                    oldPacket.call(socket, packet, preEncoded);
-                }
-            }
-        };
+            oldPacket.call(socket, packet, preEncoded);
+        }
 
         socket.on('pushId', function (data) {
             if (data.id && data.id.length >= 10) {

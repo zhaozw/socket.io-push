@@ -28,13 +28,12 @@ dependencies {
     provided 'com.google.code.gson:gson:2.3.1'
     compile 'io.socket:socket.io-client:0.7.0'
     provided 'com.loopj.android:android-async-http:1.4.8'
-    compile 'org.msgpack:msgpack-core:0.8.3'
     compile files('libs/support-v4-19.1.0.jar')
     compile files('libs/android.jar')
 }
 
 group = "com.yy"
-version = "1.0.69"
+version = "1.0.71"
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'

@@ -1,7 +1,6 @@
 module.exports = TTLService;
 
 var debug = require('debug')('TTLService');
-var msgpack = require('msgpack-lite');
 var randomstring = require("randomstring");
 
 function TTLService(redis) {
@@ -36,7 +35,7 @@ TTLService.prototype.addPacketAndEmit = function (topic, event, timeToLive, pack
             }
         });
     }
-    io.to(topic).emit(event, msgpack.encode(packet));
+    io.to(topic).emit(event, packet);
 };
 
 TTLService.prototype.getPackets = function (topic, lastId, socket) {
@@ -78,11 +77,5 @@ function emitPacket(socket, packet) {
     delete packet.event;
     delete packet.timestampValid;
     debug("emitPacket %s %j", event, packet);
-    if (socket.version > 1 && event == 'push') {
-        if (packet.data) {
-            packet.data = new Buffer(packet.data, "base64");
-        }
-        packet = msgpack.encode(packet);
-    }
     socket.emit(event, packet);
 }
