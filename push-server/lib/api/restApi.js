@@ -1,6 +1,6 @@
 module.exports = RestApi;
 
-function RestApi(io, stats, notificationService, port, uidStore, ttlService, redis) {
+function RestApi(io, stats, notificationService, port, uidStore, ttlService, redis, apiThreshold) {
 
     var restify = require('restify');
 
@@ -52,12 +52,19 @@ function RestApi(io, stats, notificationService, port, uidStore, ttlService, red
 
         var timeToLive = parseInt(req.params.timeToLive);
 
-        if (pushAll === 'true') {
-            ttlService.addPacketAndEmit(topic, 'push', timeToLive, pushData, io, false);
-            res.send({code: "success"});
+        if (pushAll == 'true') {
+            apiThreshold.checkPushDrop(topic, function (call) {
+                if (call) {
+                    ttlService.addPacketAndEmit(topic, 'push', timeToLive, pushData, io, false);
+                    res.send({code: "success"});
+                } else {
+                    res.send({code: "error", message: "call threshold exceeded"});
+                }
+
+            });
             return next();
-        }else {
-            if(pushId) {
+        } else {
+            if (pushId) {
                 if (typeof pushId === 'string') {
                     ttlService.addPacketAndEmit(pushId, 'push', timeToLive, pushData, io, true);
                     res.send({code: "success"});
@@ -69,19 +76,19 @@ function RestApi(io, stats, notificationService, port, uidStore, ttlService, red
                     res.send({code: "success"});
                     return next();
                 }
-            }else {
-                if(uid){
-                    if(typeof uid === 'string') {
-                        uidStore.getPushIdByUid(uid, function(pushIds){
+            } else {
+                if (uid) {
+                    if (typeof uid === 'string') {
+                        uidStore.getPushIdByUid(uid, function (pushIds) {
                             pushIds.forEach(function (id) {
                                 ttlService.addPacketAndEmit(id, 'push', timeToLive, pushData, io, true);
                             });
                             res.send({code: "success"});
                             return next();
                         });
-                    }else {
-                        uid.forEach(function(id, i){
-                            uidStore.getPushIdByUid(id, function(pushIds){
+                    } else {
+                        uid.forEach(function (id, i) {
+                            uidStore.getPushIdByUid(id, function (pushIds) {
                                 pushIds.forEach(function (result) {
                                     ttlService.addPacketAndEmit(result, 'push', timeToLive, pushData, io, true);
                                 });
@@ -133,8 +140,8 @@ function RestApi(io, stats, notificationService, port, uidStore, ttlService, red
                     } else {
                         uids = uid;
                     }
-                    uids.forEach(function(uid, i){
-                        uidStore.getPushIdByUid(uid, function(pushIds){
+                    uids.forEach(function (uid, i) {
+                        uidStore.getPushIdByUid(uid, function (pushIds) {
                             notificationService.sendByPushIds(pushIds, timeToLive, notification, io);
                         });
                     });
@@ -184,6 +191,21 @@ function RestApi(io, stats, notificationService, port, uidStore, ttlService, red
     server.get('/api/addPushIdToUid', handleAddPushIdToUid);
     server.post('/api/addPushIdToUid', handleAddPushIdToUid);
     server.get('api/state/getQueryDataKeys', handleQueryDataKeys)
+
+    server.get('/api/topicOnline', function (req, res, next) {
+        var topic = req.params.topic;
+        var key = "stats#topicOnline#" + topic;
+        redis.del(key, function () {
+            redis.publish("adminCommand", JSON.stringify({command: "topicOnline", topic: topic}));
+            setTimeout(function () {
+                redis.get(key, function (err, result) {
+                    result = result || "0";
+                    res.send({topic: topic, online: result.toString()});
+                });
+            }, 3000);
+        });
+        return next();
+    });
 
     server.get('/api/status', function (req, res, next) {
         res.send(redis.status());

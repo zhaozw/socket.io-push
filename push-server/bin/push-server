@@ -35,14 +35,14 @@ shift $((OPTIND-1))
 echo "DEBUG=$DEBUG, COUNT='$COUNT',FOREGROUND='$FOREGROUND', Leftovers: $@"
 
 if [ $DEBUG = 1 ]; then
-    export DEBUG=apn,PacketService,NotificationService,RestApi,TTLService
+    export DEBUG=apn,PacketService,NotificationService,RestApi,TTLService,AdminCommand,ApiThreshold
     LOG_FILE=debug.log
 else
 	export DEBUG=
 fi
 
 if [ $VERBOSE = 1 ]; then
-    export DEBUG=SimpleRedisHashCluster,apn,Stats,socket.io*,ProxyServer,PacketService,NotificationService,RestApi,TTLService,Sentinel
+    export DEBUG=SimpleRedisHashCluster,apn,Stats,socket.io*,ProxyServer,PacketService,NotificationService,RestApi,TTLService,Sentinel,AdminCommand,ApiThreshold
     LOG_FILE=verbose.log
 else
 	export DEBUG=

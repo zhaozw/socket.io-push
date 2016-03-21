@@ -4,7 +4,7 @@
 
 var uid2 = require('uid2');
 var redis = require('redis').createClient;
-var msgpack = require('msgpack-lite');
+var msgpack = require('msgpack-js');
 var Adapter = require('socket.io-adapter');
 var debug = require('debug')('socket.io-redis');
 var async = require('async');
@@ -23,7 +23,7 @@ module.exports = adapter;
  * @api public
  */
 
-function adapter(uri, opts) {
+function adapter(uri, opts, stats) {
     opts = opts || {};
 
     // handle options only
@@ -87,11 +87,10 @@ function adapter(uri, opts) {
      */
 
     Redis.prototype.onmessage = function (channel, msg) {
-        if(!channel.toString().startsWith(prefix)){
-            debug("skip none socket.io");
+        debug('channel %s', channel);
+        if (stats.shouldDrop()) {
             return;
         }
-        debug("onmessage %s", channel);
         var args = msgpack.decode(msg);
         var packet;
 
@@ -122,8 +121,9 @@ function adapter(uri, opts) {
      */
 
     Redis.prototype.broadcast = function (packet, opts, remote) {
+        Adapter.prototype.broadcast.call(this, packet, opts);
         if (!remote) {
-            var chn = prefix + '#/#';
+            var chn = prefix + '#' + packet.nsp + '#';
             var msg = msgpack.encode([uid, packet, opts]);
             if (opts.rooms) {
                 opts.rooms.forEach(function (room) {
@@ -134,7 +134,6 @@ function adapter(uri, opts) {
                 pub.publish(chn, msg);
             }
         }
-        Adapter.prototype.broadcast.call(this, packet, opts);
     };
 
     /**
@@ -179,6 +178,7 @@ function adapter(uri, opts) {
 
         if (hasRoom && !this.rooms[room]) {
             var channel = prefix + '#' + this.nsp.name + '#' + room + '#';
+            debug('unsubscribing %s from %s', id, room);
             sub.unsubscribe(channel, function (err) {
                 if (err) {
                     self.emit('error', err);

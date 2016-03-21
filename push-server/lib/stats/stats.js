@@ -20,37 +20,24 @@ function Stats(redis, port) {
     this.id = ip || randomstring.generate(32);
     var stats = this;
     setInterval(function () {
-        var packetAverage = stats.ms.sum([60 * 1000, 5 * 60 * 1000]);
-        stats.packetAverage1Minute = packetAverage[0];
-        stats.packetAverage5Minute = packetAverage[1];
+        var packetAverage = stats.ms.sum([10 * 1000]);
+        stats.packetAverage1 = packetAverage[0];
         redis.hset("stats#sessionCount", stats.id, JSON.stringify({
             timestamp: Date.now(),
             sessionCount: stats.sessionCount,
-            packetAverage1Minute: stats.packetAverage1Minute,
-            packetAverage5Minute: stats.packetAverage5Minute,
+            packetAverage1: stats.packetAverage1,
             packetDrop: stats.packetDrop,
             packetDropThreshold: stats.packetDropThreshold
         }));
-    }, 5000);
+    }, 500);
     redis.del("stats#sessionCount");
 
-    redis.on("message", function (channel, message) {
-        if (channel == "adminCommand") {
-            debug('adminCommand %s', message);
-            var command = JSON.parse(message);
-            if (command.command = 'packetDropThreshold') {
-                debug('setting packetDropThreshold %d', stats.packetDropThreshold);
-                stats.packetDropThreshold = command.packetDropThreshold;
-            }
-        }
-    });
-    redis.subscribe("adminCommand");
 }
 
 Stats.prototype.shouldDrop = function () {
-    if (this.packetDropThreshold != 0 && this.packetAverage1Minute > this.packetDropThreshold) {
+    if (this.packetDropThreshold != 0 && this.packetAverage1 && this.packetAverage1 > this.packetDropThreshold) {
+        debug('threshold exceeded dropping packet %d > %d', this.packetAverage1, this.packetDropThreshold);
         this.packetDrop++;
-        debug('threshold exceeded dropping packet %d > %d', this.packetAverage1Minute, this.packetDropThreshold);
         return true;
     } else {
         return false;
@@ -82,6 +69,7 @@ Stats.prototype.removePlatformSession = function (platform, count) {
 
 Stats.prototype.onPacket = function () {
     var timestamp = Date.now();
+    this.packetAverage1++;
     this.ms.push(timestamp);
     this.incr("stats#toClientPacket#totalCount", timestamp);
 }
@@ -153,8 +141,7 @@ Stats.prototype.getSessionCount = function (callback) {
         var iosCount = 0;
         var currentTimestamp = Date.now();
         var processCount = [];
-        var packetAverage1Minute = 0;
-        var packetAverage5Minute = 0;
+        var packetAverage1 = 0;
         var packetDrop = 0;
         var packetDropThreshold = 0;
         for (var id in results) {
@@ -163,15 +150,13 @@ Stats.prototype.getSessionCount = function (callback) {
                 totalCount += data.sessionCount.total;
                 iosCount += data.sessionCount.ios;
                 androidCount += data.sessionCount.android;
-                packetAverage1Minute += data.packetAverage1Minute || 0;
-                packetAverage5Minute += data.packetAverage5Minute || 0;
+                packetAverage1 += data.packetAverage1 || 0;
                 packetDrop += data.packetDrop || 0;
                 packetDropThreshold += data.packetDropThreshold || 0;
                 processCount.push({
                     id: id,
                     count: data.sessionCount,
-                    packetAverage1Minute: data.packetAverage1Minute,
-                    packetAverage5Minute: data.packetAverage5Minute,
+                    packetAverage1: data.packetAverage1,
                     packetDrop: data.packetDrop,
                     packetDropThreshold: data.packetDropThreshold
                 });
@@ -182,8 +167,8 @@ Stats.prototype.getSessionCount = function (callback) {
             sessionCount: totalCount,
             android: androidCount,
             ios: iosCount,
-            packetAverage1Minute: packetAverage1Minute,
-            packetAverage5Minute: packetAverage5Minute,
+            packetAverage1: packetAverage1,
+            packetDrop: packetDrop,
             processCount: processCount.sort(function (a, b) {
                 if (a.id < b.id) return -1;
                 if (a.id > b.id) return 1;

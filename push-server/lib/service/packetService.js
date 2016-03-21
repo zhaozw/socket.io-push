@@ -18,6 +18,7 @@ String.prototype.hashCode = function () {
 function PacketService(redis, subClient) {
     if (!(this instanceof PacketService)) return new PacketService(redis, subClient);
     this.redis = redis;
+    this.stopped = false;
     subClient.on("message", function (channel, message) {
         //debug("subscribe message " + channel + ": " + message);
         if (channel == "packetServer") {
@@ -62,6 +63,9 @@ function hashIndex(pushId, count) {
 }
 
 PacketService.prototype.publishPacket = function (data) {
+    if (this.stopped) {
+        return;
+    }
     var path = data.path;
     var pushId = data.pushId;
     if (path && pushId) {
@@ -85,6 +89,9 @@ PacketService.prototype.publishPacket = function (data) {
 };
 
 PacketService.prototype.publishDisconnect = function (socket) {
+    if (this.stopped) {
+        return;
+    }
     debug("publishDisconnect pushId %s", socket.pushId);
     var outerThis = this;
     this.redis.get("pushIdSocketId#" + socket.pushId, function (err, lastSocketId) {
@@ -103,6 +110,9 @@ PacketService.prototype.publishDisconnect = function (socket) {
 };
 
 PacketService.prototype.publishConnect = function (socket) {
+    if (this.stopped) {
+        return;
+    }
     debug("publishConnect pushId %s", socket.pushId);
     var outerThis = this;
     this.redis.get("pushIdSocketId#" + socket.pushId, function (err, lastSocketId) {

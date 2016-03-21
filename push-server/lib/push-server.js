@@ -14,19 +14,25 @@ function PushServer(config) {
 
         var io = require('socket.io')(ioPort, {pingTimeout: config.pingTimeout, pingInterval: config.pingInterval});
         console.log("start server on port " + ioPort);
-        var socketIoRedis = require('./redis/redisAdapter.js')({pubClient: cluster, subClient: cluster});
-        io.adapter(socketIoRedis);
-        var packetService = require('./service/packetService.js')(cluster, cluster);
         var Stats = require('./stats/stats.js');
         var stats = new Stats(cluster, ioPort);
+        var socketIoRedis = require('./redis/redisAdapter.js')({pubClient: cluster, subClient: cluster}, null, stats);
+        //var socketIoRedis = require('socket.io-redis')({pubClient: cluster, subClient: cluster}, null, stats);
+        io.adapter(socketIoRedis);
+        var packetService = require('./service/packetService.js')(cluster, cluster);
+
         var uidStore = require('./redis/uidStore.js')(cluster);
         var TtlService = require('./service/ttlService.js');
         var ttlService = new TtlService(cluster);
         var notificationService = require('./service/notificationService.js')(config.apns, cluster, ttlService);
+        var ProxyServer = require('./server/proxyServer.js');
+        var proxyServer = new ProxyServer(io, stats, packetService, notificationService, uidStore, ttlService);
+        var ApiThreshold = require('./api/apiThreshold.js');
+        var apiThreshold = new ApiThreshold(cluster);
+        var restApi = require('./api/restApi.js')(io, stats, notificationService, apiPort, uidStore, ttlService, cluster, apiThreshold);
 
-        require('./server/proxyServer.js')(io, stats, packetService, notificationService, uidStore, ttlService);
-
-        var restApi = require('./api/restApi.js')(io, stats, notificationService, apiPort, uidStore, ttlService, cluster);
+        var AdminCommand = require('./server/adminCommand.js');
+        var adminCommand = new AdminCommand(cluster, stats, packetService, proxyServer, apiThreshold);
     });
 }
 
