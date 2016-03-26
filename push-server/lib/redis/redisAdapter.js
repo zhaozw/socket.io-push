@@ -87,8 +87,8 @@ function adapter(uri, opts, stats) {
      */
 
     Redis.prototype.onmessage = function (channel, msg) {
-        debug('channel %s', channel);
-        if (stats.shouldDrop()) {
+        debug('channel %s', channel.toString().startsWith(prefix));
+        if (stats && stats.shouldDrop()) {
             return;
         }
         var args = msgpack.decode(msg);
@@ -146,12 +146,22 @@ function adapter(uri, opts, stats) {
      */
 
     Redis.prototype.add = function (id, room, fn) {
-        debug('adding %s to %s ', id, room);
         var self = this;
+        debug('adding %s to %s', id, room);
+        var needRedisSub = this.rooms.hasOwnProperty(room) && this.rooms[room]
         Adapter.prototype.add.call(this, id, room);
         var channel = prefix + '#' + this.nsp.name + '#' + room + '#';
+        if (id == room) {
+            debug("skip add to id %s", room);
+            return;
+        }
+        if (needRedisSub) {
+            debug("skip re-subscribe to room %s", room);
+            return;
+        }
         sub.subscribe(channel, function (err) {
             if (err) {
+                debug('subscribe error %s', channel);
                 self.emit('error', err);
                 if (fn) fn(err);
                 return;
@@ -177,8 +187,9 @@ function adapter(uri, opts, stats) {
         Adapter.prototype.del.call(this, id, room);
 
         if (hasRoom && !this.rooms[room]) {
+
             var channel = prefix + '#' + this.nsp.name + '#' + room + '#';
-            debug('unsubscribing %s from %s', id, room);
+            debug('unsubscribing %s', channel);
             sub.unsubscribe(channel, function (err) {
                 if (err) {
                     self.emit('error', err);

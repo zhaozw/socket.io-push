@@ -14,19 +14,24 @@ DEBUG=0
 VERBOSE=0
 FOREGROUND=0
 LOG_FILE=prod.log
+LOG_DIR=log
 
-while getopts "h?c:d?f?v?" opt; do
+while getopts "h?c:d?f?v?l:" opt; do
     case "$opt" in
     c)  COUNT=$OPTARG
         ;;
     d)  DEBUG=1
         ;;
     v)  VERBOSE=1
-                ;;
+        ;;
     f)  FOREGROUND=1
         ;;
+    l)  LOG_DIR=$OPTARG
+       ;;
     esac
 done
+
+mkdir -p $LOG_DIR
 
 shift $((OPTIND-1))
 
@@ -35,13 +40,9 @@ shift $((OPTIND-1))
 echo "DEBUG=$DEBUG, COUNT='$COUNT',FOREGROUND='$FOREGROUND', Leftovers: $@"
 
 if [ $DEBUG = 1 ]; then
-    export DEBUG=apn,PacketService,NotificationService,RestApi,TTLService,AdminCommand,ApiThreshold
+    export DEBUG=apn,PacketService,NotificationService,RestApi,TTLService,AdminCommand,ApiThreshold,ProxyServer,Stats,Sentinel,SimpleRedisHashCluster
     LOG_FILE=debug.log
-else
-	export DEBUG=
-fi
-
-if [ $VERBOSE = 1 ]; then
+elif [ $VERBOSE = 1 ]; then
     export DEBUG=SimpleRedisHashCluster,apn,Stats,socket.io*,ProxyServer,PacketService,NotificationService,RestApi,TTLService,Sentinel,AdminCommand,ApiThreshold
     LOG_FILE=verbose.log
 else
@@ -57,7 +58,7 @@ if [ $FOREGROUND = 1 ]; then
     exit
 fi
 
-rm -f log/*
+rm -f $LOG_DIR/*
 
 for (( c=1; c<=COUNT; c++ ))
 do
@@ -73,5 +74,5 @@ do
      rm pid/$c.pid
    fi
    echo "starting instance #$c in background"
-   nohup $node_script "$@" -i $c  > log/$c.log 2>&1 & echo $! > pid/$c.pid
+   nohup $node_script "$@" -i $c  > $LOG_DIR/$c.log 2>&1 & echo $! > pid/$c.pid
 done

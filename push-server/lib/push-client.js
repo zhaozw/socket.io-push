@@ -4,6 +4,7 @@ var EventEmitter = require('events').EventEmitter;
 
 function PushClient(url, opt) {
     if (!(this instanceof PushClient)) return new PushClient(url, opt);
+    opt.forceNew = true;
     this.socket = require('socket.io-client')(url, opt);
     this.pushId = randomstring.generate(24);
     this.event = new EventEmitter();

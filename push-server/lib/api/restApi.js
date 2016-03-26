@@ -230,6 +230,14 @@ function RestApi(io, stats, notificationService, port, uidStore, ttlService, red
         return next();
     });
 
+    server.get('/api/redis/hash', function (req, res, next) {
+        redis.hash(req.params.key, function (result) {
+            res.send(result);
+        });
+        return next();
+    });
+
+
     server.get('/api/admin/command', function (req, res, next) {
         redis.publish("adminCommand", req.params.command);
         res.send({code: "success"});

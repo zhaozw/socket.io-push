@@ -16,7 +16,7 @@ function NotificationService(apnConfigs, redis, ttlService) {
     var ca = [fs.readFileSync(__dirname + "/../../cert/entrust_2048_ca.cer")];
 
     apnConfigs.forEach(function (apnConfig, index) {
-        apnConfig.maxConnections = 5;
+        apnConfig.maxConnections = 10;
         apnConfig.ca = ca;
         apnConfig.errorCallback = function (errorCode, notification, device) {
             var id = device.token.toString('hex');
@@ -92,19 +92,14 @@ NotificationService.prototype.sendAll = function (notification, timeToLive, io) 
     this.bundleIds.forEach(function (bundleId) {
         redis.hgetall("apnTokens#" + bundleId, function (err, replies) {
             if (replies) {
-                var tokens = [];
+                var apnConnection = apnConnections[bundleId];
                 for (var token in replies) {
                     if (timestamp - replies[token] > apnTokenTTL * 1000) {
                         debug("delete outdated apnToken %s", token);
                         redis.hdel("apnTokens#" + bundleId, token);
                     } else {
-                        tokens.push(token);
+                        apnConnection.pushNotification(note, token);
                     }
-                }
-                if (tokens.length > 0) {
-                    var apnConnection = apnConnections[bundleId];
-                    debug("bundleId %s replies %d", bundleId, tokens.length);
-                    apnConnection.pushNotification(note, tokens);
                 }
             }
         });

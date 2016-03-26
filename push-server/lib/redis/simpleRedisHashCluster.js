@@ -7,7 +7,8 @@ var debug = require('debug')('SimpleRedisHashCluster');
 
 function SimpleRedisHashCluster(config, completeCallback) {
     this.masters = [];
-    this.slaves = [];
+    this.subSlaves = [];
+    this.readSlaves = [];
     this.messageCallbacks = [];
     var outerThis = this;
     var masterAddrs = config.masters;
@@ -16,7 +17,7 @@ function SimpleRedisHashCluster(config, completeCallback) {
         slaveAddrs = masterAddrs;
     }
     slaveAddrs.forEach(function (addr) {
-        var client = redis.createClient({
+        var subClient = redis.createClient({
             host: addr.host,
             port: addr.port,
             return_buffers: true,
@@ -24,10 +25,10 @@ function SimpleRedisHashCluster(config, completeCallback) {
             max_attempts: 0,
             connect_timeout: 10000000000000000
         });
-        client.on("error", function (err) {
+        subClient.on("error", function (err) {
             console.log("redis slave connect Error %s:%s %s", addr.host, addr.port, err);
         });
-        client.on("message", function (channel, message) {
+        subClient.on("message", function (channel, message) {
             outerThis.messageCallbacks.forEach(function (callback) {
                 try {
                     callback(channel, message);
@@ -35,13 +36,25 @@ function SimpleRedisHashCluster(config, completeCallback) {
                 }
             });
         });
-        outerThis.slaves.push(client);
+        outerThis.subSlaves.push(subClient)
+        var readClient = redis.createClient({
+            host: addr.host,
+            port: addr.port,
+            return_buffers: true,
+            retry_max_delay: 3000,
+            max_attempts: 0,
+            connect_timeout: 10000000000000000
+        });
+        readClient.on("error", function (err) {
+            console.log("redis slave connect Error %s:%s %s", addr.host, addr.port, err);
+        });
+        outerThis.readSlaves.push(readClient);
     });
 
     if (config.sentinels) {
         debug('use sentinels %j', config.sentinels);
         var Sentinel = require('./sentinel.js');
-        var sentinel = new Sentinel(config.sentinels, config.sentinelMasters, function () {
+        var sentinel = new Sentinel(config.sentinels, config.sentinelMasters, config.ipMap, function () {
             sentinel.masters.forEach(function (addr) {
                 var client = redis.createClient({
                     host: addr.host,
@@ -89,7 +102,6 @@ function SimpleRedisHashCluster(config, completeCallback) {
         completeCallback(outerThis);
     }
 }
-
 commands.list.forEach(function (command) {
 
     SimpleRedisHashCluster.prototype[command.toUpperCase()] = SimpleRedisHashCluster.prototype[command] = function (key, arg, callback) {
@@ -103,13 +115,12 @@ commands.list.forEach(function (command) {
         } else {
             client = util.getByHash(this.masters, key);
         }
-
         handleCommand(command, arguments, key, arg, callback, client);
     }
 
 });
 
-['subscribe'].forEach(function (command) {
+['subscribe', 'unsubscribe'].forEach(function (command) {
 
     SimpleRedisHashCluster.prototype[command.toUpperCase()] = SimpleRedisHashCluster.prototype[command] = function (key, arg, callback) {
         if (Array.isArray(key)) {
@@ -117,12 +128,29 @@ commands.list.forEach(function (command) {
             throw "multiple key not supported";
         }
         var client;
-        if (this.slaves.length == 1) {
-            client = this.slaves[0];
+        if (this.subSlaves.length == 1) {
+            client = this.subSlaves[0];
         } else {
-            client = util.getByHash(this.slaves, key);
+            client = util.getByHash(this.subSlaves, key);
         }
+        handleCommand(command, arguments, key, arg, callback, client);
+    }
 
+});
+
+['get', 'hkeys', 'hgetall', 'pttl', 'lrange'].forEach(function (command) {
+
+    SimpleRedisHashCluster.prototype[command.toUpperCase()] = SimpleRedisHashCluster.prototype[command] = function (key, arg, callback) {
+        if (Array.isArray(key)) {
+            console.log("multiple key not supported ");
+            throw "multiple key not supported";
+        }
+        var client;
+        if (this.readSlaves.length == 1) {
+            client = this.readSlaves[0];
+        } else {
+            client = util.getByHash(this.readSlaves, key);
+        }
         handleCommand(command, arguments, key, arg, callback, client);
     }
 
@@ -145,6 +173,12 @@ function handleCommand(command, callArguments, key, arg, callback, client) {
     return client.send_command(command, toArray(callArguments));
 }
 
+SimpleRedisHashCluster.prototype.hash = function (key, callback) {
+    var client = util.getByHash(this.readSlaves, key);
+    callback({host: client.connection_options.host, port: client.connection_options.port});
+}
+
+
 SimpleRedisHashCluster.prototype.on = function (message, callback) {
     if (message === "message") {
         debug("add messageCallbacks %s", callback);
@@ -163,12 +197,11 @@ SimpleRedisHashCluster.prototype.status = function () {
         !master.ready && masterError++;
     });
     var slaveError = 0;
-    this.slaves.forEach(function (slave) {
+    this.subSlaves.forEach(function (slave) {
         !slave.ready && slaveError++;
     });
     return {masterError: masterError, slaveError: slaveError};
 }
-
 
 function toArray(args) {
     var len = args.length,

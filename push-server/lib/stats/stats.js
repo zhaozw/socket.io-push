@@ -29,9 +29,8 @@ function Stats(redis, port) {
             packetDrop: stats.packetDrop,
             packetDropThreshold: stats.packetDropThreshold
         }));
-    }, 500);
+    }, 10000);
     redis.del("stats#sessionCount");
-
 }
 
 Stats.prototype.shouldDrop = function () {

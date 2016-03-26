@@ -12,7 +12,11 @@ function PushServer(config) {
 
     new simpleRedisHashCluster(config.redis, function (cluster) {
 
-        var io = require('socket.io')(ioPort, {pingTimeout: config.pingTimeout, pingInterval: config.pingInterval});
+        var io = require('socket.io')(ioPort, {
+            pingTimeout: config.pingTimeout,
+            pingInterval: config.pingInterval,
+            transports: ['websocket']
+        });
         console.log("start server on port " + ioPort);
         var Stats = require('./stats/stats.js');
         var stats = new Stats(cluster, ioPort);
@@ -29,10 +33,12 @@ function PushServer(config) {
         var proxyServer = new ProxyServer(io, stats, packetService, notificationService, uidStore, ttlService);
         var ApiThreshold = require('./api/apiThreshold.js');
         var apiThreshold = new ApiThreshold(cluster);
-        var restApi = require('./api/restApi.js')(io, stats, notificationService, apiPort, uidStore, ttlService, cluster, apiThreshold);
-
         var AdminCommand = require('./server/adminCommand.js');
         var adminCommand = new AdminCommand(cluster, stats, packetService, proxyServer, apiThreshold);
+
+        if (apiPort) {
+            var restApi = require('./api/restApi.js')(io, stats, notificationService, apiPort, uidStore, ttlService, cluster, apiThreshold);
+        }
     });
 }
 

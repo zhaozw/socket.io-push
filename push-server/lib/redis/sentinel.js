@@ -3,7 +3,7 @@ module.exports = Sentinel;
 var redis = require('redis');
 var debug = require('debug')('Sentinel');
 
-function Sentinel(sentinelAddrs, masterNames, completeCallback, masterChangeCallback) {
+function Sentinel(sentinelAddrs, masterNames, ipMap, completeCallback, masterChangeCallback) {
     var masters = [];
     this.masters = masters;
     this.completeCallback = completeCallback;
@@ -31,7 +31,7 @@ function Sentinel(sentinelAddrs, masterNames, completeCallback, masterChangeCall
                     var allQueried = true;
                     masters.forEach(function (master) {
                         if (master.name == masterName) {
-                            master.host = replies[0].toString();
+                            master.host = getIp(replies[0].toString());
                             master.port = parseInt(replies[1].toString());
                         } else if (!master.host) {
                             allQueried = false;
@@ -67,7 +67,7 @@ function Sentinel(sentinelAddrs, masterNames, completeCallback, masterChangeCall
                 debug("+switch-master %j %j \n", lines, masters, name, host, port);
                 masters.forEach(function (master, i) {
                     if (master && master.name == name) {
-                        master.host = host;
+                        master.host = getIp(host);
                         master.port = port;
                         debug("switch master callback %j", master)
                         masterChangeCallback(master, i);
@@ -79,5 +79,14 @@ function Sentinel(sentinelAddrs, masterNames, completeCallback, masterChangeCall
         subClient.subscribe("+switch-master");
 
     });
+
+    function getIp(fromSentinel) {
+        if (ipMap && ipMap[fromSentinel]) {
+            debug('getIp %s -> %s', fromSentinel, ipMap[fromSentinel]);
+            return ipMap[fromSentinel];
+        } else {
+            return fromSentinel;
+        }
+    }
 
 }
