@@ -58,8 +58,6 @@ if [ $FOREGROUND = 1 ]; then
     exit
 fi
 
-rm -f $LOG_DIR/*
-
 for (( c=1; c<=COUNT; c++ ))
 do
    if [ -f "pid/$c.pid" ]
@@ -74,5 +72,5 @@ do
      rm pid/$c.pid
    fi
    echo "starting instance #$c in background"
-   nohup $node_script "$@" -i $c  > $LOG_DIR/$c.log 2>&1 & echo $! > pid/$c.pid
+   nohup $node_script "$@" -i $c  >> $LOG_DIR/$c.log 2>&1 & echo $! > pid/$c.pid
 done

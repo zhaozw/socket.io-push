@@ -13,8 +13,12 @@ function RestApi(io, stats, notificationService, port, uidStore, ttlService, red
     var debug = require('debug')('RestApi');
 
     server.on('uncaughtException', function (req, res, route, err) {
-        res.send({code: "error", message: "exception " + err.stack});
-        console.log("RestApi uncaughtException " + err.stack + " \n" + JSON.stringify(req.params));
+        try {
+            console.log("RestApi uncaughtException " + err.stack + " \n params: \n" + JSON.stringify(req.params));
+            res.send({code: "error", message: "exception " + err.stack});
+        } catch (err) {
+            console.log("RestApi uncaughtException catch " + err.stack);
+        }
     });
 
     server.use(restify.acceptParser(server.acceptable));
