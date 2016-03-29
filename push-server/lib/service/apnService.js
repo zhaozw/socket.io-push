@@ -42,7 +42,7 @@ ApnService.prototype.sendOne = function (apnData, notification, timeToLive) {
     if (apnConnection) {
         var note = toApnNotification(notification, timeToLive);
         apnConnection.pushNotification(note, apnData.apnToken);
-        debug("send to notification to ios %s %s", pushId, apnData.apnToken);
+        debug("send to notification to ios %s %s", apnData.bundleId, apnData.apnToken);
     }
 };
 
