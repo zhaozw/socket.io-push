@@ -3,7 +3,6 @@ package com.yy.httpproxy;
 
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 
 import com.yy.httpproxy.requester.RequestException;
 import com.yy.httpproxy.requester.RequestInfo;
@@ -18,7 +17,6 @@ public class ProxyClient implements PushCallback {
     public static final String TAG = "ProxyClient";
     private long mainThreadId = Looper.getMainLooper().getThread().getId();
     private Handler handler = new Handler(Looper.getMainLooper());
-    private Map<String, ReplyHandler> pushHandlers = new HashMap<>();
     private Map<String, ReplyHandler> replayHandlers = new HashMap<>();
 
     public ProxyClient(Config config) {
@@ -51,46 +49,35 @@ public class ProxyClient implements PushCallback {
                 reportStats(path, successCount, errorCount, latency);
     }
 
-    public void subscribe(String topic, ReplyHandler handler) {
-        pushHandlers.put(topic, handler);
-    }
-
-    private void subscribeBroadcast(String topic, boolean receiveTtlPackets, ReplyHandler handler) {
-        pushHandlers.put(topic, handler);
+    private void subscribeBroadcast(String topic, boolean receiveTtlPackets) {
         config.getRemoteClient().subscribeBroadcast(topic, receiveTtlPackets);
     }
 
-    public void subscribeBroadcast(String topic, ReplyHandler handler) {
-        pushHandlers.put(topic, handler);
+    public void subscribeBroadcast(String topic) {
         config.getRemoteClient().subscribeBroadcast(topic, false);
     }
 
-    public void subscribeAndReceiveTtlPackets(String topic, ReplyHandler handler) {
-        pushHandlers.put(topic, handler);
+    public void subscribeAndReceiveTtlPackets(String topic) {
         config.getRemoteClient().subscribeBroadcast(topic, true);
     }
 
     public void unsubscribeBroadcast(String topic) {
-        pushHandlers.remove(topic);
         config.getRemoteClient().unsubscribeBroadcast(topic);
     }
 
     @Override
-    public void onPush(String topic, byte[] data) {
-        ReplyHandler handler = pushHandlers.get(topic);
-        if (handler != null) {
-            Object result;
-            if (data == null || data.length == 0 || config.getPushSerializer() == null) {
-                result = null;
+    public void onPush(final String topic, final byte[] data) {
+        if (config.getPushCallback() != null) {
+            if (Thread.currentThread().getId() == mainThreadId) {
+                config.getPushCallback().onPush(topic, data);
             } else {
-                try {
-                    result = config.getPushSerializer().toObject(topic, handler.clazz, data);
-                } catch (Exception e) {
-                    Log.e(TAG, "onPush serialize exception " + e.getMessage(), e);
-                    return;
-                }
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        config.getPushCallback().onPush(topic, data);
+                    }
+                });
             }
-            callSuccessOnMainThread(handler, result);
         }
     }
 

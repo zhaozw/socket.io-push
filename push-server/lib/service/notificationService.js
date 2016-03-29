@@ -10,31 +10,14 @@ function NotificationService(apnConfigs, redis, ttlService) {
     if (!(this instanceof NotificationService)) return new NotificationService(apnConfigs, redis, ttlService);
     this.redis = redis;
     this.ttlService = ttlService;
-    this.apnConnections = {};
     var outerThis = this;
-    var fs = require('fs');
-    var ca = [fs.readFileSync(__dirname + "/../../cert/entrust_2048_ca.cer")];
-
-    apnConfigs.forEach(function (apnConfig, index) {
-        apnConfig.maxConnections = 10;
-        apnConfig.ca = ca;
-        apnConfig.errorCallback = function (errorCode, notification, device) {
-            var id = device.token.toString('hex');
-            debug("apn errorCallback %d %s", errorCode, id);
-            if (errorCode == 8) {
-                redis.hdel("apnTokens", id);
-            }
+    apnConfigs.forEach(function (apnConfig) {
+        if (!outerThis.defaultBundleId) {
+            outerThis.defaultBundleId = apnConfig.bundleId;
         }
-        var connection = apn.Connection(apnConfig);
-        connection.index = index;
-        outerThis.apnConnections[apnConfig.bundleId] = connection;
-        debug("apnConnections init for %s", apnConfig.bundleId);
     });
 
-    this.bundleIds = Object.keys(this.apnConnections);
-    this.defaultBundleId = this.bundleIds[0];
     debug("defaultBundleId %s", this.defaultBundleId);
-
 }
 
 NotificationService.prototype.setApnToken = function (pushId, apnToken, bundleId) {
@@ -66,18 +49,11 @@ NotificationService.prototype.sendByPushIds = function (pushIds, timeToLive, not
             debug("pushIdToApnData " + reply);
             if (reply) {
                 var apnData = JSON.parse(reply);
-                var bundleId = apnData.bundleId;
-                var apnConnection = outerThis.apnConnections[bundleId];
-                if (apnConnection) {
-                    var note = toApnNotification(notification, timeToLive);
-                    apnConnection.pushNotification(note, apnData.apnToken);
-                    debug("send to notification to ios %s %s", pushId, apnData.apnToken);
-                }
+                outerThis.apnService.sendOne(apnData, notification, timeToLive);
             } else {
                 debug("send to notification to android %s", pushId);
                 outerThis.ttlService.addPacketAndEmit(pushId, 'noti', timeToLive, notification, io, true);
             }
-
         });
     });
 
@@ -85,48 +61,5 @@ NotificationService.prototype.sendByPushIds = function (pushIds, timeToLive, not
 
 NotificationService.prototype.sendAll = function (notification, timeToLive, io) {
     this.ttlService.addPacketAndEmit("noti", 'noti', timeToLive, notification, io, false);
-    var apnConnections = this.apnConnections;
-    var timestamp = Date.now();
-    var redis = this.redis;
-    var note = toApnNotification(notification, timeToLive);
-    this.bundleIds.forEach(function (bundleId) {
-        redis.hgetall("apnTokens#" + bundleId, function (err, replies) {
-            if (replies) {
-                var apnConnection = apnConnections[bundleId];
-                for (var token in replies) {
-                    if (timestamp - replies[token] > apnTokenTTL * 1000) {
-                        debug("delete outdated apnToken %s", token);
-                        redis.hdel("apnTokens#" + bundleId, token);
-                    } else {
-                        apnConnection.pushNotification(note, token);
-                    }
-                }
-            }
-        });
-    });
-
+    this.apnService.sendAll(notification, timeToLive);
 };
-
-function toApnNotification(notification, timeToLive) {
-    var note = new apn.Notification();
-    note.badge = notification.apn.badge;
-    if (notification.apn.sound) {
-        note.sound = notification.apn.sound;
-    } else {
-        note.sound = "default";
-    }
-    note.alert = notification.apn.alert;
-    var secondsToLive;
-    if (timeToLive > 0) {
-        secondsToLive = timeToLive / 1000;
-    } else {
-        secondsToLive = 600;
-    }
-    note.expiry = Math.floor(Date.now() / 1000) + secondsToLive;
-    if (notification.apn.payload) {
-        note.payload = notification.apn.payload;
-    } else {
-        note.payload = {};
-    }
-    return note;
-}

@@ -37,6 +37,8 @@ function PushServer(config) {
         var adminCommand = new AdminCommand(cluster, stats, packetService, proxyServer, apiThreshold);
 
         if (apiPort) {
+            var apnService = require('./service/apnService.js')(config.apns, cluster, ttlService);
+            notificationService.apnService = apnService;
             var restApi = require('./api/restApi.js')(io, stats, notificationService, apiPort, uidStore, ttlService, cluster, apiThreshold);
         }
     });

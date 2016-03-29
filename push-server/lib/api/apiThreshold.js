@@ -11,18 +11,14 @@ ApiThreshold.prototype.checkPushDrop = function (topic, callback) {
     var threshold = this.watchedTopics[topic];
     if (threshold) {
         var redis = this.redis;
-        debug('checkPushDrop2');
         redis.lindex("apiThreshold#callTimestamp#" + topic, -1, function (err, result) {
-            debug('checkPushDrop3');
             if (result && result > (Date.now() - 10 * 1000)) {
                 debug('too many call dropping %s', topic);
                 call = false;
             }
-            debug('checkPushDrop4');
             doPush(redis, topic, call, threshold, callback);
         });
     } else {
-        debug('checkPushDrop5');
         doPush(this.redis, topic, call, threshold, callback);
     }
 }

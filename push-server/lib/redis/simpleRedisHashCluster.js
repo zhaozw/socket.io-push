@@ -181,7 +181,6 @@ SimpleRedisHashCluster.prototype.hash = function (key, callback) {
 
 SimpleRedisHashCluster.prototype.on = function (message, callback) {
     if (message === "message") {
-        debug("add messageCallbacks %s", callback);
         this.messageCallbacks.push(callback);
     } else {
         var err = "on " + message + " not supported";
