@@ -18,15 +18,29 @@ function ApnService(apnConfigs, redis) {
         apnConfig.maxConnections = 10;
         apnConfig.ca = ca;
         apnConfig.errorCallback = function (errorCode, notification, device) {
-            var id = device.token.toString('hex');
-            debug("apn errorCallback %d %s", errorCode, id);
-            if (errorCode == 8) {
-                redis.hdel("apnTokens#" + apnConfig.bundleId, id);
+            if (device && device.token) {
+                var id = device.token.toString('hex');
+                debug("apn errorCallback %d %s", errorCode, id);
+                if (errorCode == 8) {
+                    redis.hdel("apnTokens#" + apnConfig.bundleId, id);
+                }
+            } else {
+                debug("apn errorCallback no token %s", errorCode);
             }
         }
         var connection = apn.Connection(apnConfig);
         connection.index = index;
         outerThis.apnConnections[apnConfig.bundleId] = connection;
+
+        apnConfig.batchFeedback = true;
+        apnConfig.interval = 300;
+
+        var feedback = new apn.Feedback(apnConfig);
+        feedback.on("feedback", function (devices) {
+            devices.forEach(function (item) {
+                debug("apn feedback %s %j", apnConfig.bundleId, item);
+            });
+        });
         debug("apnConnections init for %s", apnConfig.bundleId);
     });
 
