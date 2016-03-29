@@ -36,6 +36,8 @@ function RestApi(io, stats, notificationService, port, uidStore, ttlService, red
 
     server.get(/^\/uid\/?.*/, staticConfig);
 
+    server.get(/^\/handleStatsBase\/?.*/, staticConfig);
+
     server.get(/^\/stats\/?.*/, staticConfig);
 
     server.get(/^\/js\/?.*/, staticConfig);

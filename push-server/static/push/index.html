@@ -185,7 +185,7 @@
 
         var uri = $('input[name=uri]:checked').val();
 
-        var content = btoa($("#content").val());
+        var content = utf8_to_b64($("#content").val());
 
         var data = {
             pushId: pushIds,
@@ -220,6 +220,10 @@
     $("#uid").bind('input propertychange', function () {
         $("#pushId").val("");
     });
+
+    function utf8_to_b64( str ) {
+        return window.btoa(unescape(encodeURIComponent( str )));
+    }
 
 
 </script>
