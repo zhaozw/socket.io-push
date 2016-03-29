@@ -33,7 +33,8 @@ function ApnService(apnConfigs, redis) {
         outerThis.apnConnections[apnConfig.bundleId] = connection;
 
         apnConfig.batchFeedback = true;
-        apnConfig.interval = 300;
+        apnConfig.interval = 10;
+        delete apnConfig.errorCallback;
 
         var feedback = new apn.Feedback(apnConfig);
         feedback.on("feedback", function (devices) {
