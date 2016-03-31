@@ -7,7 +7,7 @@ function RedisIncrBuffer(redis) {
     this.redis = redis;
     this.map = {};
     this.timestamp = Date.now();
-    this.commitThreshold = 10 * 1000;
+    this.commitThreshold = 20 * 1000;
 }
 
 RedisIncrBuffer.prototype.incrby = function (key, by) {

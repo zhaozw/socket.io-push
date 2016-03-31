@@ -161,15 +161,15 @@
             alert("title 不能为空");
             return false;
         }
-        var content = $("#content").val();
-        if (content == "") {
-            alert("content 不能为空");
-            return false
-        }
+//        var content = $("#content").val();
+//        if (content == "") {
+//            alert("content 不能为空");
+//            return false
+//        }
 
         var data = {
             "android": {"title": $("#title").val(), "message": $("#content").val()},
-            "apn": {"alert": $("#content").val(), "badge": 5, "sound": "default", "payload": {}}
+            "apn": {"alert": $("#content").val(), "payload": {}}
         }
         var str = JSON.stringify(data);
 

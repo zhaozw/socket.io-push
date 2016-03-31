@@ -1,6 +1,6 @@
 module.exports = RestApi;
 
-function RestApi(io, stats, notificationService, port, uidStore, ttlService, redis, apiThreshold) {
+function RestApi(io, stats, notificationService, port, uidStore, ttlService, redis, apiThreshold, apnService) {
 
     var restify = require('restify');
 
@@ -129,6 +129,7 @@ function RestApi(io, stats, notificationService, port, uidStore, ttlService, red
         debug('notification %j', req.params);
 
         if (pushAll === 'true') {
+            debug("pushAll %j", req.headers);
             notificationService.sendAll(notification, timeToLive, io);
             res.send({code: "success"});
             return next();
@@ -193,6 +194,14 @@ function RestApi(io, stats, notificationService, port, uidStore, ttlService, red
         return next();
     }
 
+    var handleApnSlice = function (req, res, next) {
+        apnService.sliceSendAll(JSON.parse(req.params.notification), req.params.timeToLive, req.params.pattern);
+        res.send({code: "success"});
+        return next();
+    }
+
+    server.get('/api/sliceSendAll', handleApnSlice);
+    server.post('/api/sliceSendAll', handleApnSlice);
     server.get('/api/stats/base', handleStatsBase);
     server.get('/api/stats/chart', handleChartStats);
     server.get('/api/push', handlePush);
@@ -215,6 +224,27 @@ function RestApi(io, stats, notificationService, port, uidStore, ttlService, red
                 });
             }, 3000);
         });
+        return next();
+    });
+
+    server.get('/api/testApnAll', function (req, res, next) {
+        var noti = {
+            apn: {
+                payload: {
+                    "idolUid": 100583688,
+                    "idolNick": "賴薇如Doris",
+                    "idolHeaderUrl": "http://tva1.sinaimg.cn/crop.0.0.750.750.1024/6a6b71c2jw8ewp6ruqormj20ku0ku3zx.jpg",
+                    "idolVerified": true,
+                    "msgClientId": "56fbcf98c34f2b5e461c051c",
+                    "msgTime": 1459343256531,
+                    "dataType": "f_ls_start",
+                    "lid": "56fbceb40000d506a1021e23",
+                    "msg": "正在直播"
+                }
+            }
+        };
+        apnService.sendAll(noti);
+        res.send("success");
         return next();
     });
 

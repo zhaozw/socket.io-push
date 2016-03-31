@@ -54,7 +54,7 @@ describe('socket.io-redis', function () {
                             client2.disconnect();
                             client3.disconnect();
                             client4.disconnect()
-                            setTimeout(done, 100);
+                            setTimeout(done,100);
                         });
 
                         client2.on('broadcast', function () {

@@ -25,6 +25,12 @@ NotificationService.prototype.setApnToken = function (pushId, apnToken, bundleId
         if (!bundleId) {
             bundleId = this.defaultBundleId;
         }
+        try {
+            var buffer = new Buffer(apnToken, 'hex');
+        } catch (err) {
+            debug("invalid apnToken format %s", apnToken);
+            return;
+        }
         var apnData = JSON.stringify({bundleId: bundleId, apnToken: apnToken});
         var outerThis = this;
         this.redis.get("apnTokenToPushId#" + apnToken, function (err, oldPushId) {
@@ -46,12 +52,12 @@ NotificationService.prototype.sendByPushIds = function (pushIds, timeToLive, not
     var outerThis = this;
     pushIds.forEach(function (pushId) {
         outerThis.redis.get("pushIdToApnData#" + pushId, function (err, reply) {
-            debug("pushIdToApnData " + reply);
+            debug("pushIdToApnData %s %s", pushId, reply);
             if (reply) {
                 var apnData = JSON.parse(reply);
                 outerThis.apnService.sendOne(apnData, notification, timeToLive);
             } else {
-                debug("send to notification to android %s", pushId);
+                debug("send notification to android %s", pushId);
                 outerThis.ttlService.addPacketAndEmit(pushId, 'noti', timeToLive, notification, io, true);
             }
         });
