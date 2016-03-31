@@ -6,7 +6,7 @@ function RestApi(io, stats, notificationService, port, uidStore, ttlService, red
 
     var server = restify.createServer({
         name: 'myapp',
-        version: '1.0.0',
+        version: '1.0.0'
     });
 
 
