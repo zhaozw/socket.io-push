@@ -2,6 +2,7 @@ module.exports = Logger;
 
 var winston = require('winston-levelonly');
 var fs = require('fs');
+var loggerSingleton;
 
 function formatStr(param){
     if(param < 10) {
@@ -10,38 +11,38 @@ function formatStr(param){
     return param;
 }
 
-function format(times) {
+function format(times, isDate) {
     var date = new Date(times);
-    var Y = date.getFullYear() + '-';
-    var M = formatStr(date.getMonth() + 1) + '-';//January is 0!
-    var D = formatStr(date.getDate()) + ' ' ;
-    var h = formatStr(date.getHours()) + ":";
-    var m = formatStr(date.getMinutes()) + ":" ;
+    var Y = date.getFullYear() ;
+    var M = formatStr(date.getMonth() + 1);//January is 0!
+    var D = formatStr(date.getDate());
+    var h = formatStr(date.getHours());
+    var m = formatStr(date.getMinutes());
     var s = formatStr(date.getSeconds());
-    return Y + M + D + h + m + s;
+    if(isDate){
+        return Y + '-'+ M + '-' + D;
+    }else {
+        return Y + '-'+ M + '-' + D + ' ' + h + ':' + m + ':' + s;
+    }
 }
-
-function formatDate(times){
-    var date = new Date(times);
-    var Y = date.getFullYear() + '-';
-    var M = formatStr(date.getMonth() + 1) + '-';
-    var D = formatStr(date.getDate()) ;
-    return Y + M + D;
-}
-
 
 function Logger(dir) {
+/*    if(!(loggerSingleton instanceof Logger)){
+        loggerSingleton = new Logger(dir);
+        return loggerSingleton;
+    }*/
     if (!(this instanceof Logger)) return new Logger(dir);
     this.logger = this.newInstance(dir);
     var oldLog = this.logger.log;
     var ourterThis = this;
+
     this.logger.log = function (level) {
-        if(ourterThis.fileName != formatDate(Date.now())){
+        if(ourterThis.fileName != format(Date.now(), true)){
             ourterThis.changeLogFile(dir);
         }
-        //add property index 1
         var args = Array.prototype.slice.call(arguments);
-        //args.splice(1, 0, "instance: " + instance);
+        args[1] = 'process pid:%d '+ args[1];
+        console.log(JSON.stringify(args));
         oldLog.apply(ourterThis.logger, args);
     }
 }
@@ -53,12 +54,12 @@ Logger.prototype.setOpts = function (dir, level) {
     var opts = {
         json: false,
         timestamp: function () {
-            return format(Date.now());
+            return format(Date.now(), false);
         }
     }
     opts.level = level;
 
-    this.fileName = formatDate(Date.now());
+    this.fileName = format(Date.now(), true);
 
     if (level === 'info') {
         opts.name = "info";
@@ -78,7 +79,7 @@ Logger.prototype.newInstance = function (dir) {
         transports: [
             new (winston.transports.Console)({
                 level:'debug',
-                levelOnly: false//if true, will only log the specified level, if false will log from the specified level and above
+                levelOnly: true//if true, will only log the specified level, if false will log from the specified level and above
             }),
             new (winston.transports.File)(errorOpts),
             new (winston.transports.File)(infoOpts)
