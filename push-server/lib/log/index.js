@@ -7,9 +7,6 @@ var Logger = function Logger(index, dir) {
     console.log("new singleton");
     var dir =  'log';
     var workerId =  1;
-    if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir);
-    }
 
     this.getLogger = function (tag, index, logDir) {
         var fileTag = tag;
@@ -18,6 +15,9 @@ var Logger = function Logger(index, dir) {
         }
         if(logDir){
             dir = logDir;
+            if (!fs.existsSync(dir)) {
+                fs.mkdirSync(dir);
+            }
             return;
         }
         var opts = {
