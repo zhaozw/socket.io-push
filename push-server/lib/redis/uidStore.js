@@ -1,5 +1,5 @@
 module.exports = UidStore;
-var debug = require('debug')('UidStore');
+var Logger = require('../log/index.js')('UidStore');
 
 function UidStore(redis, subClient) {
     if (!(this instanceof UidStore)) return new UidStore(redis, subClient);
@@ -7,12 +7,12 @@ function UidStore(redis, subClient) {
 }
 
 UidStore.prototype.addUid = function(pushId, uid, timeToLive) {
-    debug("addUid pushId %s %s", uid, pushId);
+    Logger.info("addUid pushId %s %s", uid, pushId);
     var key = "pushIdToUid#" + pushId;
     var ourThis = this;
     this.getUidByPushId(pushId, function(oldUid){
         if(oldUid) {
-            debug("remove %s from old uid %s", pushId, oldUid);
+            Logger.log('info', "remove %s from old uid %s", pushId, oldUid);
             ourThis.redis.hdel("uidToPushId#" + oldUid, pushId);
         }
         ourThis.redis.set(key, uid);
@@ -24,12 +24,12 @@ UidStore.prototype.addUid = function(pushId, uid, timeToLive) {
 };
 
 UidStore.prototype.removePushId = function (pushId) {
-    debug("removePushId pushId %s %s", uid, pushId);
+    Logger.info("removePushId pushId %s %s", uid, pushId);
     var key = "pushIdToUid#" + pushId;
     var ourThis = this;
     this.redis.get(key, function (err, oldUid) {
         if (oldUid) {
-            debug("remove %s from old uid %s", pushId, oldUid);
+            Logger.log('info', "remove %s from old uid %s", pushId, oldUid);
             ourThis.redis.hdel("uidToPushId#" + uid, pushId);
             ourThis.redis.del(key);
         }
@@ -39,7 +39,7 @@ UidStore.prototype.removePushId = function (pushId) {
 UidStore.prototype.getUidByPushId = function (pushId, callback) {
     this.redis.get("pushIdToUid#" + pushId, function (err, uid) {
         // reply is null when the key is missing
-        debug("getUidByPushId %s %s", pushId, uid);
+        Logger.info("getUidByPushId %s %s", pushId, uid);
         callback(uid);
     });
 };

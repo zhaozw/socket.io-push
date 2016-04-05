@@ -6,7 +6,8 @@ var uid2 = require('uid2');
 var redis = require('redis').createClient;
 var msgpack = require('msgpack-js');
 var Adapter = require('socket.io-adapter');
-var debug = require('debug')('socket.io-redis');
+var Logger = require('../log/index.js')('RedisAdapter');
+
 var async = require('async');
 
 /**
@@ -87,14 +88,14 @@ function adapter(uri, opts, stats) {
      */
 
     Redis.prototype.onmessage = function (channel, msg) {
-        debug('channel %s', channel.toString().startsWith(prefix));
+        Logger.log("info", 'channel %s', channel.toString().startsWith(prefix));
         if (stats && stats.shouldDrop()) {
             return;
         }
         var args = msgpack.decode(msg);
         var packet;
 
-        if (uid == args.shift()) return debug('ignore same uid');
+        if (uid == args.shift()) return  Logger.log("info", 'ignore same uid');
 
         packet = args[0];
 
@@ -103,7 +104,7 @@ function adapter(uri, opts, stats) {
         }
 
         if (!packet || packet.nsp != this.nsp.name) {
-            return debug('ignore different namespace');
+            return Logger.log("info", 'ignore different namespace');
         }
 
         args.push(true);
@@ -147,21 +148,21 @@ function adapter(uri, opts, stats) {
 
     Redis.prototype.add = function (id, room, fn) {
         var self = this;
-        debug('adding %s to %s', id, room);
+        Logger.log("info", 'adding %s to %s', id, room);
         var needRedisSub = this.rooms.hasOwnProperty(room) && this.rooms[room]
         Adapter.prototype.add.call(this, id, room);
         var channel = prefix + '#' + this.nsp.name + '#' + room + '#';
         if (id == room) {
-            debug("skip add to id %s", room);
+            Logger.log("info", "skip add to id %s", room);
             return;
         }
         if (needRedisSub) {
-            debug("skip re-subscribe to room %s", room);
+            Loggerlog("info", "skip re-subscribe to room %s", room);
             return;
         }
         sub.subscribe(channel, function (err) {
             if (err) {
-                debug('subscribe error %s', channel);
+                Logger.log("info", 'subscribe error %s', channel);
                 self.emit('error', err);
                 if (fn) fn(err);
                 return;
@@ -180,8 +181,7 @@ function adapter(uri, opts, stats) {
      */
 
     Redis.prototype.del = function (id, room, fn) {
-        debug('removing %s from %s', id, room);
-
+        Logger.log("info", 'removing %s from %s', id, room);
         var self = this;
         var hasRoom = this.rooms.hasOwnProperty(room);
         Adapter.prototype.del.call(this, id, room);
@@ -189,7 +189,7 @@ function adapter(uri, opts, stats) {
         if (hasRoom && !this.rooms[room]) {
 
             var channel = prefix + '#' + this.nsp.name + '#' + room + '#';
-            debug('unsubscribing %s', channel);
+            Logger.log("info", 'unsubscribing %s', channel);
             sub.unsubscribe(channel, function (err) {
                 if (err) {
                     self.emit('error', err);
@@ -212,8 +212,7 @@ function adapter(uri, opts, stats) {
      */
 
     Redis.prototype.delAll = function (id, fn) {
-        debug('removing %s from all rooms', id);
-
+        Logger.log("info", 'removing %s from all rooms', id);
         var self = this;
         var rooms = this.sids[id];
 

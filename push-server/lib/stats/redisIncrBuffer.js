@@ -1,6 +1,6 @@
 module.exports = RedisIncrBuffer;
 
-var debug = require('debug')('Stats');
+var Logger = require('../log/index.js')('RedisIncrBuffer');
 
 function RedisIncrBuffer(redis) {
     if (!(this instanceof RedisIncrBuffer)) return new RedisIncrBuffer(redis);
@@ -19,13 +19,13 @@ RedisIncrBuffer.prototype.incrby = function (key, by) {
 RedisIncrBuffer.prototype.checkCommit = function () {
     var timestamp = Date.now();
     if ((timestamp - this.timestamp) > this.commitThreshold) {
-        debug("stats threshold committing");
+        Logger.info("stats threshold committing");
         for (var key in this.map) {
             this.redis.incrby(key, this.map[key]);
             var index = key.indexOf("#totalCount");
             if(index != -1){
                 var str = key.substring(6, index);
-                debug("checkCommit:  " + str);  //stats#request#/addDot#totalCount#1457344800000
+                Logger.info("checkCommit:  " + str);  //stats#request#/addDot#totalCount#1457344800000
                 this.redis.hset("queryDataKeys", str, Date.now())
             }
         }

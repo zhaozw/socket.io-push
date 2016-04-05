@@ -1,6 +1,6 @@
 module.exports = TTLService;
 
-var debug = require('debug')('TTLService');
+var Logger = require('../log/index.js')('TTLService');
 var randomstring = require("randomstring");
 
 function TTLService(redis) {
@@ -16,7 +16,7 @@ var maxTllPacketPerTopic = -50;
 TTLService.prototype.addPacketAndEmit = function (topic, event, timeToLive, packet, io, unicast) {
     packet.id = randomstring.generate(12);
     if (timeToLive > 0) {
-        debug("addPacket %s %s %s", topic, event, timeToLive);
+        Logger.info("addPacket %s %s %s", topic, event, timeToLive);
         packet.ttl = "";
         if (unicast) {
             packet.unicast = "";
@@ -27,7 +27,7 @@ TTLService.prototype.addPacketAndEmit = function (topic, event, timeToLive, pack
         data.event = event;
         var listKey = "ttl#packet#" + topic;
         redis.pttl(listKey, function (err, oldTtl) {
-            debug("addPacket key %s , %d , %d", listKey, oldTtl, timeToLive);
+            Logger.info("addPacket key %s , %d , %d", listKey, oldTtl, timeToLive);
             redis.rpush(listKey, JSON.stringify(data));
             redis.ltrim(listKey, maxTllPacketPerTopic, -1);
             if (timeToLive > oldTtl) {
@@ -51,15 +51,15 @@ TTLService.prototype.getPackets = function (topic, lastId, socket) {
                     var now = Date.now();
                     if (jsonPacket.id == lastId) {
                         lastFound = true;
-                        debug("lastFound %s %s", jsonPacket.id, lastId);
+                        Logger.info("lastFound %s %s", jsonPacket.id, lastId);
                     } else if (lastFound == true && jsonPacket.timestampValid > now) {
-                        debug("call emitPacket %s %s", jsonPacket.id, lastId);
+                        Logger.info("call emitPacket %s %s", jsonPacket.id, lastId);
                         emitPacket(socket, jsonPacket);
                     }
                 });
 
                 if (!lastFound) {
-                    debug('lastId %s not found send all packets', lastId);
+                    Logger.info('lastId %s not found send all packets', lastId);
                     list.forEach(function (packet) {
                         var jsonPacket = JSON.parse(packet);
                         if (jsonPacket.timestampValid > now) {
@@ -76,6 +76,6 @@ function emitPacket(socket, packet) {
     var event = packet.event;
     delete packet.event;
     delete packet.timestampValid;
-    debug("emitPacket %s %j", event, packet);
+    Logger.info("emitPacket %s %j", event, packet);
     socket.emit(event, packet);
 }
